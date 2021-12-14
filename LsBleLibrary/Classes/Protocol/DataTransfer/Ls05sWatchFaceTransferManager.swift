@@ -189,7 +189,7 @@ extension Ls05sWatchFaceTransferManager {
         self.timeoutTimer = Timer.init(timeInterval: timeOutInterval, repeats: repeats, block: { (timer) in
             timerBlock()
         })
-        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoopMode.commonModes)
+//        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoopMode.commonModes)
     }
     
     func invalidateTimeoutTimer() {

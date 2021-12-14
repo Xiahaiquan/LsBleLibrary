@@ -200,7 +200,7 @@ extension LsSportsModelViewController {
         self.durationTimer = Timer.init(timeInterval: timeOutInterval, repeats: repeats, block: { (timer) in
             timerBlock()
         })
-        RunLoop.current.add(self.durationTimer!, forMode: RunLoopMode.commonModes)
+//        RunLoop.current.add(self.durationTimer!, forMode: RunLoopMode.commonModes)
     }
     
     func invalidateDurationTimer() {
