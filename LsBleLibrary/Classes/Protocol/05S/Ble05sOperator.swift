@@ -1253,38 +1253,63 @@ extension Ble05sOperator: BleCommandProtocol {
         
     }
     
+    public func checkWatchFaceStatus(data: Data, type: BinFileTypeEnum) ->Observable<Bool> {
+        
+        let contentData = Ble05sSendDataConfig.shared.thisDoesItExist(data: data, type: type)
+        
+        return Observable.create { (observer) -> Disposable in
+            
+            self.bleFacade?.write(contentData, "cmdSendBigData", 3, nil).subscribe(onNext: { (response) in
+                guard let cmds = response.pbDatas?.first else {
+                    observer.onNext(false)
+                    observer.onCompleted()
+                    return
+                }
+                
+                if cmds.rErrorCode.err == 0 {
+                    observer.onNext(true)
+                }else {
+                    observer.onNext(false)
+                }
+                
+                observer.onCompleted()
+            }, onError: { (err) in
+                print("")
+            }).disposed(by: self.bag)
+            
+            return Disposables.create()
+        }
+    }
     
-//    public func dailUpgradeWatch(data: Data) ->Observable<DialUpgradeProcess> {
-//
-//        return Observable.create { (observer) -> Disposable in
-//
-//            self.bleFacade?.write(data, "dailUpgradeWatch", 5 * 60, nil)
-//                .subscribe(onNext: { (response) in
-//                    guard let cmds = response.pbDatas?.first else {
-//                        observer.onNext(.dataerror)
-//                        observer.onCompleted()
-//                        return
-//                    }
-//
-//                    if cmds.rErrorCode.err == 0 {
-//                        observer.onNext(.success)
-//                    }else {
-//                        observer.onNext(.dataerror)
-//                    }
-//
-//                    observer.onCompleted()
-//                }, onError: { (err) in
-//                    print("")
-//                }).disposed(by: self.bag)
-//
-//            return Disposables.create()
-//        }
-//    }
+    public func dailUpgradeWatch(data: Data) ->Observable<DialUpgradeProcess> {
+
+        return Observable.create { (observer) -> Disposable in
+
+            self.bleFacade?.write(data, "dailUpgradeWatch", 5 * 60, nil)
+                .subscribe(onNext: { (response) in
+                    guard let cmds = response.pbDatas?.first else {
+                        observer.onNext(.dataerror)
+                        observer.onCompleted()
+                        return
+                    }
+
+                    if cmds.rErrorCode.err == 0 {
+                        observer.onNext(.success)
+                    }else {
+                        observer.onNext(.dataerror)
+                    }
+
+                    observer.onCompleted()
+                }, onError: { (err) in
+                    print("")
+                }).disposed(by: self.bag)
+
+            return Disposables.create()
+        }
+    }
     
     public func getSportModelHistoryData(datebyFar: Date) -> Observable<[SportModelItem]> {
-        
-//    public func multiSportQuery(startTime: U
-        
+                
         let endTime = UInt32(datebyFar.timeIntervalSince1970)
         let startTime = endTime - 7 * 24 * 60 * 60
         

@@ -17,7 +17,7 @@ class LSItemFuncTestViewModel {
     
     let bag = DisposeBag()
     
-//    var cloudTransferManager: LsCloudWatchFaceViewController!
+    var cloudTransferManager: Ls05sWatchFaceTransferManager!
     
     init() {
         bleDataObserver()
@@ -178,24 +178,24 @@ class LSItemFuncTestViewModel {
 //                }
 //                .disposed(by: self.bag)
         case "升表盘2":
-            break
-//            let filePath = Bundle.main.path(forResource: "Ls05s_2", ofType: "bin")
-//            let watchFaceData = try! Data.init(contentsOf: URL(fileURLWithPath: filePath!))
-//            self.cloudTransferManager = Ls05sWatchFaceTransferManager.init(binData: watchFaceData)
-//
-//            self.cloudTransferManager.start()
-//                .subscribe { (progressState) in
-//                    switch progressState {
-//                    case .progress(let value):
-//                        print("progress: \(value)")
-//                    default:
-//                        print("\(progressState)")
-//                    }
-//
-//                } onError: { (error) in
-//                    print("start error")
-//                }
-//                .disposed(by: self.bag)
+//            break
+            let filePath = Bundle.main.path(forResource: "Ls05s_2", ofType: "bin")
+            let watchFaceData = try! Data.init(contentsOf: URL(fileURLWithPath: filePath!))
+            self.cloudTransferManager = Ls05sWatchFaceTransferManager.init(binData: watchFaceData)
+
+            self.cloudTransferManager.start()
+                .subscribe { (progressState) in
+                    switch progressState {
+                    case .progress(let value):
+                        print("progress: \(value)")
+                    default:
+                        print("\(progressState)")
+                    }
+
+                } onError: { (error) in
+                    print("start error")
+                }
+                .disposed(by: self.bag)
             
         case "清除连接记录":
             BleDeviceArchiveModel.delete()

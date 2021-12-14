@@ -27,6 +27,7 @@ enum ParserState {
     case dataEnd
     case noData
     case bigDataEnd
+    case binInTransit
 }
 
 enum BigDataParserState {
@@ -117,8 +118,11 @@ class Ble05sParser {
         // 符合校验的 PB 数据集合
         self.receiveArray.append(pbObj)
         
-        if responseObj.cmd == .cmdSetBinDataUpdate ||
-            responseObj.cmd == .cmdSetUpdateGpsData ||
+        if responseObj.cmd == .cmdSetBinDataUpdate {
+            return .dataItemEnd
+        }
+        
+        if responseObj.cmd == .cmdSetUpdateGpsData ||
             responseObj.cmd == .cmdSetSyncHealthData  {
             bigDataParserState = .start
             print("开始接受大数据")

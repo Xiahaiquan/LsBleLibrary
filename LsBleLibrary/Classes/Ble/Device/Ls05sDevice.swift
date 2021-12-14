@@ -81,7 +81,7 @@ public class Ls05sDevice: NSObject, Deviceable {
                         return
                     }
                     
-                    print("back data：\(acceptData.count)")
+//                    print("back data：\(acceptData.count)")
                     
                     let acceptBytes = [UInt8](acceptData)
                     
@@ -97,6 +97,8 @@ public class Ls05sDevice: NSObject, Deviceable {
                             self.responseAck()
                         }
                     }
+                    
+                    
                     
                     if parserState != .dataItemEnd { return }
                     
@@ -218,7 +220,18 @@ extension Ls05sDevice {
     func onException(_ error: BleError) -> Void {
         QueueManager.shared.syncDataQueue.cancelAllOperations()
     }
-    public  func directWrite(_ data: Data, _ type: Int) {
+    public func directWrite(_ data: Data, _ type: Int) {
+        
+        guard let p = self.peripheral, let c = self.char0002, self.connected == true else {
+            return
+        }
+        
+        let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: 180)
+        for data in dataArr {
+            print("send data:", data.desc())
+            p.writeValue(data, for: c, type: .withoutResponse)
+        }
+        
     }
 }
 
@@ -265,6 +278,7 @@ extension Ls05sDevice {
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
         }) as? BLEOperation else {
+            data["data"] = cmd
             self.dataObserverPublishRelay.accept((type: LsBackDataTypeEnum.init(rawValue: cmd.cmd.rawValue)!, data: data))
             return
         }
@@ -287,35 +301,28 @@ extension Ls05sDevice {
     func callbackBigData(cmd: hl_cmds, data: [BigDataProtocol]) {
         
         print("all big data finisn",data.count)
-//        print("cmd", cmd)
         
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
         }) as? BLEOperation else {
             return
         }
-//        print(operation)
-        let sendData = ["data": data]
-
+        
         operation.observer?.onNext(.init(item: data))
         operation.finish()
-        
         
     }
     
     func callbackBigData(cmd: hl_cmds, data: [SportModelItem]) {
         
         print("all big data finisn",data.count)
-//        print("cmd", cmd)
         
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
         }) as? BLEOperation else {
             return
         }
-//        print(operation)
-        let sendData = ["data": data]
-
+        
         operation.observer?.onNext(.init(sprotItems: data))
         operation.finish()
         
