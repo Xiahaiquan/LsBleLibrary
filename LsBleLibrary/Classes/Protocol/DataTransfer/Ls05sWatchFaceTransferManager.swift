@@ -30,7 +30,6 @@ public class Ls05sWatchFaceTransferManager {
         static let endFlag = 0xFFFF
     }
     
-    
     private var serialNo: Int = 0               //发送的编号
     
     private var timeoutTimer: Timer?
@@ -127,24 +126,10 @@ public class Ls05sWatchFaceTransferManager {
         
         let writeData = Ble05sSendDataConfig.shared.dialPB(sn: UInt32(serialNo), data: currentWriteData!)
         
-        Ble05sOperator.shared.directWrite(writeData, 0)
-        
-//        Ble05sOperator.shared.dailUpgradeWatch(data: writeData).subscribe {[weak self] (state) in
-//            printLog("\(state)")
-//            switch state {
-//            case .success:
-//                self?.serialNo += 1
-//                self?.continueNext4k()
-//            default:
-//                break
-//            }
-//
-//        } onError: { (error) in
-//            printLog("\(error)")
-//        }.disposed(by: bag)
-        
+        Ble05sOperator.shared.directWrite(writeData, 1)
+                
         let progress: Float = Float(self.serialNo) / (Float(self.splitDataBy4KArray.count) )
-        self.progressAction.progress.accept(.progress(progress))
+        self.progressAction.progress.accept(.progress(progress > 1 ? 1 : progress))
         
     }
     
@@ -152,19 +137,21 @@ public class Ls05sWatchFaceTransferManager {
         guard let obser = BleOperator.shared.dataObserver else {
             return
         }
-        obser.subscribe { (data) in
+        obser.subscribe { [unowned self] (data) in
             
-            if let ss = data.ls {
-                let ssss = ss.data["data"] as? hl_cmds
+            guard let ls = data.ls,
+               let cmds = ls.data["data"] as? hl_cmds,
+               cmds.cmd == .cmdSetBinDataUpdate,
+               cmds.rErrorCode.err == 0 else {
                 
-                if ssss?.cmd == .cmdSetBinDataUpdate {
-                    if ssss?.rErrorCode.err == 0 {
-                        self.serialNo += 1
-                        self.continueNext4k()
-                    }
-                }
+                self.serialNo += 1
+                self.continueNext4k()
+                
+                return
+    
             }
             
+            print("升级失败")
             
         } onError: { (error) in
             print("error", error)

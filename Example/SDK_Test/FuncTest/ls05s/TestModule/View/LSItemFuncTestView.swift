@@ -38,7 +38,7 @@ class LSItemFuncTestView: UIView {
     let sportStatus = WatchFunction.init(column: "运动状态", item: ["设置运动状态", "查询运动状态"])
     let switches = WatchFunction.init(column: "开关相关", item: ["同步开关"])
     let testData = WatchFunction.init(column: "测试数据", item: ["生成测试数据"])
-    let bigData = WatchFunction.init(column: "大数据相关", item: ["获取步数历史数据", "获取血氧历史数据", "获取心率历史数据", "获取睡眠历史数据", "获取手表Log"])
+    let bigData = WatchFunction.init(column: "大数据相关", item: ["获取步数历史数据", "获取血氧历史数据", "获取心率历史数据", "获取睡眠历史数据","获取运动数据", "获取手表Log"])
     let daile = WatchFunction.init(column: "表盘相关", item: ["获取表盘数据","升表盘1","升表盘2"])
     let inner = WatchFunction.init(column: "内部应用", item: ["清除连接记录"])
     let appFunc = WatchFunction.init(column: "App功能测试", item: ["获取每日步数", "获取手表功能列表"])

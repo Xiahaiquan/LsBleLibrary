@@ -50,9 +50,6 @@ extension BleOperator {
         
     }
     
-
-    
-    
     public func makeTestData() ->Observable<Bool> {
         return self.strategy.makeTestData()
     }

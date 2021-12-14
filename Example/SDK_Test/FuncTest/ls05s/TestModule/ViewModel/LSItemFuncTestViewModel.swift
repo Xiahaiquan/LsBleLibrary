@@ -185,6 +185,7 @@ class LSItemFuncTestViewModel {
 
             self.cloudTransferManager.start()
                 .subscribe { (progressState) in
+                    print("progressState", progressState)
                     switch progressState {
                     case .progress(let value):
                         print("progress: \(value)")

@@ -98,8 +98,6 @@ public class Ls05sDevice: NSObject, Deviceable {
                         }
                     }
                     
-                    
-                    
                     if parserState != .dataItemEnd { return }
                     
                     guard let cmds = self.parser.receiveArray.first else {
@@ -229,7 +227,7 @@ extension Ls05sDevice {
         let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: 180)
         for data in dataArr {
             print("send data:", data.desc())
-            p.writeValue(data, for: c, type: .withoutResponse)
+            p.writeValue(data, for: c, type: CBCharacteristicWriteType.init(rawValue: type) ?? .withoutResponse)
         }
         
     }

@@ -145,8 +145,6 @@ protocol BleCommandProtocol {
     
     func checkWatchFaceStatus(data: Data, type: BinFileTypeEnum) ->Observable<Bool>
     
-    func dailUpgradeWatch(data: Data) ->Observable<DialUpgradeProcess>
-    
     func makeTestData() ->Observable<Bool>
     
     
@@ -434,12 +432,7 @@ extension BleCommandProtocol {
     public func dialPB(sn:UInt32, data: Data) ->Observable<Bool> {
         return Observable.just(true)
     }
-    
-    
-        public func dailUpgradeWatch(data: Data) ->Observable<DialUpgradeProcess> {
-            return Observable<DialUpgradeProcess>.empty()
-        }
-    
+        
     public func checkWatchFaceStatus(data: Data, type: BinFileTypeEnum) ->Observable<Bool> {
         return Observable<Bool>.empty()
     }

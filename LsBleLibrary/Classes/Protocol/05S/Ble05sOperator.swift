@@ -1280,34 +1280,7 @@ extension Ble05sOperator: BleCommandProtocol {
             return Disposables.create()
         }
     }
-    
-    public func dailUpgradeWatch(data: Data) ->Observable<DialUpgradeProcess> {
-
-        return Observable.create { (observer) -> Disposable in
-
-            self.bleFacade?.write(data, "dailUpgradeWatch", 5 * 60, nil)
-                .subscribe(onNext: { (response) in
-                    guard let cmds = response.pbDatas?.first else {
-                        observer.onNext(.dataerror)
-                        observer.onCompleted()
-                        return
-                    }
-
-                    if cmds.rErrorCode.err == 0 {
-                        observer.onNext(.success)
-                    }else {
-                        observer.onNext(.dataerror)
-                    }
-
-                    observer.onCompleted()
-                }, onError: { (err) in
-                    print("")
-                }).disposed(by: self.bag)
-
-            return Disposables.create()
-        }
-    }
-    
+        
     public func getSportModelHistoryData(datebyFar: Date) -> Observable<[SportModelItem]> {
                 
         let endTime = UInt32(datebyFar.timeIntervalSince1970)
