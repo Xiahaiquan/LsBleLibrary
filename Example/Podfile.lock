@@ -1,0 +1,48 @@
+PODS:
+  - LsBleLibrary (0.1.0):
+    - RxCocoa (~> 6.2.0)
+    - RxSwift (~> 6.2.0)
+    - SwiftProtobuf (~> 1.18.0)
+  - RxCocoa (6.2.0):
+    - RxRelay (= 6.2.0)
+    - RxSwift (= 6.2.0)
+  - RxRelay (6.2.0):
+    - RxSwift (= 6.2.0)
+  - RxSwift (6.2.0)
+  - SnapKit (5.0.1)
+  - SwiftProtobuf (1.18.0)
+  - Toast-Swift (5.0.1)
+
+DEPENDENCIES:
+  - LsBleLibrary (from `../`)
+  - RxCocoa
+  - RxSwift
+  - SnapKit
+  - SwiftProtobuf (~> 1.0)
+  - Toast-Swift
+
+SPEC REPOS:
+  trunk:
+    - RxCocoa
+    - RxRelay
+    - RxSwift
+    - SnapKit
+    - SwiftProtobuf
+    - Toast-Swift
+
+EXTERNAL SOURCES:
+  LsBleLibrary:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  LsBleLibrary: c44a7650564c9ea7c65d16d6c47c02fcf1b12842
+  RxCocoa: 4baf94bb35f2c0ab31bc0cb9f1900155f646ba42
+  RxRelay: e72dbfd157807478401ef1982e1c61c945c94b2f
+  RxSwift: d356ab7bee873611322f134c5f9ef379fa183d8f
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
+  Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
+
+PODFILE CHECKSUM: f505a07ea931026458c4334dc4d0f3d44b1645ff
+
+COCOAPODS: 1.11.2

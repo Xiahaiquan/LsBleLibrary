@@ -1,0 +1,14 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'LsBleLibrary_Example' do
+  pod 'LsBleLibrary', :path => '../'
+  
+  pod 'RxSwift'
+  pod 'RxCocoa'
+  pod 'SwiftProtobuf', '~> 1.0'
+  pod 'SnapKit'
+  pod 'Toast-Swift'
+
+end
