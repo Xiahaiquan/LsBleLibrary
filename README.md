@@ -16,7 +16,7 @@ pod 'LsBleLibrary'
 ## How use ble lib
 
 ### Config lib
-```
+```sh
         // 扫描 和 连接 的具体实现
         let scanBuilder: BluetoothScanable.ScanBuilder = {
             BluetoothScan(centralManager: $0.centralManager, scanInfo: $0.scanInfo)
@@ -38,10 +38,10 @@ pod 'LsBleLibrary'
             deviceCategory: [.Watch],
             deviceType: [.LS04,.LS05, .LS05S, .LS09A, .LS09B, .LS10, .LS11]
         ))
-        ```
+ ```
 
 ### Search
-```
+```sh
         BleFacade.shared.scaner
             .scan(duration: 5)
             .subscribe(onNext: { (state, response) in
