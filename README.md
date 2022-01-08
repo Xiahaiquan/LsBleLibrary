@@ -59,7 +59,7 @@ pod 'LsBleLibrary'
             .disposed(by: bag)
 ```
 ### Connect
-```
+```swift
                BleFacade.shared.connecter.connect(duration: 5)
             .subscribe(onNext: { (state, response) in
                 if state == .connectSuccessed {
@@ -115,9 +115,10 @@ pod 'LsBleLibrary'
                 print("设置天气失败", error)
             }.disposed(by: bag)
   ```
+  
 ### Monitor  device data update
 
-```
+```swift
         BleHandler.shared.dataObserver?.filter({ arg in
             return arg.type == .electricityUpdate
         })
