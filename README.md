@@ -3,12 +3,6 @@
 
 ## Getting Started 使用指南
 
-项目使用条件、如何安装部署、怎样运行使用以及使用演示
-
-### Prerequisites 项目使用条件
-
-你需要安装什么软件以及如何去安装它们。
-
 ```
 Give examples
 ```
