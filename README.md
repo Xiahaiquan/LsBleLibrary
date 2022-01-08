@@ -17,7 +17,7 @@ Give examples
 
 通过一步步实例告诉你如何安装部署、怎样运行使用。
 
-CocoaPods:
+[CocoaPods](https://guides.cocoapods.org/using/using-cocoapods.html):
 
 ```sh
 pod 'LsBleLibrary'
@@ -38,7 +38,7 @@ pod 'LsBleLibrary'
 
 ## Authors 关于作者
 
-* **Haiquan**  - [Haiquan](https://xiahaiquan.github.io/)
+[Haiquan](https://xiahaiquan.github.io/)
 
 ## License 授权协议
 
