@@ -41,7 +41,7 @@ pod 'LsBleLibrary'
  ```
 
 ### Search
-```sh
+```swift
         BleFacade.shared.scaner
             .scan(duration: 5)
             .subscribe(onNext: { (state, response) in
@@ -85,7 +85,7 @@ pod 'LsBleLibrary'
 
 ### Get data from device
 
-```
+```swift
             BleHandler.shared.getmtu().subscribe { (mtu) in
                 print(mtu, "back mtu")
             } onError: { (err) in
@@ -94,7 +94,7 @@ pod 'LsBleLibrary'
 ```
 
 ### Set data to device
-```
+```swift
                 let weather = LSWeather.init(timestamp: 1641571200,
                                          city: "shenzhen",
                                          air: 0,
