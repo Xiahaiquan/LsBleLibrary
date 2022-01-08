@@ -1,12 +1,7 @@
 # LsBleLibrary
  封装系统蓝牙，同时可使用原始字节流和pb格式与蓝牙通信的库。
 
-## Getting Started 使用指南
-
-
 ### Installation 安装
-
-通过一步步实例告诉你如何安装部署、怎样运行使用。
 
 [CocoaPods](https://guides.cocoapods.org/using/using-cocoapods.html):
 
@@ -130,10 +125,6 @@ pod 'LsBleLibrary'
                 print(error)
             }.disposed(by: bag)
 ```
-
-### Usage example 使用示例
-
-给出更多使用演示和截图，并贴出相应代码。
 
 ## Release History 版本历史
 
