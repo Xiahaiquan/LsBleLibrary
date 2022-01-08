@@ -17,7 +17,7 @@ Give examples
 
 通过一步步实例告诉你如何安装部署、怎样运行使用。
 
-Cocopod:
+CocoaPods:
 
 ```sh
 pod 'LsBleLibrary'
@@ -26,16 +26,6 @@ pod 'LsBleLibrary'
 ### Usage example 使用示例
 
 给出更多使用演示和截图，并贴出相应代码。
-
-## Deployment 部署方法
-
-部署到生产环境注意事项。
-
-## Contributing 贡献指南
-
-Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the process for submitting pull requests to us.
-
-清阅读 [CONTRIBUTING.md](#) 了解如何向这个项目贡献代码
 
 ## Release History 版本历史
 
@@ -48,7 +38,7 @@ Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the pro
 
 ## Authors 关于作者
 
-* **Haiquan** - *Initial work* - [Haiquan](https://xiahaiquan.github.io/)
+* **Haiquan**  - [Haiquan](https://xiahaiquan.github.io/)
 
 ## License 授权协议
 
