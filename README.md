@@ -16,9 +16,9 @@ Give examples
 ```sh
 pod 'LsBleLibrary'
 ```
-##How use ble lib
+## How use ble lib
 
-###Config lib
+### Config lib
 ```
         // 扫描 和 连接 的具体实现
         let scanBuilder: BluetoothScanable.ScanBuilder = {
