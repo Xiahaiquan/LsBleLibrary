@@ -17,16 +17,10 @@ Give examples
 
 通过一步步实例告诉你如何安装部署、怎样运行使用。
 
-OS X & Linux:
+Cocopod:
 
 ```sh
-Give the example
-```
-
-Windows:
-
-```sh
-Give the example
+pod 'LsBleLibrary'
 ```
 
 ### Usage example 使用示例
@@ -54,9 +48,7 @@ Please read [CONTRIBUTING.md](#) for details on our code of conduct, and the pro
 
 ## Authors 关于作者
 
-* **WangYan** - *Initial work* - [WangYan](https://wangyan.org)
-
-查看更多关于这个项目的贡献者，请阅读 [contributors](#) 
+* **Haiquan** - *Initial work* - [Haiquan](https://xiahaiquan.github.io/)
 
 ## License 授权协议
 
