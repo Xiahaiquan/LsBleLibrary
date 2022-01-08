@@ -43,7 +43,7 @@ pod 'LsBleLibrary'
         ))
         ```
 
-###Search
+### Search
 ```
         BleFacade.shared.scaner
             .scan(duration: 5)
@@ -61,7 +61,7 @@ pod 'LsBleLibrary'
             })
             .disposed(by: bag)
 ```
-###Connect
+### Connect
 ```
                BleFacade.shared.connecter.connect(duration: 5)
             .subscribe(onNext: { (state, response) in
@@ -84,9 +84,9 @@ pod 'LsBleLibrary'
             .disposed(by: bag)
 ```
 
-##How to use ble handler
+## How to use ble handler
 
-###Get data from device
+### Get data from device
 
 ```
             BleHandler.shared.getmtu().subscribe { (mtu) in
@@ -96,7 +96,7 @@ pod 'LsBleLibrary'
             }.disposed(by: bag)
 ```
 
-###Set data to device
+### Set data to device
 ```
                 let weather = LSWeather.init(timestamp: 1641571200,
                                          city: "shenzhen",
@@ -118,7 +118,7 @@ pod 'LsBleLibrary'
                 print("设置天气失败", error)
             }.disposed(by: bag)
             ```
-###Monitor  device data update
+### Monitor  device data update
 
 ```
         BleHandler.shared.dataObserver?.filter({ arg in
