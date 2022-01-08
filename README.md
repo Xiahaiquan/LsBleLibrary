@@ -16,7 +16,7 @@ pod 'LsBleLibrary'
 ## How use ble lib
 
 ### Config lib
-```sh
+```swift
         // 扫描 和 连接 的具体实现
         let scanBuilder: BluetoothScanable.ScanBuilder = {
             BluetoothScan(centralManager: $0.centralManager, scanInfo: $0.scanInfo)
@@ -114,7 +114,7 @@ pod 'LsBleLibrary'
             } onError: { error in
                 print("设置天气失败", error)
             }.disposed(by: bag)
-            ```
+  ```
 ### Monitor  device data update
 
 ```
