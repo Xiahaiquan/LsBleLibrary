@@ -3,9 +3,6 @@
 
 ## Getting Started 使用指南
 
-```
-Give examples
-```
 
 ### Installation 安装
 
