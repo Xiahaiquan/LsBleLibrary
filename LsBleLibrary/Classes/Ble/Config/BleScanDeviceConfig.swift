@@ -12,13 +12,13 @@ import CoreBluetooth
 public class BleScanDeviceConfig {
     
     //
-    var services: [CBUUID]
+    var services: [CBUUID]?
     var deviceCategory: [LSDeviceCategory] //手表、耳机、体脂称
     var deviceType: [LSSportWatchType] // 05、11
     var timeout: Int = 8
     
     
-    public init(services: [CBUUID],
+    public init(services: [CBUUID]?,
                 deviceCategory: [LSDeviceCategory],
                 deviceType: [LSSportWatchType],
                 timeout: Int = 8) {
@@ -39,7 +39,6 @@ public class BleConnectDeviceConfig {
     
     public init(connectName: String?,
                 deviceMacAddress: String?,
-                services: [CBUUID],
                 timeout: Int = 8) {
         self.connectName = connectName
         self.deviceMacAddress = deviceMacAddress

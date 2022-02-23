@@ -1,5 +1,5 @@
 PODS:
-  - LsBleLibrary (0.1.0):
+  - LsBleLibrary (0.1.7):
     - RxCocoa (~> 6.2.0)
     - RxSwift (~> 6.2.0)
     - SwiftProtobuf (~> 1.18.0)
@@ -35,7 +35,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  LsBleLibrary: c44a7650564c9ea7c65d16d6c47c02fcf1b12842
+  LsBleLibrary: 5d06627f0cb53d77c04fb90e50d1bb9234f1c78c
   RxCocoa: 4baf94bb35f2c0ab31bc0cb9f1900155f646ba42
   RxRelay: e72dbfd157807478401ef1982e1c61c945c94b2f
   RxSwift: d356ab7bee873611322f134c5f9ef379fa183d8f

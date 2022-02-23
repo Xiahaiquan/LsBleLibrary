@@ -17,12 +17,14 @@ public class Ble02Operator: NSObject {
     var bleFacade: BleFacadeable?
     
     let bag: DisposeBag = DisposeBag()
-    public var dataObserver02: Observable<BleBackData>?
+    public var dataObserver: Observable<BleBackData>?
     private var dataObserverPublishRelay: PublishRelay<BleBackData> = PublishRelay()
+    
+    var uteFunc: UTEFunctionTag?
     
     private override init() {
         super.init()
-        self.dataObserver02 = self.dataObserverPublishRelay.asObservable()
+        self.dataObserver = self.dataObserverPublishRelay.asObservable()
     }
     
     public func configFacade(_ facade: BleFacadeable) {
@@ -36,18 +38,20 @@ extension Ble02Operator {
     
     func startObserver() {
         
-        guard let obser = self.bleFacade?.dataObserver02 else {
+        guard let obser = self.bleFacade?.dataObserver else {
             return
         }
         obser.subscribe { (data) in
-            self.routerData(data)
+            if let value = data as? UTEOriginalData {
+                self.routerData(value)
+            }
         } onError: { (error) in
             print("observer: \(error)")
         }
         .disposed(by: self.bag)
     }
     
-    func routerData(_ routerData: (from: String, data: Data)) {
+    func routerData(_ routerData: UTEOriginalData) {
         
         let data = routerData.data
         let acceptBytes = [UInt8](data)
@@ -57,57 +61,68 @@ extension Ble02Operator {
         if routerData.from == Characteristic02.char6101 && acceptBytes.count == 2 {
             // 最大可写值
             let maxWriteValue = Int(Int(data[0]) << 8) + Int(data[1])
-            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.u6101maxvalue, data: maxWriteValue), ls: nil))
+            mtu = Int(maxWriteValue)
+        
+            self.dataObserverPublishRelay.accept(BleBackData(type: .u6101maxvalue, data: UInt32(maxWriteValue)))
+
             return
         }
         
+        //08000000000000076D63C13E590B0051704B254C
         if routerData.from == Characteristic02.char33F1 && acceptBytes.count == 20 {
             // 支持的功能列表
             guard let functionTag = self.analysisFunctionTag(data) else {
                 return
             }
-            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.functionTag, data: functionTag), ls: nil))
+            Ble02Operator.shared.uteFunc = functionTag
+            self.dataObserverPublishRelay.accept(BleBackData(type: .functionTag, data: functionTag))
             return
         }
-        
-        
-        
+    
         //依据指令，判断的返回指令
         switch command {
         case LS02CommandType.requestRealtimeSteps.rawValue:
             guard let realtimesport = self.analysisSport(data) else {
                 return
             }
-                self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.realtimesport, data: realtimesport), ls: nil))
+            
+            self.dataObserverPublishRelay.accept(BleBackData(type: .stepUpdate, data: realtimesport))
+            
         case LS02CommandType.sevenDaysHistorySleepingDataReceive.rawValue:
             let sleepData = self.analysisSleep(data)
-                                                     self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sleepdetail, data: sleepData), ls: nil))
+            
+            self.dataObserverPublishRelay.accept(BleBackData(type: .sleepdetail, data: sleepData))
         case LS02CommandType.requestRealtimeHeartRate.rawValue:
             let realtimeHrValue = self.analysisRealtimeHr(data)
-                                                                                          self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.realtimehr, data: realtimeHrValue), ls: nil))
+            self.dataObserverPublishRelay.accept(BleBackData(type: .realtimehr, data: CurrentUIHR.init(act: UInt32(realtimeHrValue))))
         case LS02CommandType.historyHeartRateData.rawValue:
             let type = acceptBytes[1]
             if type == 4 { //返回手环当天心率最大值和最小值
                 guard let statisticshrHrValue = self.analysisStatisticshrHr(data) else {
                     return
                 }
-                    self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.statisticshr, data: statisticshrHrValue), ls: nil))
+                
+                let uiHR = CurrentUIHR.init(avg: UInt32(statisticshrHrValue.avg), max: UInt32(statisticshrHrValue.max), min: UInt32(statisticshrHrValue.max), datetime: statisticshrHrValue.datetime)
+                
+                self.dataObserverPublishRelay.accept(BleBackData(type: .realtimehr, data: uiHR))
             } else if type == 3 { //每隔十分钟返回当前测试结果的心率数据
                 guard let t10MinuterHrValue = self.analysis10MinuteHr(data) else {
                     return
                 }
-                        self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.statistics10Mhr, data: t10MinuterHrValue), ls: nil))
+                
+                self.dataObserverPublishRelay.accept(BleBackData.init(type: .statistics10Mhr, data: t10MinuterHrValue))
             } else if type == 0xFA { //同步心率历史数据指令
                 guard let historyData = self.analysisHistoryHr(data) else {
                     return
                 }
-                            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.heartratedetail, data: historyData), ls: nil))
+                self.dataObserverPublishRelay.accept(BleBackData(type: .heartratedetail, data: historyData))
             }
         case LS02CommandType.getWatchSkinTheme.rawValue, 0x26:
+            //FIXME: 这里还要解析要发送表盘的具体信息
             if acceptBytes.count == 3 && acceptBytes[1] == LS02Placeholder.three.rawValue {
                 
-                self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.cloudwatchface, data: (3, Int(acceptBytes[2]))), ls: nil))
-
+                self.dataObserverPublishRelay.accept(BleBackData(type: .cloudwatchface, data: (3, Int(acceptBytes[2]))))
+                
             }
         case LS02CommandType.multiSport.rawValue:
             if acceptBytes.count == 14 {
@@ -115,20 +130,47 @@ extension Ble02Operator {
                 guard let sportModelInfo = self.analysisSportModelUpload(data) else {
                     return
                 }
-                                    self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sportmodeling, data: sportModelInfo), ls: nil))
+                //                19 FA 07 E5 0C 18 13 05 00 00
+                let item = LSSportRealtimeItem.init(hr: UInt32(sportModelInfo.hr),
+                                                    status: .unknown,
+                                                    sportModel: sportModelInfo.model,
+                                                    step: UInt32(sportModelInfo.step),
+                                                    calories: UInt32(sportModelInfo.cal),
+                                                    distance: UInt32(sportModelInfo.distance),
+                                                    timeSeond: 0,
+                                                    spacesKm: UInt32(sportModelInfo.pace),
+                                                    count: UInt32(sportModelInfo.count))
+                
+                self.dataObserverPublishRelay.accept(BleBackData(type: .realtimeSporthr, data: item))
             } else if acceptBytes.count == 13 {
                 // 运动设备状态变更 暂停、恢复等
                 guard let sportModelInfo = self.analysisSportModelStateChange(data) else {
                     return
                 }
-                                        self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sportmodestatechange, data: sportModelInfo), ls: nil))
+                
+                let item = LSSportRealtimeItem.init(status: sportModelInfo.state, sportModel: sportModelInfo.model, step: UInt32(sportModelInfo.step), calories: UInt32(sportModelInfo.cal), distance: UInt32(sportModelInfo.distance), timeSeond: 0, spacesKm: UInt32(sportModelInfo.pace), interval: sportModelInfo.interval)
+                self.dataObserverPublishRelay.accept(BleBackData.init(type: .realtimeSporthr, data: item))
+                
+            } else if acceptBytes.count == 4 {
+                //手表返回的运动开关状态（结束）
+                let byte1 = acceptBytes[1]
+                let byte2 = acceptBytes[2]
+                let byte3 = acceptBytes[3]
+                
+                guard byte1 == 0x00 && byte2 == 0x01 && byte3 == 0x06 else {
+                    return
+                }
+                
+                let item = LSSportRealtimeItem.init(status: .stop, isStatueOnly: true)
+                
+                self.dataObserverPublishRelay.accept(BleBackData.init(type: .realtimeSporthr, data: item))
             }
             
         case LS02CommandType.bindingWatch.rawValue, LS02Placeholder.four.rawValue:
             let bindState = LsBleBindState.init(uteType: Int(acceptBytes[2]))
             
             
-            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.bindState, data: bindState), ls: nil))
+            self.dataObserverPublishRelay.accept(BleBackData(type: .bindState, data: bindState))
             
         case LS02CommandType.gpsCommand.rawValue:
             let type = acceptBytes[1]
@@ -136,9 +178,11 @@ extension Ble02Operator {
                 guard let value = self.analysisGPSRealtime(data) else {
                     return
                 }
-                                            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.realtimeGPS, data: value), ls: nil))
+                self.dataObserverPublishRelay.accept(BleBackData(type: .realtimeGPS, data: value))
             }
             
+            let state = Ls02ReadyUpdateAGPSStatus.init(rawValue: acceptBytes[2])
+            self.dataObserverPublishRelay.accept(BleBackData(type: .gpsUpgradeStatus, data: state))
         case LS02CommandType.historySpo2Data.rawValue:
             
             let type = acceptBytes[1]
@@ -151,15 +195,15 @@ extension Ble02Operator {
                 if type == 0x00, acceptBytes[2] == 0x00 {
                     valueSpo2 = acceptBytes[3]
                 }
-            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sp02Data, data: valueSpo2),ls: nil))
+                self.dataObserverPublishRelay.accept(BleBackData(type: .spo2Update, data: valueSpo2))
             }
             
             if acceptBytes.count == 2 {
                 if type == 0xFD {
-                    self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sp02Data, data: LsSpo2Status.timeout),ls: nil))
+                    self.dataObserverPublishRelay.accept(BleBackData(type: .spo2Update, data: LsSpo2Status.timeout))
                 }
                 if type == 0x0C {
-                    self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.sp02Data, data: LsSpo2Status.delete),ls: nil))
+                    self.dataObserverPublishRelay.accept(BleBackData(type: .spo2Update, data: LsSpo2Status.delete))
                 }
             }
             
@@ -172,34 +216,51 @@ extension Ble02Operator {
             guard let value = analysisWatchFunctionAndStateValue(data: data) else {
                 return
             }
-            self.dataObserverPublishRelay.accept(((ute:(dataType: Ls02DeviceUploadDataType.shortcutSwitchStatus, data: value),ls: nil)))
+            self.dataObserverPublishRelay.accept((BleBackData(type: .shortcutSwitchStatus, data: value)))
             
         case LS02CommandType.watchBtnFunction.rawValue:
             
             guard let value = analysisWatchBtnFunction(data: data) else {
                 return
             }
-            self.dataObserverPublishRelay.accept(((ute:(dataType: Ls02DeviceUploadDataType.watchKeyEvent, data: value),ls: nil)))
+            
+            self.dataObserverPublishRelay.accept(BleBackData(type: .findPhone, data: value))
+            
             
         default:
             print("有未知的数据")
             
-            self.dataObserverPublishRelay.accept((ute:(dataType: Ls02DeviceUploadDataType.unknow, data: routerData),ls: nil))
+            self.dataObserverPublishRelay.accept(BleBackData(type: .unknow, data: routerData))
         }
     }
 }
 
 //MARK: 绑定和解除绑定
 extension Ble02Operator: BleCommandProtocol {
-    public func getmtu() ->Observable<Int> {
-        return Observable.just(20)
+    
+    public func getmtu() ->Observable<Monitored> {
+        
+        return Observable.create { observer in
+            self.dataObserverPublishRelay.filter { arg in
+                return arg.type == .u6101maxvalue
+            }.subscribe { arg in
+                observer.onNext(arg.data as? UInt32 ?? 0)
+                observer.onCompleted()
+            } onError: { err in
+                observer.onError(err)
+            }.disposed(by: self.bag)
+
+            Ble02Operator.shared.readValue(channel: .ute6101)
+            
+            return Disposables.create()
+        }
     }
-    public func setUserInfo(userId: UInt32,
-                            gender: Ls02Gender,
-                            age: UInt32,
-                            height: UInt32,
-                            weight: UInt32,
-                            wearstyle: WearstyleEnum) ->Observable<LsBleBindState> {
+    public func bindDevice(userId: UInt32,
+                                     gender: LsGender,
+                                     age: UInt32,
+                                     height: UInt32,
+                                     weight: UInt32,
+                                     wearstyle: WearstyleEnum) ->Observable<LSDeviceModel> {
         let bindCmd: [UInt8] = [LS02CommandType.bindingWatch.rawValue,
                                 LS02Placeholder.two.rawValue,
                                 UInt8((userId >> 24) & 0xFF),
@@ -209,7 +270,7 @@ extension Ble02Operator: BleCommandProtocol {
         let bindData = Data.init(bytes: bindCmd, count: bindCmd.count)
         return Observable.create { (subscriber) -> Disposable in
             
-            self.bleFacade?.write(bindData, LS02CommandType.bindingWatch.rawValue.description, 15, { (data) in
+            self.bleFacade?.write(bindData, 0,LS02CommandType.bindingWatch.name, 30, { (data) in
                 let bindBytes = [UInt8](data)
                 guard bindBytes.count >= 3 else {
                     return false
@@ -217,10 +278,7 @@ extension Ble02Operator: BleCommandProtocol {
                 return bindBytes[0] == 0x20 && bindBytes[1] == 4 && bindBytes[2] == 1               // 1 表示绑定完成
             })
                 .subscribe { (bleResponse) in
-//                    guard let datas = bleResponse.uteData, let bindState = datas as? LsBleBindState else {
-//                        subscriber.onError(BleError.error("设备返回数据缺失"))
-//                        return
-//                    }
+                    
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
                         return
@@ -230,79 +288,65 @@ extension Ble02Operator: BleCommandProtocol {
                         subscriber.onError(BleError.error("设备返回数据不匹配"))
                         return
                     }
-                     let bindState = LsBleBindState(uteType: Int(bindBytes[2]))
-                       
-                    print("Ble02Operator.setUserInfo", bindState)
-                    subscriber.onNext(bindState)
+                    let bindState = LsBleBindState(uteType: Int(bindBytes[2]))
+                    
+                    print("Ble02Operator.bindDevice", bindState)
+
+                    subscriber.onNext(LSDeviceModel.init(bindStatus: bindState))
                     if bindState == .success {
-                        subscriber.onCompleted()
                         return
                     }
                     
-                    if bindState == .notExsitValidId {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                            print("is the first bind")
-                            
-//                            BleOperator.shared.sentBindcmd(Int(userId))
-//                                .subscribe { (state) in
-//                                    printLog("\(state)")
-//                                    if state == .success {
-//                                        print("第一次绑定完成了")
-//                                        subscriber.onNext(.success)
-//                                        subscriber.onCompleted()
-//                                    }
-//                                } onError: { (error) in
-//                                    print("bind device error 3: \(error)")
-//                                }
-//                                .disposed(by: self.bag)
-                        }
+                    if bindState == .confirm {
+                        
+                        print("is the first bind")
+                        
+                        Observable.just(()).delay(.seconds(10), scheduler: MainScheduler.instance)
+                            .flatMap { _ in
+                                BleFacade.shared.connecter.connect(duration: 10)
+                            }
+                            .subscribe(onNext: {  (state, response) in
+                                if state == .connectSuccessed {
+                                    print("已连接  等待扫描服务及特征")
+                                    BleFacade.shared.bleDevice?.peripheral = response?.peripheral
+                                    
+                                } else if (state == .dicoverChar) {
+                                    BleFacade.shared.bleDevice?.updateCharacteristic(characteristic: response?.characteristics, statusCallback: { status in
+                                        if status {
+                                            self.bindDevice(userId: userId, gender: gender, age: age, height: height, weight: weight, wearstyle: wearstyle)
+                                                .subscribe { (state) in
+                                                    printLog("\(state)")
+                                                    if state.bindStatus == .success {
+                                                        print("第一次绑定完成了")
+                                                        subscriber.onNext(LSDeviceModel.init(bindStatus: .success))
+                                                        subscriber.onCompleted()
+                                                    }
+                                                } onError: { (error) in
+                                                    print("bind device error 3: \(error)")
+                                                }
+                                                .disposed(by: self.bag)
+                                        }
+                                    })
+                                    if ((BleFacade.shared.bleDevice?.connected) != nil) { BleFacade.shared.connecter.finish() }
+                                    print("发现了当前设备的服务")
+                                }
+                            }, onError: { error in
+                                
+                                print("error")
+                            }, onCompleted: {
+                                print("onCompleted")
+                            }).disposed(by: self.bag)
+                        
+                        
                     }
                     
                 } onError: { (error) in
+                    print("bindDevice, err", error)
                     subscriber.onError(error)
                 }
                 .disposed(by: self.bag)
             return Disposables.create()
         }
-    }
-    
-
-    public func bindDevice(_ userId: Int) ->Observable<LsBleBindState> {
-        
-        return Observable.create { (subscriber) ->Disposable in
-            
-            BleOperator.shared.sentBindcmd(userId)
-                .subscribe { (state) in
-                    print("state123: \(state)")
-                    
-                    if state == .success {
-                        print("重新绑定完成")
-                        subscriber.onNext(.success)
-                        
-                    }else if state == .timeout {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                            
-                            BleOperator.shared.sentBindcmd(userId)
-                                .subscribe { (state) in
-                                    if state == .success {
-                                        print("第一次绑定完成了")
-                                        subscriber.onNext(.success)
-                                    }
-                                } onError: { (error) in
-                                    print("bind device error 3: \(error)")
-                                }
-                                .disposed(by: self.bag)
-                        }
-                    }
-                } onError: { (e) in
-                    
-                }
-                .disposed(by: self.bag)
-            
-            return Disposables.create()
-        }
-        
-        
     }
     
     
@@ -312,16 +356,14 @@ extension Ble02Operator: BleCommandProtocol {
     public func unBindDevice(mode: UInt32) -> Observable<Bool> {
         let resetCmd: [UInt8] = [LS02CommandType.requstFactoryReset.rawValue, LS02Placeholder.zero.rawValue]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
-        return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, LS02CommandType.requstFactoryReset.name, 3, nil)
-                .subscribe { (bleResponse) in
-                    subscriber.onNext(true)
-                } onError: { (error) in
-                    subscriber.onError(error)
-                }
-                .disposed(by: self.bag)
-            return Disposables.create()
-        }
+        self.bleFacade?.write(resetData, 0,LS02CommandType.requstFactoryReset.name, 3, nil)
+            .subscribe { (bleResponse) in
+                print("bleResponse", bleResponse)
+            } onError: { (error) in
+                print("unBindDevice", error)
+            }
+            .disposed(by: self.bag)
+        return Observable.just(true)
     }
 }
 
@@ -344,7 +386,7 @@ extension Ble02Operator {
         var crcN: UInt8 = 0
         return Observable.create { (subscriber) -> Disposable in
             var crc: UInt8 = 0
-            self.bleFacade?.write(getData, LS02CommandType.historyHeartRateData.name,8,  { (data) -> Bool in
+            self.bleFacade?.write(getData, 0,LS02CommandType.historyHeartRateData.name,8,  { (data) -> Bool in
                 var dataBytes = [UInt8](data)
                 guard dataBytes.count >= 3 else {
                     return false
@@ -414,7 +456,7 @@ extension Ble02Operator {
         var crcN: UInt8 = 0
         return Observable.create { (subscriber) -> Disposable in
             var crc: UInt8 = 0
-            self.bleFacade?.write(getData, LS02CommandType.historySpo2Data.name,8,  { (data) -> Bool in
+            self.bleFacade?.write(getData, 0,LS02CommandType.historySpo2Data.name,8,  { (data) -> Bool in
                 var dataBytes = [UInt8](data)
                 guard dataBytes.count >= 3 else {
                     return false
@@ -479,14 +521,14 @@ extension Ble02Operator {
         let yearByte1 = UInt8(((dateByFar.hour()>>8)&0xFF))
         let yearByte2 = UInt8(dateByFar.hour()&0xFF)
         let getCmd: [UInt8] = [LS02CommandType.requestSevenDaysHistorySteps.rawValue, yearByte1, yearByte2,
-                               UInt8(dateByFar.min()),
+                               UInt8(dateByFar.month()),
                                UInt8(dateByFar.day()),
                                UInt8(dateByFar.hour())]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         var crcN: UInt8 = 0
         return Observable.create { (subscriber) -> Disposable in
             var crc: UInt8 = 0
-            self.bleFacade?.write(getData,LS02CommandType.requestSevenDaysHistorySteps.name, 8,  { (data) -> Bool in
+            self.bleFacade?.write(getData,0,LS02CommandType.requestSevenDaysHistorySteps.name, 8,  { (data) -> Bool in
                 var dataBytes = [UInt8](data)
                 guard dataBytes.count >= 3 else {
                     return false
@@ -557,7 +599,7 @@ extension Ble02Operator {
         var sleepDatas: [Ls02SleepInfo] = []
         
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, LS02CommandType.sevenDaysHistorySleepingDataSend.name, 8, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.sevenDaysHistorySleepingDataSend.name, 8, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -585,12 +627,12 @@ extension Ble02Operator {
                     let dataCount = Int(dataBytes[6])
                     
                     // 监听数据上传
-                    guard let obser = BleOperator.shared.dataObserver else {
+                    guard let obser = BleHandler.shared.dataObserver else {
                         return
                     }
                     obser.subscribe { (p) in
                         switch p {
-                        case let (_, sleepItems) as (Ls02DeviceUploadDataType, [Ls02SleepItem]):            // 监听感兴趣的数据类型
+                        case let (_, sleepItems) as (MonitoredType, [Ls02SleepItem]):            // 监听感兴趣的数据类型
                             sleepDetail.append(contentsOf: sleepItems)
                             if sleepDetail.count == dataCount {         // 收到数据 与 期待数据 一致
                                 sleepDatas.append(Ls02SleepInfo(year: year, month: month, day: day, dataCount: dataCount, sleepItems: sleepDetail))
@@ -671,7 +713,7 @@ extension Ble02Operator {
         let resetCmd: [UInt8] = [LS02CommandType.historySpo2Data.rawValue, status.rawValue]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "changeSpo2switch", 3, nil)
+            self.bleFacade?.write(resetData, 0,LS02CommandType.historySpo2Data.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first else {
                         subscriber.onError(BleError.error(""))
@@ -696,7 +738,7 @@ extension Ble02Operator {
         let resetCmd: [UInt8] = [LS02CommandType.historySpo2Data.rawValue, LS02Placeholder.aa.rawValue]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "inquireSpo2TestStatus", 3, nil)
+            self.bleFacade?.write(resetData, 0,LS02CommandType.historySpo2Data.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first else {
                         subscriber.onError(BleError.error(""))
@@ -724,7 +766,7 @@ extension Ble02Operator {
                                  UInt8(((type.rawValue)&0xFF))]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "setSpo2CollectTime", 3, nil)
+            self.bleFacade?.write(resetData, 0,"setSpo2CollectTime", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first else {
                         subscriber.onError(BleError.error(""))
@@ -759,7 +801,7 @@ extension Ble02Operator {
                                  UInt8(((type.rawValue)&0xFF))]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "setSpo2CollectPeriod", 3, nil)
+            self.bleFacade?.write(resetData, 0,"setSpo2CollectPeriod", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first else {
                         subscriber.onError(BleError.error(""))
@@ -877,7 +919,7 @@ extension Ble02Operator {
         let hour = Int(acceptBytes[5])
         
         let totalStep = (Int(acceptBytes[6]) << 8) + Int(acceptBytes[7])
-       
+        
         let runStart = Int(acceptBytes[8])
         let runEnd = Int(acceptBytes[9])
         let runDuration = Int(acceptBytes[10])
@@ -888,10 +930,10 @@ extension Ble02Operator {
         let walkDuration = Int(acceptBytes[15])
         let walkStep = (Int(acceptBytes[16]) << 8) + Int(acceptBytes[17])
         
-        return Ls02SportInfo(year: year, month: month, day: day, hour: hour, totalStep: totalStep, runStart: runStart, runEnd: runEnd, runDuration: runDuration, runStep: runStep, walkStart: walkStart, walkEnd: walkEnd, walkDuration: walkDuration, walkStep: walkStep)
+        return Ls02SportInfo(year: year, month: month, day: day, hour: hour, totalStep: totalStep, runStart: runStart, runEnd: runEnd, runDuration: runDuration, runStep: runStep, walkStart: walkStart, walkEnd: walkEnd, walkDuration: walkDuration, walkStep: walkStep, calorieTotal: 0, distanceTotal: 0, durationTotal: 0, activityTotal: 0)
     }
     
-    public func analysisFunctionTag(_ data: Data) -> FunctionTag? {
+    public func analysisFunctionTag(_ data: Data) -> UTEFunctionTag? {
         guard data.count == 20 else {
             return nil
         }
@@ -901,6 +943,7 @@ extension Ble02Operator {
         let function8 = acceptBytes[8]
         let function7 = acceptBytes[7]
         let function6 = acceptBytes[6]
+        let function5 = acceptBytes[5]
         
         let mlsEnable = function16&0x08 > 0
         let gpsEnable = function16&0x02 > 0
@@ -918,9 +961,11 @@ extension Ble02Operator {
         let customDataTransferEnable = function6&0x20 > 0
         let pumpBloodEnable = function6&0x80 > 0
         
-        return FunctionTag(muLanguageShow: mlsEnable, queryLanguage: queryLEnable, updateLanguage: updateLEnable, languageMenu: languageMenuEnable, sportModelStatiStepAndCal: smssacEnable, sportControlSyn: sportControlSynEnable, bloodOxygen: bloodOxyGenEnable, GPS: gpsEnable, NFC: nfcEnable, gPSAndAGPSUpdate: gpsUpdateEnable, CustomDataTransfer: customDataTransferEnable, PumpBloodOxygen: pumpBloodEnable)
+        let multiSportDuration = function5&0x04 > 0
+        
+        return UTEFunctionTag(muLanguageShow: mlsEnable, queryLanguage: queryLEnable, updateLanguage: updateLEnable, languageMenu: languageMenuEnable, sportModelStatiStepAndCal: smssacEnable, sportControlSyn: sportControlSynEnable, bloodOxygen: bloodOxyGenEnable, GPS: gpsEnable, NFC: nfcEnable, gPSAndAGPSUpdate: gpsUpdateEnable, CustomDataTransfer: customDataTransferEnable, PumpBloodOxygen: pumpBloodEnable, multiSportDuration: multiSportDuration)
     }
-    func analysisWatchFunctionAndStateValue(data: Data) -> Ls02sShortcutSwitchsProtocol? {
+    func analysisWatchFunctionAndStateValue(data: Data) -> Ls02sShortcutSwitchsOpenStatus? {
         guard data.count == 20 else {
             return nil
         }
@@ -928,7 +973,7 @@ extension Ble02Operator {
         let acceptBytes = [UInt8](data)
         
         let byte0 = acceptBytes[2]
-    
+        
         let foundWristband = byte0 & 0b0000_0001 > 0//查找手环
         let lightWhenWristUp = byte0 & 0b0000_0010 > 0//抬手亮屏
         let longSitNotification = byte0 & 0b0000_0100 > 0//久坐提醒
@@ -937,23 +982,13 @@ extension Ble02Operator {
         let messageNotification = byte0 & 0b0010_0000 > 0 //短信提醒
         let heartRate = byte0 & 0b0100_0000 > 0 //心率
         
-        if acceptBytes[1] == 0x01 { //支持的 开 关 （ 长 度 18byte
-            return Ls02sShortcutSwitchsSupporedStatus.init(foundWristband: foundWristband,
-                                                          lightWhenWristUp: lightWhenWristUp,
-                                                          longSitNotification: longSitNotification,
-                                                          noDisturb: noDisturb,
-                                                          lossPrevent: lossPrevent,
-                                                          messageNotification: messageNotification,
-                                                          heartRate: heartRate)
-        }else { //开关变化位
-            return Ls02sShortcutSwitchsOpenStatus.init(foundWristband: foundWristband,
-                                                       lightWhenWristUp: lightWhenWristUp,
-                                                       longSitNotification: longSitNotification,
-                                                       noDisturb: noDisturb,
-                                                       lossPrevent: lossPrevent,
-                                                       messageNotification: messageNotification,
-                                                       heartRate: heartRate)
-        }
+        return Ls02sShortcutSwitchsOpenStatus.init(foundWristband: foundWristband,
+                                                   lightWhenWristUp: lightWhenWristUp,
+                                                   longSitNotification: longSitNotification,
+                                                   noDisturb: noDisturb,
+                                                   lossPrevent: lossPrevent,
+                                                   messageNotification: messageNotification,
+                                                   heartRate: heartRate)
         
     }
     
@@ -961,11 +996,11 @@ extension Ble02Operator {
         guard data.count > 1 else {
             return nil
         }
-
+        
         let acceptBytes = [UInt8](data)
         
         return Ls02BraceletKeyEvent.init(rawValue: acceptBytes[1])
-
+        
     }
 }
 
@@ -985,7 +1020,7 @@ extension Ble02Operator {
                     return self.writeData(item, LS02CommandType.sendWeatherInfo.name)
                 }
                 .subscribe(onNext: {
-                    print("currentIndex",currentIndex)
+                    //                    print("currentIndex",currentIndex)
                     currentIndex += 1
                     
                     if currentIndex == datas.count {
@@ -1002,7 +1037,7 @@ extension Ble02Operator {
     
     public func writeData(_ data: Data, _ name: String) -> Observable<Data> {
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(data, name, 3, nil)
+            self.bleFacade?.write(data, 0,name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(Ls02Error.error("数据异常"))
@@ -1021,13 +1056,14 @@ extension Ble02Operator {
 
 extension Ble02Operator {
     
-    public func readValue(type: Int) {
-        self.bleFacade?.readValue(type: type)
+    public func readValue(channel: Channel) {
+        self.bleFacade?.readValue(channel: channel)
     }
+    
     /**
      不入队列 直接发送
      */
-    public func directWrite(_ data: Data, _ type: Int) {
+    public func directWrite(_ data: Data, _ type: WitheType) {
         
         self.bleFacade?.directWrite(data, type)
     }
@@ -1037,7 +1073,7 @@ extension Ble02Operator {
     
     public func sendNFCData(writeData: Data, characteristic: Int, duration: Int, endRecognition: ((Any) -> Bool)? = nil) -> Observable<BleResponse> {
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(writeData, "NFC", duration, endRecognition)
+            self.bleFacade?.write(writeData, 0,"NFC", duration, endRecognition)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(bleResponse)
                 } onError: { (error) in
@@ -1052,11 +1088,11 @@ extension Ble02Operator {
 
 //Tips
 /*
-UTE距离返回的是KM
+ UTE距离返回的是KM
  
-保存的一天内都是12个点
+ 保存的一天内都是12个点
  
-*/
+ */
 
 
 

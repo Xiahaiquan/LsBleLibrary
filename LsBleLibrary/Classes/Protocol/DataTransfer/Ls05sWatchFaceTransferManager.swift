@@ -10,7 +10,7 @@ import CoreBluetooth
 import RxCocoa
 import RxSwift
 
-public enum DialUpgradeProcess {
+public enum DialUpgradeAction {
     case success                        // 成功
     case progress(_ value: Float)       // 进度条
     case dataerror                      // 升级bin 文件异常
@@ -22,6 +22,7 @@ public enum DialUpgradeProcess {
     case unknow                         // 未知
     case existed
     case complete
+    case faile
 }
 
 public class Ls05sWatchFaceTransferManager {
@@ -30,8 +31,11 @@ public class Ls05sWatchFaceTransferManager {
         static let endFlag = 0xFFFF
     }
     
-    private var serialNo: Int = 0               //发送的编号
+    private let timeoutTerval = 2
+    private var isInTransit = false
     
+    private var serialNo: Int = 0               //发送的编号
+    private var fileType: BinFileTypeEnum = .dial
     private var timeoutTimer: Timer?
     
     private var binData: Data!                  // 需要升级的bin 文件
@@ -40,8 +44,9 @@ public class Ls05sWatchFaceTransferManager {
     
     private let bag: DisposeBag = DisposeBag()
     
-    public init(binData: Data) {
+    public init(binData: Data, fileType: BinFileTypeEnum) {
         self.binData = binData
+        self.fileType = fileType
         self.splitData(data: binData)
         
     }
@@ -52,54 +57,48 @@ public class Ls05sWatchFaceTransferManager {
     
     // 信号中转器，功能： 监听 cell 的点击，信号转发到外部
     typealias RouterAction = (
-        progress: PublishRelay<DialUpgradeProcess>, ()
+        progress: PublishRelay<DialUpgradeAction>, ()
     )
     
-    private let progressAction: RouterAction = (
+    private let routerAction: RouterAction = (
         PublishRelay(), ()
     )
     
-    typealias Routing = (
-        event: Observable<DialUpgradeProcess>, ()
-    )
-    
-    lazy var progressEvent: Routing = (
-        event: progressAction.progress.asObservable(), ()
-    )
-    
-    public func start() -> Observable<DialUpgradeProcess> {
+    public func start() -> Observable<DialUpgradeAction> {
         self.requestCloudWatchFaceTransfer()
         addObesver()
-        return progressEvent.event
+        addTimeoutTimer(timeOutInterval: TimeInterval(timeoutTerval), repeats: true)
+        return routerAction.progress.asObservable()
     }
     
     func requestCloudWatchFaceTransfer() {
         
-        Ble05sOperator.shared.checkWatchFaceStatus(data: binData, type: .dial)
+        Ble05sOperator.shared.checkWatchFaceStatus(data: binData, type: fileType)
             .subscribe { [weak self](isCanUpgrade) in
                 print("isCanUpgrade", isCanUpgrade)
                 
                 if isCanUpgrade {
                     self?.startCloudWatchFaceTransfer()
                 }else {
-                    self?.progressAction.progress.accept(.existed)
+                    self?.routerAction.progress.accept(.existed)
                 }
                 
             } onError: { [weak self](err) in
-                self?.progressAction.progress.accept(.unknow)
+                self?.routerAction.progress.accept(.unknow)
             }.disposed(by: bag)
         
     }
     
-
+    
     func startCloudWatchFaceTransfer() {
         guard self.splitDataBy4KArray.count > 0 else {
-            self.progressAction.progress.accept(.dataerror)           // 传入的数据为空
+            self.routerAction.progress.accept(.dataerror)           // 传入的数据为空
             return
         }
         
-        if serialNo == Constant.endFlag {
-            self.progressAction.progress.accept(.complete)
+        if serialNo >= Constant.endFlag {
+            self.routerAction.progress.accept(.complete)
+            invalidateTimeoutTimer()
             return
         }
         
@@ -115,48 +114,38 @@ public class Ls05sWatchFaceTransferManager {
         
     }
     
-    func continueNext4k() {
-        self.invalidateTimeoutTimer()       // 继续发送，定时器作废
-        
-        self.startCloudWatchFaceTransfer()
-    }
-    
-    
     func writeBinData() {
         
         let writeData = Ble05sSendDataConfig.shared.dialPB(sn: UInt32(serialNo), data: currentWriteData!)
         
-        Ble05sOperator.shared.directWrite(writeData, 1)
-                
-        let progress: Float = Float(self.serialNo) / (Float(self.splitDataBy4KArray.count) )
-        self.progressAction.progress.accept(.progress(progress > 1 ? 1 : progress))
+        Ble05sOperator.shared.directWrite(writeData, .withoutResponse)
+        
         
     }
     
     private func addObesver() {
-        guard let obser = BleOperator.shared.dataObserver else {
-            return
-        }
-        obser.subscribe { [unowned self] (data) in
-            
-            guard let ls = data.ls,
-               let cmds = ls.data["data"] as? hl_cmds,
-               cmds.cmd == .cmdSetBinDataUpdate,
-               cmds.rErrorCode.err == 0 else {
+        
+        BleHandler.shared.dataObserver?
+            .subscribe { [unowned self] (data) in
                 
+                guard let code = data.data as? UInt32, code == 0 else {
+                    print("升级失败")
+                    self.routerAction.progress.accept(.faile)
+                    return
+                }
+                
+                let progress: Float = Float(self.serialNo) / (Float(self.splitDataBy4KArray.count))
+                let value = progress > 1 ? 1 : progress
+                self.routerAction.progress.accept(.progress(value))
+                
+                self.isInTransit = true
                 self.serialNo += 1
-                self.continueNext4k()
+                self.startCloudWatchFaceTransfer()
                 
-                return
-    
+            } onError: { (error) in
+                print("error", error)
             }
-            
-            print("升级失败")
-            
-        } onError: { (error) in
-            print("error", error)
-        }
-        .disposed(by: bag)
+            .disposed(by: bag)
     }
     
     //MARK: 4K切割数据
@@ -185,11 +174,15 @@ public class Ls05sWatchFaceTransferManager {
 
 extension Ls05sWatchFaceTransferManager {
     
-    func addTimeoutTimer(timeOutInterval:TimeInterval, repeats: Bool,  timerBlock: @escaping (() -> Void)) {
-        self.timeoutTimer = Timer.init(timeInterval: timeOutInterval, repeats: repeats, block: { (timer) in
-            timerBlock()
+    func addTimeoutTimer(timeOutInterval:TimeInterval, repeats: Bool) {
+        self.timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeOutInterval, repeats: repeats, block: { [unowned self]timer in
+            if !isInTransit {
+                self.routerAction.progress.accept(.timeout)
+                self.invalidateTimeoutTimer()
+            }
+            self.isInTransit = false
         })
-//        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoopMode.commonModes)
+        //        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoopMode.commonModes)
     }
     
     func invalidateTimeoutTimer() {

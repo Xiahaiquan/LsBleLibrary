@@ -39,12 +39,12 @@ class Ls02WeatherViewController: UIViewController, Storyboardable {
         ]
         
         var dataSource = [LSWeather]()
-        for item in 0 ... 6 {
-            let weather = LSWeather.init(date: "", city: "", weatherTag: item, temperature: item, maxTemp: item, minTemp: item, air: item, humidity: item, uvIndex: item, weatherState: .cloudy, timestamp: UInt64(item))
-            dataSource.append(weather)
-        }
+//        for item in 0 ... 6 {
+//            let weather = LSWeather.init(date: "", city: "", weatherTag: item, temperature: item, maxTemp: item, minTemp: item, air: item, humidity: item, uvIndex: item, weatherState: .cloudy, timestamp: UInt64(item))
+//            dataSource.append(weather)
+//        }
 
-        BleOperator.shared.setWeatherData(dataSource)
+        BleHandler.shared.setWeatherData(dataSource)
             .subscribe { (flag) in
                 print("updateWeather : \(flag)")
                 if flag {

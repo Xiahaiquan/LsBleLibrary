@@ -17,8 +17,8 @@ class Ls02SetViewController: UIViewController, Storyboardable {
     
     let bag: DisposeBag = DisposeBag()
 
-    private var unit: Ls02Units = .metric
-    private var dateFormat: Ls02TimeFormat = .h12
+    private var unit: DeviceUnitsFormat = .metric
+    private var dateFormat: DeviceTimeFormat = .h12
     
     private var reminders: [(index: Int, hour: Int, min: Int, period: UInt8, state: Bool)] = []
     private var tempReminders: [(index: Int, hour: Int, min: Int, period: UInt8, state: Bool)] = []
@@ -57,7 +57,7 @@ class Ls02SetViewController: UIViewController, Storyboardable {
     }
     
     @IBAction func clickAlertBtn(_ sender: Any) {
-        self.setReminder()
+//        self.setReminder()
     }
 }
 
@@ -68,7 +68,7 @@ extension Ls02SetViewController {
      */
     func setUnitAndDateFormat() {
     
-        BleOperator.shared.setDateFormat(unit: self.unit, date: self.dateFormat)
+        BleHandler.shared.setDateFormat(unit: self.unit, date: self.dateFormat)
             .subscribe(onNext: { (result) in
                 print("setUnitAndDateFormat result: \(result)")
                 self.view.makeToast("设置成功", duration: TimeInterval(2), position: .center)
@@ -83,7 +83,7 @@ extension Ls02SetViewController {
      */
     func syncDatetime() {
         
-        let calendar: Calendar = Calendar.current
+        let calendar: Calendar = Calendar.init(identifier: Calendar.Identifier.gregorian)
         let now = Date()
         let year = calendar.component(.year, from: now)
         let month = calendar.component(.month, from: now)
@@ -92,7 +92,7 @@ extension Ls02SetViewController {
         let min = calendar.component(.minute, from: now)
         let second = calendar.component(.second, from: now)
         
-        BleOperator.shared.syncDateTime(year, UInt8(month), UInt8(day), UInt8(hour), UInt8(min), UInt8(second), 8)
+        BleHandler.shared.syncDateTime(year, UInt8(month), UInt8(day), UInt8(hour), UInt8(min), UInt8(second), 8)
             .subscribe { (flag) in
                 print("flag \(flag)")
                 self.view.makeToast("同步成功", duration: TimeInterval(2), position: .center)
@@ -122,7 +122,7 @@ extension Ls02SetViewController {
       
      */
     func setDeviceParam() {
-        BleOperator.shared.setDeviceParameter(175, 77, 10, 2000, .open, 100, 50, 28, .female, .open, .chinese, .f)
+        BleHandler.shared.syncUserInfoToUTE(height: 175, weight: 77, brightScreen: 10, stepGoal: 2000, raiseSwitch: .open, maxHrAlert: 100, minHrAlert: 50, age: 28, gender: .female, lostAlert: .open, language: .en, temperatureUnit: .celsius)
             .subscribe { (flag) in
                 print("param flag \(flag)")
                 self.view.makeToast("设置成功", duration: TimeInterval(2), position: .center)
@@ -160,35 +160,36 @@ extension Ls02SetViewController {
      新增 和 更新 要 把所有的reminder 都递归更新到设备
      */
     func addAndEditReminders(_ reminder: (index: Int, hour: Int, min: Int, period: UInt8, state: Bool)) {
-        BleOperator.shared.setReminder(reminder)
-            .subscribe { (flag) in
-                print("addAndEditReminders : \(flag)")
-                if self.tempReminders.count > 0 {
-                    print("addAndEditReminders remove")
-                    self.tempReminders.removeFirst()
-                }
-                print("addAndEditReminders remove\(self.tempReminders.count)")
-                if self.tempReminders.count > 0 {
-                    self.addAndEditReminders(self.tempReminders.first!)
-                } else {
-                    print("addAndEditReminders done")
-                }
-            } onError: { (error) in
-                print("addAndEditReminders error \(error)")
-            }
-            .disposed(by: self.bag)
+//        BleHandler.shared.setReminder(reminder)
+//            .subscribe { (flag) in
+//                print("addAndEditReminders : \(flag)")
+//                if self.tempReminders.count > 0 {
+//                    print("addAndEditReminders remove")
+//                    self.tempReminders.removeFirst()
+//                }
+//                print("addAndEditReminders remove\(self.tempReminders.count)")
+//                if self.tempReminders.count > 0 {
+//                    self.addAndEditReminders(self.tempReminders.first!)
+//                } else {
+//                    print("addAndEditReminders done")
+//                }
+//            } onError: { (error) in
+//                print("addAndEditReminders error \(error)")
+//            }
+//            .disposed(by: self.bag)
     }
+    
     /*
     删除 提醒
     */
     func deleteReminder(_ reminder: (index: Int, hour: Int, min: Int, period: UInt8, state: Bool)) {
-        BleOperator.shared.setReminder(reminder)
-            .subscribe { (flag) in
-                print("deleteReminder success")
-            } onError: { (error) in
-                print("deleteReminder error \(error)")
-            }
-            .disposed(by: self.bag)
+//        BleHandler.shared.setReminder(reminder)
+//            .subscribe { (flag) in
+//                print("deleteReminder success")
+//            } onError: { (error) in
+//                print("deleteReminder error \(error)")
+//            }
+//            .disposed(by: self.bag)
     }
     
 }

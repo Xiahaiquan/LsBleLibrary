@@ -19,7 +19,7 @@ extension Ble02Operator {
                                  0,0,0]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "createTestStepsData", 3, nil)
+            self.bleFacade?.write(resetData, 0,"createTestStepsData", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -38,7 +38,7 @@ extension Ble02Operator {
                                  0,0,0]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "createTestSleepingData", 3, nil)
+            self.bleFacade?.write(resetData, 0,"createTestSleepingData", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -56,7 +56,7 @@ extension Ble02Operator {
                                  UInt8(day)]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "createTestHeartRateData", 3, nil)
+            self.bleFacade?.write(resetData, 0,"createTestHeartRateData", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -77,7 +77,7 @@ extension Ble02Operator {
                                  UInt8(min)]
         let resetData = Data.init(bytes: resetCmd, count: resetCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(resetData, "createTestHeartRateData", 3, nil)
+            self.bleFacade?.write(resetData, 0,"createTestHeartRateData", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in

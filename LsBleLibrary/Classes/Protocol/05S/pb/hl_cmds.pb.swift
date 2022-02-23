@@ -137,6 +137,33 @@ struct weather_t {
   /// Clears the value of `mSeconds`. Subsequent reads from it will return its default value.
   mutating func clearMSeconds() {self._mSeconds = nil}
 
+  var mHumidity: UInt32 {
+    get {return _mHumidity ?? 0}
+    set {_mHumidity = newValue}
+  }
+  /// Returns true if `mHumidity` has been explicitly set.
+  var hasMHumidity: Bool {return self._mHumidity != nil}
+  /// Clears the value of `mHumidity`. Subsequent reads from it will return its default value.
+  mutating func clearMHumidity() {self._mHumidity = nil}
+
+  var mUv: UInt32 {
+    get {return _mUv ?? 0}
+    set {_mUv = newValue}
+  }
+  /// Returns true if `mUv` has been explicitly set.
+  var hasMUv: Bool {return self._mUv != nil}
+  /// Clears the value of `mUv`. Subsequent reads from it will return its default value.
+  mutating func clearMUv() {self._mUv = nil}
+
+  var mCityName: Data {
+    get {return _mCityName ?? Data()}
+    set {_mCityName = newValue}
+  }
+  /// Returns true if `mCityName` has been explicitly set.
+  var hasMCityName: Bool {return self._mCityName != nil}
+  /// Clears the value of `mCityName`. Subsequent reads from it will return its default value.
+  mutating func clearMCityName() {self._mCityName = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -150,6 +177,9 @@ struct weather_t {
   fileprivate var _mMaxTemp: UInt32? = nil
   fileprivate var _mMinTemp: UInt32? = nil
   fileprivate var _mSeconds: UInt32? = nil
+  fileprivate var _mHumidity: UInt32? = nil
+  fileprivate var _mUv: UInt32? = nil
+  fileprivate var _mCityName: Data? = nil
 }
 
 struct alarm_t {
@@ -406,6 +436,15 @@ struct r_bind_device_t {
   /// Clears the value of `mLangversion`. Subsequent reads from it will return its default value.
   mutating func clearMLangversion() {self._mLangversion = nil}
 
+  var mLangIsRight: UInt32 {
+    get {return _mLangIsRight ?? 0}
+    set {_mLangIsRight = newValue}
+  }
+  /// Returns true if `mLangIsRight` has been explicitly set.
+  var hasMLangIsRight: Bool {return self._mLangIsRight != nil}
+  /// Clears the value of `mLangIsRight`. Subsequent reads from it will return its default value.
+  mutating func clearMLangIsRight() {self._mLangIsRight = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -423,6 +462,7 @@ struct r_bind_device_t {
   fileprivate var _mBindOperate: UInt32? = nil
   fileprivate var _mPower: UInt32? = nil
   fileprivate var _mLangversion: UInt32? = nil
+  fileprivate var _mLangIsRight: UInt32? = nil
 }
 
 struct r_get_device_info_t {
@@ -529,6 +569,15 @@ struct r_get_device_info_t {
   /// Clears the value of `mLangversion`. Subsequent reads from it will return its default value.
   mutating func clearMLangversion() {self._mLangversion = nil}
 
+  var mLangIsRight: UInt32 {
+    get {return _mLangIsRight ?? 0}
+    set {_mLangIsRight = newValue}
+  }
+  /// Returns true if `mLangIsRight` has been explicitly set.
+  var hasMLangIsRight: Bool {return self._mLangIsRight != nil}
+  /// Clears the value of `mLangIsRight`. Subsequent reads from it will return its default value.
+  mutating func clearMLangIsRight() {self._mLangIsRight = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -544,6 +593,7 @@ struct r_get_device_info_t {
   fileprivate var _mBattvalue: UInt32? = nil
   fileprivate var _mDevicemac: UInt32? = nil
   fileprivate var _mLangversion: UInt32? = nil
+  fileprivate var _mLangIsRight: UInt32? = nil
 }
 
 struct sync_phone_info_t {
@@ -1553,6 +1603,33 @@ struct set_music_info_t {
   /// Clears the value of `mMusicTitle`. Subsequent reads from it will return its default value.
   mutating func clearMMusicTitle() {self._mMusicTitle = nil}
 
+  var mMusicWords: Data {
+    get {return _mMusicWords ?? Data()}
+    set {_mMusicWords = newValue}
+  }
+  /// Returns true if `mMusicWords` has been explicitly set.
+  var hasMMusicWords: Bool {return self._mMusicWords != nil}
+  /// Clears the value of `mMusicWords`. Subsequent reads from it will return its default value.
+  mutating func clearMMusicWords() {self._mMusicWords = nil}
+
+  var mMusicDurationMs: UInt32 {
+    get {return _mMusicDurationMs ?? 0}
+    set {_mMusicDurationMs = newValue}
+  }
+  /// Returns true if `mMusicDurationMs` has been explicitly set.
+  var hasMMusicDurationMs: Bool {return self._mMusicDurationMs != nil}
+  /// Clears the value of `mMusicDurationMs`. Subsequent reads from it will return its default value.
+  mutating func clearMMusicDurationMs() {self._mMusicDurationMs = nil}
+
+  var mMusicElapsedMs: UInt32 {
+    get {return _mMusicElapsedMs ?? 0}
+    set {_mMusicElapsedMs = newValue}
+  }
+  /// Returns true if `mMusicElapsedMs` has been explicitly set.
+  var hasMMusicElapsedMs: Bool {return self._mMusicElapsedMs != nil}
+  /// Clears the value of `mMusicElapsedMs`. Subsequent reads from it will return its default value.
+  mutating func clearMMusicElapsedMs() {self._mMusicElapsedMs = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -1560,6 +1637,9 @@ struct set_music_info_t {
   fileprivate var _mMusicCtrCode: UInt32? = nil
   fileprivate var _mMusicVolume: UInt32? = nil
   fileprivate var _mMusicTitle: Data? = nil
+  fileprivate var _mMusicWords: Data? = nil
+  fileprivate var _mMusicDurationMs: UInt32? = nil
+  fileprivate var _mMusicElapsedMs: UInt32? = nil
 }
 
 struct r_get_mtu_size_t {
@@ -2248,6 +2328,24 @@ struct r_get_active_record_data_t {
   /// Clears the value of `mTotalGpsNum`. Subsequent reads from it will return its default value.
   mutating func clearMTotalGpsNum() {_uniqueStorage()._mTotalGpsNum = nil}
 
+  var mActiveSpaceCount: UInt32 {
+    get {return _storage._mActiveSpaceCount ?? 0}
+    set {_uniqueStorage()._mActiveSpaceCount = newValue}
+  }
+  /// Returns true if `mActiveSpaceCount` has been explicitly set.
+  var hasMActiveSpaceCount: Bool {return _storage._mActiveSpaceCount != nil}
+  /// Clears the value of `mActiveSpaceCount`. Subsequent reads from it will return its default value.
+  mutating func clearMActiveSpaceCount() {_uniqueStorage()._mActiveSpaceCount = nil}
+
+  var mActiveSpeedCount: UInt32 {
+    get {return _storage._mActiveSpeedCount ?? 0}
+    set {_uniqueStorage()._mActiveSpeedCount = newValue}
+  }
+  /// Returns true if `mActiveSpeedCount` has been explicitly set.
+  var hasMActiveSpeedCount: Bool {return _storage._mActiveSpeedCount != nil}
+  /// Clears the value of `mActiveSpeedCount`. Subsequent reads from it will return its default value.
+  mutating func clearMActiveSpeedCount() {_uniqueStorage()._mActiveSpeedCount = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -2310,16 +2408,16 @@ public struct set_nfc_operate_t {
   /// Clears the value of `mNfcOperateCode`. Subsequent reads from it will return its default value.
   mutating func clearMNfcOperateCode() {self._mNfcOperateCode = nil}
 
-  var mNfcData: Data {
+    public var mNfcData: Data {
     get {return _mNfcData ?? Data()}
     set {_mNfcData = newValue}
   }
   /// Returns true if `mNfcData` has been explicitly set.
-    public  var hasMNfcData: Bool {return self._mNfcData != nil}
+public  var hasMNfcData: Bool {return self._mNfcData != nil}
   /// Clears the value of `mNfcData`. Subsequent reads from it will return its default value.
   mutating func clearMNfcData() {self._mNfcData = nil}
 
-  var mNfcErrCode: UInt32 {
+ public var mNfcErrCode: UInt32 {
     get {return _mNfcErrCode ?? 0}
     set {_mNfcErrCode = newValue}
   }
@@ -2346,9 +2444,9 @@ public struct set_nfc_operate_t {
   /// Clears the value of `mNfcCity`. Subsequent reads from it will return its default value.
   mutating func clearMNfcCity() {self._mNfcCity = nil}
 
-    public  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    public  init() {}
+    public init() {}
 
   fileprivate var _mNfcOperateCode: UInt32? = nil
   fileprivate var _mNfcData: Data? = nil
@@ -2746,12 +2844,12 @@ struct r_get_menu_sequence_t {
   fileprivate var _mData: Data? = nil
 }
 
-struct get_nfc_card_data_t {
+public struct get_nfc_card_data_t {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var mData: Data {
+ public var mData: Data {
     get {return _mData ?? Data()}
     set {_mData = newValue}
   }
@@ -2760,9 +2858,9 @@ struct get_nfc_card_data_t {
   /// Clears the value of `mData`. Subsequent reads from it will return its default value.
   mutating func clearMData() {self._mData = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 
   fileprivate var _mData: Data? = nil
 }
@@ -3020,6 +3118,367 @@ struct set_female_health_info_t {
   fileprivate var _mSetMonth: UInt32? = nil
   fileprivate var _mSetDay: UInt32? = nil
   fileprivate var _mCheck: UInt32? = nil
+}
+
+struct r_get_record_info_t {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var mRebootCnt: UInt32 {
+    get {return _storage._mRebootCnt ?? 0}
+    set {_uniqueStorage()._mRebootCnt = newValue}
+  }
+  /// Returns true if `mRebootCnt` has been explicitly set.
+  var hasMRebootCnt: Bool {return _storage._mRebootCnt != nil}
+  /// Clears the value of `mRebootCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMRebootCnt() {_uniqueStorage()._mRebootCnt = nil}
+
+  var mKey1PressCnt: UInt32 {
+    get {return _storage._mKey1PressCnt ?? 0}
+    set {_uniqueStorage()._mKey1PressCnt = newValue}
+  }
+  /// Returns true if `mKey1PressCnt` has been explicitly set.
+  var hasMKey1PressCnt: Bool {return _storage._mKey1PressCnt != nil}
+  /// Clears the value of `mKey1PressCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMKey1PressCnt() {_uniqueStorage()._mKey1PressCnt = nil}
+
+  var mMsgCnt: UInt32 {
+    get {return _storage._mMsgCnt ?? 0}
+    set {_uniqueStorage()._mMsgCnt = newValue}
+  }
+  /// Returns true if `mMsgCnt` has been explicitly set.
+  var hasMMsgCnt: Bool {return _storage._mMsgCnt != nil}
+  /// Clears the value of `mMsgCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMMsgCnt() {_uniqueStorage()._mMsgCnt = nil}
+
+  var mCallCnt: UInt32 {
+    get {return _storage._mCallCnt ?? 0}
+    set {_uniqueStorage()._mCallCnt = newValue}
+  }
+  /// Returns true if `mCallCnt` has been explicitly set.
+  var hasMCallCnt: Bool {return _storage._mCallCnt != nil}
+  /// Clears the value of `mCallCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMCallCnt() {_uniqueStorage()._mCallCnt = nil}
+
+  var mLongsitCnt: UInt32 {
+    get {return _storage._mLongsitCnt ?? 0}
+    set {_uniqueStorage()._mLongsitCnt = newValue}
+  }
+  /// Returns true if `mLongsitCnt` has been explicitly set.
+  var hasMLongsitCnt: Bool {return _storage._mLongsitCnt != nil}
+  /// Clears the value of `mLongsitCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMLongsitCnt() {_uniqueStorage()._mLongsitCnt = nil}
+
+  var mUpdateDialCnt: UInt32 {
+    get {return _storage._mUpdateDialCnt ?? 0}
+    set {_uniqueStorage()._mUpdateDialCnt = newValue}
+  }
+  /// Returns true if `mUpdateDialCnt` has been explicitly set.
+  var hasMUpdateDialCnt: Bool {return _storage._mUpdateDialCnt != nil}
+  /// Clears the value of `mUpdateDialCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMUpdateDialCnt() {_uniqueStorage()._mUpdateDialCnt = nil}
+
+  var mRaiseUpCnt: UInt32 {
+    get {return _storage._mRaiseUpCnt ?? 0}
+    set {_uniqueStorage()._mRaiseUpCnt = newValue}
+  }
+  /// Returns true if `mRaiseUpCnt` has been explicitly set.
+  var hasMRaiseUpCnt: Bool {return _storage._mRaiseUpCnt != nil}
+  /// Clears the value of `mRaiseUpCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMRaiseUpCnt() {_uniqueStorage()._mRaiseUpCnt = nil}
+
+  var mMusicPageCnt: UInt32 {
+    get {return _storage._mMusicPageCnt ?? 0}
+    set {_uniqueStorage()._mMusicPageCnt = newValue}
+  }
+  /// Returns true if `mMusicPageCnt` has been explicitly set.
+  var hasMMusicPageCnt: Bool {return _storage._mMusicPageCnt != nil}
+  /// Clears the value of `mMusicPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMMusicPageCnt() {_uniqueStorage()._mMusicPageCnt = nil}
+
+  var mHrPageCnt: UInt32 {
+    get {return _storage._mHrPageCnt ?? 0}
+    set {_uniqueStorage()._mHrPageCnt = newValue}
+  }
+  /// Returns true if `mHrPageCnt` has been explicitly set.
+  var hasMHrPageCnt: Bool {return _storage._mHrPageCnt != nil}
+  /// Clears the value of `mHrPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMHrPageCnt() {_uniqueStorage()._mHrPageCnt = nil}
+
+  var mSpo2PageCnt: UInt32 {
+    get {return _storage._mSpo2PageCnt ?? 0}
+    set {_uniqueStorage()._mSpo2PageCnt = newValue}
+  }
+  /// Returns true if `mSpo2PageCnt` has been explicitly set.
+  var hasMSpo2PageCnt: Bool {return _storage._mSpo2PageCnt != nil}
+  /// Clears the value of `mSpo2PageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMSpo2PageCnt() {_uniqueStorage()._mSpo2PageCnt = nil}
+
+  var mAlipayPageCnt: UInt32 {
+    get {return _storage._mAlipayPageCnt ?? 0}
+    set {_uniqueStorage()._mAlipayPageCnt = newValue}
+  }
+  /// Returns true if `mAlipayPageCnt` has been explicitly set.
+  var hasMAlipayPageCnt: Bool {return _storage._mAlipayPageCnt != nil}
+  /// Clears the value of `mAlipayPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMAlipayPageCnt() {_uniqueStorage()._mAlipayPageCnt = nil}
+
+  var mWeatherPageCnt: UInt32 {
+    get {return _storage._mWeatherPageCnt ?? 0}
+    set {_uniqueStorage()._mWeatherPageCnt = newValue}
+  }
+  /// Returns true if `mWeatherPageCnt` has been explicitly set.
+  var hasMWeatherPageCnt: Bool {return _storage._mWeatherPageCnt != nil}
+  /// Clears the value of `mWeatherPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMWeatherPageCnt() {_uniqueStorage()._mWeatherPageCnt = nil}
+
+  var mBreathPageCnt: UInt32 {
+    get {return _storage._mBreathPageCnt ?? 0}
+    set {_uniqueStorage()._mBreathPageCnt = newValue}
+  }
+  /// Returns true if `mBreathPageCnt` has been explicitly set.
+  var hasMBreathPageCnt: Bool {return _storage._mBreathPageCnt != nil}
+  /// Clears the value of `mBreathPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMBreathPageCnt() {_uniqueStorage()._mBreathPageCnt = nil}
+
+  var mStopwatchPageCnt: UInt32 {
+    get {return _storage._mStopwatchPageCnt ?? 0}
+    set {_uniqueStorage()._mStopwatchPageCnt = newValue}
+  }
+  /// Returns true if `mStopwatchPageCnt` has been explicitly set.
+  var hasMStopwatchPageCnt: Bool {return _storage._mStopwatchPageCnt != nil}
+  /// Clears the value of `mStopwatchPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMStopwatchPageCnt() {_uniqueStorage()._mStopwatchPageCnt = nil}
+
+  var mCountdownPageCnt: UInt32 {
+    get {return _storage._mCountdownPageCnt ?? 0}
+    set {_uniqueStorage()._mCountdownPageCnt = newValue}
+  }
+  /// Returns true if `mCountdownPageCnt` has been explicitly set.
+  var hasMCountdownPageCnt: Bool {return _storage._mCountdownPageCnt != nil}
+  /// Clears the value of `mCountdownPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMCountdownPageCnt() {_uniqueStorage()._mCountdownPageCnt = nil}
+
+  var mStatusPageCnt: UInt32 {
+    get {return _storage._mStatusPageCnt ?? 0}
+    set {_uniqueStorage()._mStatusPageCnt = newValue}
+  }
+  /// Returns true if `mStatusPageCnt` has been explicitly set.
+  var hasMStatusPageCnt: Bool {return _storage._mStatusPageCnt != nil}
+  /// Clears the value of `mStatusPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMStatusPageCnt() {_uniqueStorage()._mStatusPageCnt = nil}
+
+  var mSleepPageCnt: UInt32 {
+    get {return _storage._mSleepPageCnt ?? 0}
+    set {_uniqueStorage()._mSleepPageCnt = newValue}
+  }
+  /// Returns true if `mSleepPageCnt` has been explicitly set.
+  var hasMSleepPageCnt: Bool {return _storage._mSleepPageCnt != nil}
+  /// Clears the value of `mSleepPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMSleepPageCnt() {_uniqueStorage()._mSleepPageCnt = nil}
+
+  var mFindphonePageCnt: UInt32 {
+    get {return _storage._mFindphonePageCnt ?? 0}
+    set {_uniqueStorage()._mFindphonePageCnt = newValue}
+  }
+  /// Returns true if `mFindphonePageCnt` has been explicitly set.
+  var hasMFindphonePageCnt: Bool {return _storage._mFindphonePageCnt != nil}
+  /// Clears the value of `mFindphonePageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMFindphonePageCnt() {_uniqueStorage()._mFindphonePageCnt = nil}
+
+  var mMulsptPageCnt: UInt32 {
+    get {return _storage._mMulsptPageCnt ?? 0}
+    set {_uniqueStorage()._mMulsptPageCnt = newValue}
+  }
+  /// Returns true if `mMulsptPageCnt` has been explicitly set.
+  var hasMMulsptPageCnt: Bool {return _storage._mMulsptPageCnt != nil}
+  /// Clears the value of `mMulsptPageCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMMulsptPageCnt() {_uniqueStorage()._mMulsptPageCnt = nil}
+
+  var mMotorCnt: UInt32 {
+    get {return _storage._mMotorCnt ?? 0}
+    set {_uniqueStorage()._mMotorCnt = newValue}
+  }
+  /// Returns true if `mMotorCnt` has been explicitly set.
+  var hasMMotorCnt: Bool {return _storage._mMotorCnt != nil}
+  /// Clears the value of `mMotorCnt`. Subsequent reads from it will return its default value.
+  mutating func clearMMotorCnt() {_uniqueStorage()._mMotorCnt = nil}
+
+  var mMotorWorkTimeSec: UInt32 {
+    get {return _storage._mMotorWorkTimeSec ?? 0}
+    set {_uniqueStorage()._mMotorWorkTimeSec = newValue}
+  }
+  /// Returns true if `mMotorWorkTimeSec` has been explicitly set.
+  var hasMMotorWorkTimeSec: Bool {return _storage._mMotorWorkTimeSec != nil}
+  /// Clears the value of `mMotorWorkTimeSec`. Subsequent reads from it will return its default value.
+  mutating func clearMMotorWorkTimeSec() {_uniqueStorage()._mMotorWorkTimeSec = nil}
+
+  var mLcdOnTimeSec: UInt32 {
+    get {return _storage._mLcdOnTimeSec ?? 0}
+    set {_uniqueStorage()._mLcdOnTimeSec = newValue}
+  }
+  /// Returns true if `mLcdOnTimeSec` has been explicitly set.
+  var hasMLcdOnTimeSec: Bool {return _storage._mLcdOnTimeSec != nil}
+  /// Clears the value of `mLcdOnTimeSec`. Subsequent reads from it will return its default value.
+  mutating func clearMLcdOnTimeSec() {_uniqueStorage()._mLcdOnTimeSec = nil}
+
+  var mLastChargeTimestamps: UInt32 {
+    get {return _storage._mLastChargeTimestamps ?? 0}
+    set {_uniqueStorage()._mLastChargeTimestamps = newValue}
+  }
+  /// Returns true if `mLastChargeTimestamps` has been explicitly set.
+  var hasMLastChargeTimestamps: Bool {return _storage._mLastChargeTimestamps != nil}
+  /// Clears the value of `mLastChargeTimestamps`. Subsequent reads from it will return its default value.
+  mutating func clearMLastChargeTimestamps() {_uniqueStorage()._mLastChargeTimestamps = nil}
+
+  var mLastChargeSecond: UInt32 {
+    get {return _storage._mLastChargeSecond ?? 0}
+    set {_uniqueStorage()._mLastChargeSecond = newValue}
+  }
+  /// Returns true if `mLastChargeSecond` has been explicitly set.
+  var hasMLastChargeSecond: Bool {return _storage._mLastChargeSecond != nil}
+  /// Clears the value of `mLastChargeSecond`. Subsequent reads from it will return its default value.
+  mutating func clearMLastChargeSecond() {_uniqueStorage()._mLastChargeSecond = nil}
+
+  var mLastUsedSecond: UInt32 {
+    get {return _storage._mLastUsedSecond ?? 0}
+    set {_uniqueStorage()._mLastUsedSecond = newValue}
+  }
+  /// Returns true if `mLastUsedSecond` has been explicitly set.
+  var hasMLastUsedSecond: Bool {return _storage._mLastUsedSecond != nil}
+  /// Clears the value of `mLastUsedSecond`. Subsequent reads from it will return its default value.
+  mutating func clearMLastUsedSecond() {_uniqueStorage()._mLastUsedSecond = nil}
+
+  var mDialID: UInt32 {
+    get {return _storage._mDialID ?? 0}
+    set {_uniqueStorage()._mDialID = newValue}
+  }
+  /// Returns true if `mDialID` has been explicitly set.
+  var hasMDialID: Bool {return _storage._mDialID != nil}
+  /// Clears the value of `mDialID`. Subsequent reads from it will return its default value.
+  mutating func clearMDialID() {_uniqueStorage()._mDialID = nil}
+
+  var mPageStyle: UInt32 {
+    get {return _storage._mPageStyle ?? 0}
+    set {_uniqueStorage()._mPageStyle = newValue}
+  }
+  /// Returns true if `mPageStyle` has been explicitly set.
+  var hasMPageStyle: Bool {return _storage._mPageStyle != nil}
+  /// Clears the value of `mPageStyle`. Subsequent reads from it will return its default value.
+  mutating func clearMPageStyle() {_uniqueStorage()._mPageStyle = nil}
+
+  var mCallOnoff: UInt32 {
+    get {return _storage._mCallOnoff ?? 0}
+    set {_uniqueStorage()._mCallOnoff = newValue}
+  }
+  /// Returns true if `mCallOnoff` has been explicitly set.
+  var hasMCallOnoff: Bool {return _storage._mCallOnoff != nil}
+  /// Clears the value of `mCallOnoff`. Subsequent reads from it will return its default value.
+  mutating func clearMCallOnoff() {_uniqueStorage()._mCallOnoff = nil}
+
+  var mMsgOnoff: UInt32 {
+    get {return _storage._mMsgOnoff ?? 0}
+    set {_uniqueStorage()._mMsgOnoff = newValue}
+  }
+  /// Returns true if `mMsgOnoff` has been explicitly set.
+  var hasMMsgOnoff: Bool {return _storage._mMsgOnoff != nil}
+  /// Clears the value of `mMsgOnoff`. Subsequent reads from it will return its default value.
+  mutating func clearMMsgOnoff() {_uniqueStorage()._mMsgOnoff = nil}
+
+  var mLongsitOnoff: UInt32 {
+    get {return _storage._mLongsitOnoff ?? 0}
+    set {_uniqueStorage()._mLongsitOnoff = newValue}
+  }
+  /// Returns true if `mLongsitOnoff` has been explicitly set.
+  var hasMLongsitOnoff: Bool {return _storage._mLongsitOnoff != nil}
+  /// Clears the value of `mLongsitOnoff`. Subsequent reads from it will return its default value.
+  mutating func clearMLongsitOnoff() {_uniqueStorage()._mLongsitOnoff = nil}
+
+  var mRaiseUpOnoff: UInt32 {
+    get {return _storage._mRaiseUpOnoff ?? 0}
+    set {_uniqueStorage()._mRaiseUpOnoff = newValue}
+  }
+  /// Returns true if `mRaiseUpOnoff` has been explicitly set.
+  var hasMRaiseUpOnoff: Bool {return _storage._mRaiseUpOnoff != nil}
+  /// Clears the value of `mRaiseUpOnoff`. Subsequent reads from it will return its default value.
+  mutating func clearMRaiseUpOnoff() {_uniqueStorage()._mRaiseUpOnoff = nil}
+
+  var mLcdOnLevel: UInt32 {
+    get {return _storage._mLcdOnLevel ?? 0}
+    set {_uniqueStorage()._mLcdOnLevel = newValue}
+  }
+  /// Returns true if `mLcdOnLevel` has been explicitly set.
+  var hasMLcdOnLevel: Bool {return _storage._mLcdOnLevel != nil}
+  /// Clears the value of `mLcdOnLevel`. Subsequent reads from it will return its default value.
+  mutating func clearMLcdOnLevel() {_uniqueStorage()._mLcdOnLevel = nil}
+
+  var mLcdOnSecond: UInt32 {
+    get {return _storage._mLcdOnSecond ?? 0}
+    set {_uniqueStorage()._mLcdOnSecond = newValue}
+  }
+  /// Returns true if `mLcdOnSecond` has been explicitly set.
+  var hasMLcdOnSecond: Bool {return _storage._mLcdOnSecond != nil}
+  /// Clears the value of `mLcdOnSecond`. Subsequent reads from it will return its default value.
+  mutating func clearMLcdOnSecond() {_uniqueStorage()._mLcdOnSecond = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _storage = _StorageClass.defaultInstance
+}
+
+struct r_get_shell_temperature_t {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var mData: Data {
+    get {return _mData ?? Data()}
+    set {_mData = newValue}
+  }
+  /// Returns true if `mData` has been explicitly set.
+  var hasMData: Bool {return self._mData != nil}
+  /// Clears the value of `mData`. Subsequent reads from it will return its default value.
+  mutating func clearMData() {self._mData = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _mData: Data? = nil
+}
+
+struct set_dev_config_t {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var mType: UInt32 {
+    get {return _mType ?? 0}
+    set {_mType = newValue}
+  }
+  /// Returns true if `mType` has been explicitly set.
+  var hasMType: Bool {return self._mType != nil}
+  /// Clears the value of `mType`. Subsequent reads from it will return its default value.
+  mutating func clearMType() {self._mType = nil}
+
+  var mParam: Data {
+    get {return _mParam ?? Data()}
+    set {_mParam = newValue}
+  }
+  /// Returns true if `mParam` has been explicitly set.
+  var hasMParam: Bool {return self._mParam != nil}
+  /// Clears the value of `mParam`. Subsequent reads from it will return its default value.
+  mutating func clearMParam() {self._mParam = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _mType: UInt32? = nil
+  fileprivate var _mParam: Data? = nil
 }
 
 ///***********************app or fw send cmd****************/
@@ -3461,12 +3920,12 @@ public struct hl_cmds {
   /// Clears the value of `rErrorCode`. Subsequent reads from it will return its default value.
   mutating func clearRErrorCode() {_uniqueStorage()._rErrorCode = nil}
 
-    public  var setNfcOperate: set_nfc_operate_t {
+ public var setNfcOperate: set_nfc_operate_t {
     get {return _storage._setNfcOperate ?? set_nfc_operate_t()}
     set {_uniqueStorage()._setNfcOperate = newValue}
   }
   /// Returns true if `setNfcOperate` has been explicitly set.
-  var hasSetNfcOperate: Bool {return _storage._setNfcOperate != nil}
+ public var hasSetNfcOperate: Bool {return _storage._setNfcOperate != nil}
   /// Clears the value of `setNfcOperate`. Subsequent reads from it will return its default value.
   mutating func clearSetNfcOperate() {_uniqueStorage()._setNfcOperate = nil}
 
@@ -3551,12 +4010,12 @@ public struct hl_cmds {
   /// Clears the value of `rGetMenuSeqData`. Subsequent reads from it will return its default value.
   mutating func clearRGetMenuSeqData() {_uniqueStorage()._rGetMenuSeqData = nil}
 
-  var getNfcCardData: get_nfc_card_data_t {
+    public var getNfcCardData: get_nfc_card_data_t {
     get {return _storage._getNfcCardData ?? get_nfc_card_data_t()}
     set {_uniqueStorage()._getNfcCardData = newValue}
   }
   /// Returns true if `getNfcCardData` has been explicitly set.
-  var hasGetNfcCardData: Bool {return _storage._getNfcCardData != nil}
+ public var hasGetNfcCardData: Bool {return _storage._getNfcCardData != nil}
   /// Clears the value of `getNfcCardData`. Subsequent reads from it will return its default value.
   mutating func clearGetNfcCardData() {_uniqueStorage()._getNfcCardData = nil}
 
@@ -3605,10 +4064,37 @@ public struct hl_cmds {
   /// Clears the value of `setFemaleHealthInfo`. Subsequent reads from it will return its default value.
   mutating func clearSetFemaleHealthInfo() {_uniqueStorage()._setFemaleHealthInfo = nil}
 
+  var rGetRecordInfo: r_get_record_info_t {
+    get {return _storage._rGetRecordInfo ?? r_get_record_info_t()}
+    set {_uniqueStorage()._rGetRecordInfo = newValue}
+  }
+  /// Returns true if `rGetRecordInfo` has been explicitly set.
+  var hasRGetRecordInfo: Bool {return _storage._rGetRecordInfo != nil}
+  /// Clears the value of `rGetRecordInfo`. Subsequent reads from it will return its default value.
+  mutating func clearRGetRecordInfo() {_uniqueStorage()._rGetRecordInfo = nil}
+
+  var rGetShellTemperature: r_get_shell_temperature_t {
+    get {return _storage._rGetShellTemperature ?? r_get_shell_temperature_t()}
+    set {_uniqueStorage()._rGetShellTemperature = newValue}
+  }
+  /// Returns true if `rGetShellTemperature` has been explicitly set.
+  var hasRGetShellTemperature: Bool {return _storage._rGetShellTemperature != nil}
+  /// Clears the value of `rGetShellTemperature`. Subsequent reads from it will return its default value.
+  mutating func clearRGetShellTemperature() {_uniqueStorage()._rGetShellTemperature = nil}
+
+  var setDevConfig: set_dev_config_t {
+    get {return _storage._setDevConfig ?? set_dev_config_t()}
+    set {_uniqueStorage()._setDevConfig = newValue}
+  }
+  /// Returns true if `setDevConfig` has been explicitly set.
+  var hasSetDevConfig: Bool {return _storage._setDevConfig != nil}
+  /// Clears the value of `setDevConfig`. Subsequent reads from it will return its default value.
+  mutating func clearSetDevConfig() {_uniqueStorage()._setDevConfig = nil}
+
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum cmd_t: SwiftProtobuf.Enum {
-    typealias RawValue = Int
+    public enum cmd_t: SwiftProtobuf.Enum {
+        public typealias RawValue = Int
     case cmdBindDevice // = 1
     case cmdGetDeviceInfo // = 2
     case cmdSyncPhoneInfo // = 3
@@ -3676,12 +4162,15 @@ public struct hl_cmds {
     case cmdPhoneAppSetStatus // = 65
     case cmdGetAlarms // = 66
     case cmdSetFemaleHealthInfo // = 67
+    case cmdGetRecordInfo // = 68
+    case cmdGetShellTemperatureInfo // = 69
+    case cmdSetDevConfigInfo // = 70
 
-    init() {
+    public init() {
       self = .cmdBindDevice
     }
 
-    init?(rawValue: Int) {
+    public init?(rawValue: Int) {
       switch rawValue {
       case 1: self = .cmdBindDevice
       case 2: self = .cmdGetDeviceInfo
@@ -3750,11 +4239,14 @@ public struct hl_cmds {
       case 65: self = .cmdPhoneAppSetStatus
       case 66: self = .cmdGetAlarms
       case 67: self = .cmdSetFemaleHealthInfo
+      case 68: self = .cmdGetRecordInfo
+      case 69: self = .cmdGetShellTemperatureInfo
+      case 70: self = .cmdSetDevConfigInfo
       default: return nil
       }
     }
 
-    var rawValue: Int {
+        public var rawValue: Int {
       switch self {
       case .cmdBindDevice: return 1
       case .cmdGetDeviceInfo: return 2
@@ -3823,6 +4315,9 @@ public struct hl_cmds {
       case .cmdPhoneAppSetStatus: return 65
       case .cmdGetAlarms: return 66
       case .cmdSetFemaleHealthInfo: return 67
+      case .cmdGetRecordInfo: return 68
+      case .cmdGetShellTemperatureInfo: return 69
+      case .cmdSetDevConfigInfo: return 70
       }
     }
 
@@ -3861,6 +4356,9 @@ extension weather_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     7: .standard(proto: "m_max_temp"),
     8: .standard(proto: "m_min_temp"),
     9: .standard(proto: "m_seconds"),
+    10: .standard(proto: "m_humidity"),
+    11: .standard(proto: "m_uv"),
+    12: .standard(proto: "m_city_name"),
   ]
 
   public var isInitialized: Bool {
@@ -3891,39 +4389,55 @@ extension weather_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       case 7: try { try decoder.decodeSingularUInt32Field(value: &self._mMaxTemp) }()
       case 8: try { try decoder.decodeSingularUInt32Field(value: &self._mMinTemp) }()
       case 9: try { try decoder.decodeSingularUInt32Field(value: &self._mSeconds) }()
+      case 10: try { try decoder.decodeSingularUInt32Field(value: &self._mHumidity) }()
+      case 11: try { try decoder.decodeSingularUInt32Field(value: &self._mUv) }()
+      case 12: try { try decoder.decodeSingularBytesField(value: &self._mCityName) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mWeatherNum {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mWeatherNum {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mClimate {
+    } }()
+    try { if let v = self._mClimate {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mTemperature {
+    } }()
+    try { if let v = self._mTemperature {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mPm25 {
+    } }()
+    try { if let v = self._mPm25 {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mAqi {
+    } }()
+    try { if let v = self._mAqi {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mCity {
+    } }()
+    try { if let v = self._mCity {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mMaxTemp {
+    } }()
+    try { if let v = self._mMaxTemp {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
-    if let v = self._mMinTemp {
+    } }()
+    try { if let v = self._mMinTemp {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    }
-    if let v = self._mSeconds {
+    } }()
+    try { if let v = self._mSeconds {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    }
+    } }()
+    try { if let v = self._mHumidity {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
+    } }()
+    try { if let v = self._mUv {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 11)
+    } }()
+    try { if let v = self._mCityName {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 12)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -3937,6 +4451,9 @@ extension weather_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     if lhs._mMaxTemp != rhs._mMaxTemp {return false}
     if lhs._mMinTemp != rhs._mMinTemp {return false}
     if lhs._mSeconds != rhs._mSeconds {return false}
+    if lhs._mHumidity != rhs._mHumidity {return false}
+    if lhs._mUv != rhs._mUv {return false}
+    if lhs._mCityName != rhs._mCityName {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -3976,21 +4493,25 @@ extension alarm_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mAlarm1Cfg {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mAlarm1Cfg {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._mAlarm1Hour {
+    } }()
+    try { if let v = self._mAlarm1Hour {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mAlarm1Min {
+    } }()
+    try { if let v = self._mAlarm1Min {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mAlarm1Once {
+    } }()
+    try { if let v = self._mAlarm1Once {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mAlarm1Remarks {
+    } }()
+    try { if let v = self._mAlarm1Remarks {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4044,24 +4565,28 @@ extension bind_app_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mUsrid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mUsrid {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mGender {
+    } }()
+    try { if let v = self._mGender {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mAge {
+    } }()
+    try { if let v = self._mAge {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mHeight {
+    } }()
+    try { if let v = self._mHeight {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mWeight {
+    } }()
+    try { if let v = self._mWeight {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mWearstyle {
+    } }()
+    try { if let v = self._mWearstyle {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4093,6 +4618,7 @@ extension r_bind_device_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     11: .standard(proto: "m_bind_operate"),
     12: .standard(proto: "m_power"),
     13: .standard(proto: "m_langversion"),
+    14: .standard(proto: "m_lang_is_right"),
   ]
 
   public var isInitialized: Bool {
@@ -4130,51 +4656,59 @@ extension r_bind_device_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       case 11: try { try decoder.decodeSingularUInt32Field(value: &self._mBindOperate) }()
       case 12: try { try decoder.decodeSingularUInt32Field(value: &self._mPower) }()
       case 13: try { try decoder.decodeSingularUInt32Field(value: &self._mLangversion) }()
+      case 14: try { try decoder.decodeSingularUInt32Field(value: &self._mLangIsRight) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mProjno {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mProjno {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._mHwversion {
+    } }()
+    try { if let v = self._mHwversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mFwversion {
+    } }()
+    try { if let v = self._mFwversion {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
-    if let v = self._mFontversion {
+    } }()
+    try { if let v = self._mFontversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mSdversion {
+    } }()
+    try { if let v = self._mSdversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mUiversion {
+    } }()
+    try { if let v = self._mUiversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mDevicesn {
+    } }()
+    try { if let v = self._mDevicesn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
-    if let v = self._mDevicename {
+    } }()
+    try { if let v = self._mDevicename {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    }
-    if let v = self._mBattvalue {
+    } }()
+    try { if let v = self._mBattvalue {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    }
-    if let v = self._mDevicemac {
+    } }()
+    try { if let v = self._mDevicemac {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
-    }
-    if let v = self._mBindOperate {
+    } }()
+    try { if let v = self._mBindOperate {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 11)
-    }
-    if let v = self._mPower {
+    } }()
+    try { if let v = self._mPower {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 12)
-    }
-    if let v = self._mLangversion {
+    } }()
+    try { if let v = self._mLangversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 13)
-    }
+    } }()
+    try { if let v = self._mLangIsRight {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 14)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4192,6 +4726,7 @@ extension r_bind_device_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     if lhs._mBindOperate != rhs._mBindOperate {return false}
     if lhs._mPower != rhs._mPower {return false}
     if lhs._mLangversion != rhs._mLangversion {return false}
+    if lhs._mLangIsRight != rhs._mLangIsRight {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -4211,6 +4746,7 @@ extension r_get_device_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     9: .standard(proto: "m_battvalue"),
     10: .standard(proto: "m_devicemac"),
     11: .standard(proto: "m_langversion"),
+    12: .standard(proto: "m_lang_is_right"),
   ]
 
   public var isInitialized: Bool {
@@ -4244,45 +4780,53 @@ extension r_get_device_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       case 9: try { try decoder.decodeSingularUInt32Field(value: &self._mBattvalue) }()
       case 10: try { try decoder.decodeSingularUInt32Field(value: &self._mDevicemac) }()
       case 11: try { try decoder.decodeSingularUInt32Field(value: &self._mLangversion) }()
+      case 12: try { try decoder.decodeSingularUInt32Field(value: &self._mLangIsRight) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mProjno {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mProjno {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._mHwversion {
+    } }()
+    try { if let v = self._mHwversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mFwversion {
+    } }()
+    try { if let v = self._mFwversion {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
-    if let v = self._mFontversion {
+    } }()
+    try { if let v = self._mFontversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mSdversion {
+    } }()
+    try { if let v = self._mSdversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mUiversion {
+    } }()
+    try { if let v = self._mUiversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mDevicesn {
+    } }()
+    try { if let v = self._mDevicesn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
-    if let v = self._mDevicename {
+    } }()
+    try { if let v = self._mDevicename {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    }
-    if let v = self._mBattvalue {
+    } }()
+    try { if let v = self._mBattvalue {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    }
-    if let v = self._mDevicemac {
+    } }()
+    try { if let v = self._mDevicemac {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
-    }
-    if let v = self._mLangversion {
+    } }()
+    try { if let v = self._mLangversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 11)
-    }
+    } }()
+    try { if let v = self._mLangIsRight {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 12)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4298,6 +4842,7 @@ extension r_get_device_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if lhs._mBattvalue != rhs._mBattvalue {return false}
     if lhs._mDevicemac != rhs._mDevicemac {return false}
     if lhs._mLangversion != rhs._mLangversion {return false}
+    if lhs._mLangIsRight != rhs._mLangIsRight {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -4336,18 +4881,22 @@ extension sync_phone_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mPhonemodel {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mPhonemodel {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSystemversion {
+    } }()
+    try { if let v = self._mSystemversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mAppversion {
+    } }()
+    try { if let v = self._mAppversion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mLanguage {
+    } }()
+    try { if let v = self._mLanguage {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4400,24 +4949,28 @@ extension sync_user_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mUsrid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mUsrid {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mGender {
+    } }()
+    try { if let v = self._mGender {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mAge {
+    } }()
+    try { if let v = self._mAge {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mHeight {
+    } }()
+    try { if let v = self._mHeight {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mWeight {
+    } }()
+    try { if let v = self._mWeight {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mWearstyle {
+    } }()
+    try { if let v = self._mWearstyle {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4469,21 +5022,25 @@ extension set_drink_slot_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mDrinkSlot {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mDrinkSlot {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mStartTime {
+    } }()
+    try { if let v = self._mStartTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mEndTime {
+    } }()
+    try { if let v = self._mEndTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mNodisturbStartTime {
+    } }()
+    try { if let v = self._mNodisturbStartTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mNodisturbEndTime {
+    } }()
+    try { if let v = self._mNodisturbEndTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4522,9 +5079,13 @@ extension sync_switch_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSwitchs {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSwitchs {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4559,9 +5120,13 @@ extension set_hr_sample_slot_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mHrSlot {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mHrSlot {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4608,21 +5173,25 @@ extension set_longsit_duration_t: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mLongsitDuration {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mLongsitDuration {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mStartTime {
+    } }()
+    try { if let v = self._mStartTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mEndTime {
+    } }()
+    try { if let v = self._mEndTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mNodisturbStartTime {
+    } }()
+    try { if let v = self._mNodisturbStartTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mNodisturbEndTime {
+    } }()
+    try { if let v = self._mNodisturbEndTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4664,12 +5233,16 @@ extension set_notdisturb_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNotdisturbTime1 {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNotdisturbTime1 {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._mNotdisturbTime2 {
+    } }()
+    try { if let v = self._mNotdisturbTime2 {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4708,12 +5281,16 @@ extension set_country_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mCountryName {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mCountryName {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._mCountryTimezone {
+    } }()
+    try { if let v = self._mCountryTimezone {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4752,12 +5329,16 @@ extension set_ui_style_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mUiStyle {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mUiStyle {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mDialClock {
+    } }()
+    try { if let v = self._mDialClock {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4803,21 +5384,25 @@ extension set_sport_target_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mTargetCal {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mTargetCal {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mTargetDis {
+    } }()
+    try { if let v = self._mTargetDis {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mTargetStep {
+    } }()
+    try { if let v = self._mTargetStep {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mTargetActime {
+    } }()
+    try { if let v = self._mTargetActime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mCheck {
+    } }()
+    try { if let v = self._mCheck {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4856,9 +5441,13 @@ extension set_time_format_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mTimeFormat {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mTimeFormat {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4893,9 +5482,13 @@ extension set_metric_inch_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mMetricInch {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mMetricInch {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4930,9 +5523,13 @@ extension set_bright_times_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mBrightTime {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mBrightTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4970,12 +5567,16 @@ extension set_hr_warning_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mHrUpper {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mHrUpper {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mHrLower {
+    } }()
+    try { if let v = self._mHrLower {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5014,12 +5615,16 @@ extension r_get_hr_value_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mHrValue {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mHrValue {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mErrCode {
+    } }()
+    try { if let v = self._mErrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5073,27 +5678,31 @@ extension set_notify_warning_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNotifyType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNotifyType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mTitleLen {
+    } }()
+    try { if let v = self._mTitleLen {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mMsgLen {
+    } }()
+    try { if let v = self._mMsgLen {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mReserved {
+    } }()
+    try { if let v = self._mReserved {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
-    }
-    if let v = self._mTitle {
+    } }()
+    try { if let v = self._mTitle {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 5)
-    }
-    if let v = self._mMsg {
+    } }()
+    try { if let v = self._mMsg {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 6)
-    }
-    if let v = self._mUtc {
+    } }()
+    try { if let v = self._mUtc {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5140,15 +5749,19 @@ extension r_sync_health_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSyncType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSyncType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSecondStart {
+    } }()
+    try { if let v = self._mSecondStart {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSecondEnd {
+    } }()
+    try { if let v = self._mSecondEnd {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5191,15 +5804,19 @@ extension r_get_health_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mErrCode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mErrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSn {
+    } }()
+    try { if let v = self._mSn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mData {
+    } }()
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5239,12 +5856,16 @@ extension r_get_power_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mErrCode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mErrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mPower {
+    } }()
+    try { if let v = self._mPower {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5280,9 +5901,13 @@ extension set_updata_fw_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNewVersion {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNewVersion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5354,9 +5979,13 @@ extension set_reset_machine_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mFactoryMode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mFactoryMode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5414,33 +6043,37 @@ extension set_sport_status_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSportMode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSportMode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSportStatus {
+    } }()
+    try { if let v = self._mSportStatus {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSportSpeed {
+    } }()
+    try { if let v = self._mSportSpeed {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mSportDistance {
+    } }()
+    try { if let v = self._mSportDistance {
       try visitor.visitSingularFloatField(value: v, fieldNumber: 4)
-    }
-    if let v = self._mSportCalorie {
+    } }()
+    try { if let v = self._mSportCalorie {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mSportFlag {
+    } }()
+    try { if let v = self._mSportFlag {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mSportDuration {
+    } }()
+    try { if let v = self._mSportDuration {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
-    if let v = self._mSportSecond {
+    } }()
+    try { if let v = self._mSportSecond {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    }
-    if let v = self._mSportStep {
+    } }()
+    try { if let v = self._mSportStep {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5495,21 +6128,25 @@ extension r_get_sport_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSportMode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSportMode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSportStatus {
+    } }()
+    try { if let v = self._mSportStatus {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSportStep {
+    } }()
+    try { if let v = self._mSportStep {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mSportCalorie {
+    } }()
+    try { if let v = self._mSportCalorie {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mSportHeart {
+    } }()
+    try { if let v = self._mSportHeart {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5530,6 +6167,9 @@ extension set_music_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
     1: .standard(proto: "m_music_ctr_code"),
     2: .standard(proto: "m_music_volume"),
     3: .standard(proto: "m_music_title"),
+    4: .standard(proto: "m_music_words"),
+    5: .standard(proto: "m_music_duration_ms"),
+    6: .standard(proto: "m_music_elapsed_ms"),
   ]
 
   public var isInitialized: Bool {
@@ -5546,21 +6186,37 @@ extension set_music_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self._mMusicCtrCode) }()
       case 2: try { try decoder.decodeSingularUInt32Field(value: &self._mMusicVolume) }()
       case 3: try { try decoder.decodeSingularBytesField(value: &self._mMusicTitle) }()
+      case 4: try { try decoder.decodeSingularBytesField(value: &self._mMusicWords) }()
+      case 5: try { try decoder.decodeSingularUInt32Field(value: &self._mMusicDurationMs) }()
+      case 6: try { try decoder.decodeSingularUInt32Field(value: &self._mMusicElapsedMs) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mMusicCtrCode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mMusicCtrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mMusicVolume {
+    } }()
+    try { if let v = self._mMusicVolume {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mMusicTitle {
+    } }()
+    try { if let v = self._mMusicTitle {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
+    } }()
+    try { if let v = self._mMusicWords {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._mMusicDurationMs {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
+    } }()
+    try { if let v = self._mMusicElapsedMs {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5568,6 +6224,9 @@ extension set_music_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
     if lhs._mMusicCtrCode != rhs._mMusicCtrCode {return false}
     if lhs._mMusicVolume != rhs._mMusicVolume {return false}
     if lhs._mMusicTitle != rhs._mMusicTitle {return false}
+    if lhs._mMusicWords != rhs._mMusicWords {return false}
+    if lhs._mMusicDurationMs != rhs._mMusicDurationMs {return false}
+    if lhs._mMusicElapsedMs != rhs._mMusicElapsedMs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -5600,12 +6259,16 @@ extension r_get_mtu_size_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mErrCode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mErrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mMtu {
+    } }()
+    try { if let v = self._mMtu {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5644,12 +6307,16 @@ extension set_bin_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSn {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mData {
+    } }()
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5694,18 +6361,22 @@ extension set_big_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mDataLenth {
+    } }()
+    try { if let v = self._mDataLenth {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mPicID {
+    } }()
+    try { if let v = self._mPicID {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mCrcCode {
+    } }()
+    try { if let v = self._mCrcCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5780,9 +6451,13 @@ extension set_rtimehr_dur_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mHrDuration {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mHrDuration {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5817,9 +6492,13 @@ extension r_rtimehr_value_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mHrValue {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mHrValue {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5854,9 +6533,13 @@ extension r_error_code_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._err {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._err {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5891,9 +6574,13 @@ extension r_find_phone_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mRingStatus {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mRingStatus {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5928,9 +6615,13 @@ extension r_get_disturb_en_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mDisturbEn {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mDisturbEn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5976,21 +6667,25 @@ extension r_get_step_count_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mStepCount {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mStepCount {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mTimeSecond {
+    } }()
+    try { if let v = self._mTimeSecond {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mStepCalorie {
+    } }()
+    try { if let v = self._mStepCalorie {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mStepDistance {
+    } }()
+    try { if let v = self._mStepDistance {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mActiveduration {
+    } }()
+    try { if let v = self._mActiveduration {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6041,27 +6736,31 @@ extension r_get_current_hr_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mCurrentHr {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mCurrentHr {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mCurSportStatus {
+    } }()
+    try { if let v = self._mCurSportStatus {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mStep {
+    } }()
+    try { if let v = self._mStep {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mCaloriesKcal {
+    } }()
+    try { if let v = self._mCaloriesKcal {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mDistanceM {
+    } }()
+    try { if let v = self._mDistanceM {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mTimeSecond {
+    } }()
+    try { if let v = self._mTimeSecond {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mSpaceSkm {
+    } }()
+    try { if let v = self._mSpaceSkm {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6102,9 +6801,13 @@ extension r_set_light_leak_result_t: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mCheckResult {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mCheckResult {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6145,15 +6848,19 @@ extension r_get_log_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mLogLength {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mLogLength {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mLogSn {
+    } }()
+    try { if let v = self._mLogSn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mLogData {
+    } }()
+    try { if let v = self._mLogData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6193,12 +6900,16 @@ extension r_set_active_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mActStartTime {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mActStartTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mActEndTime {
+    } }()
+    try { if let v = self._mActEndTime {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6237,6 +6948,8 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
     22: .standard(proto: "m_active_skip_times"),
     23: .standard(proto: "m_active_gps_count"),
     24: .standard(proto: "m_total_gps_num"),
+    25: .standard(proto: "m_active_space_count"),
+    26: .standard(proto: "m_active_speed_count"),
   ]
 
   fileprivate class _StorageClass {
@@ -6264,6 +6977,8 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
     var _mActiveSkipTimes: UInt32? = nil
     var _mActiveGpsCount: UInt32? = nil
     var _mTotalGpsNum: UInt32? = nil
+    var _mActiveSpaceCount: UInt32? = nil
+    var _mActiveSpeedCount: UInt32? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -6294,6 +7009,8 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
       _mActiveSkipTimes = source._mActiveSkipTimes
       _mActiveGpsCount = source._mActiveGpsCount
       _mTotalGpsNum = source._mTotalGpsNum
+      _mActiveSpaceCount = source._mActiveSpaceCount
+      _mActiveSpeedCount = source._mActiveSpeedCount
     }
   }
 
@@ -6365,6 +7082,8 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
         case 22: try { try decoder.decodeSingularUInt32Field(value: &_storage._mActiveSkipTimes) }()
         case 23: try { try decoder.decodeSingularUInt32Field(value: &_storage._mActiveGpsCount) }()
         case 24: try { try decoder.decodeSingularUInt32Field(value: &_storage._mTotalGpsNum) }()
+        case 25: try { try decoder.decodeSingularUInt32Field(value: &_storage._mActiveSpaceCount) }()
+        case 26: try { try decoder.decodeSingularUInt32Field(value: &_storage._mActiveSpeedCount) }()
         default: break
         }
       }
@@ -6373,78 +7092,88 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._mCountNum {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._mCountNum {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._mTotalLength {
+      } }()
+      try { if let v = _storage._mTotalLength {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-      }
-      if let v = _storage._mActiveStartSecond {
+      } }()
+      try { if let v = _storage._mActiveStartSecond {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-      }
-      if let v = _storage._mActiveHrCount {
+      } }()
+      try { if let v = _storage._mActiveHrCount {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-      }
-      if let v = _storage._mActiveType {
+      } }()
+      try { if let v = _storage._mActiveType {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-      }
-      if let v = _storage._mActiveStep {
+      } }()
+      try { if let v = _storage._mActiveStep {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-      }
-      if let v = _storage._mActiveDurations {
+      } }()
+      try { if let v = _storage._mActiveDurations {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-      }
-      if let v = _storage._mActiveCalories {
+      } }()
+      try { if let v = _storage._mActiveCalories {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-      }
-      if let v = _storage._mActiveDistance {
+      } }()
+      try { if let v = _storage._mActiveDistance {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-      }
-      if let v = _storage._mActiveAvgHr {
+      } }()
+      try { if let v = _storage._mActiveAvgHr {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
-      }
-      if let v = _storage._mActiveMaxHr {
+      } }()
+      try { if let v = _storage._mActiveMaxHr {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 11)
-      }
-      if let v = _storage._mBurnFatMins {
+      } }()
+      try { if let v = _storage._mBurnFatMins {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 12)
-      }
-      if let v = _storage._mAerobicMins {
+      } }()
+      try { if let v = _storage._mAerobicMins {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 13)
-      }
-      if let v = _storage._mLimitMins {
+      } }()
+      try { if let v = _storage._mLimitMins {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 14)
-      }
-      if let v = _storage._mIsEffective {
+      } }()
+      try { if let v = _storage._mIsEffective {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 15)
-      }
-      if let v = _storage._mMagicNum {
+      } }()
+      try { if let v = _storage._mMagicNum {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 16)
-      }
-      if let v = _storage._mSn {
+      } }()
+      try { if let v = _storage._mSn {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 17)
-      }
-      if let v = _storage._mHrData {
+      } }()
+      try { if let v = _storage._mHrData {
         try visitor.visitSingularBytesField(value: v, fieldNumber: 18)
-      }
-      if let v = _storage._mActiveSpeed {
+      } }()
+      try { if let v = _storage._mActiveSpeed {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 19)
-      }
-      if let v = _storage._mActiveSwing {
+      } }()
+      try { if let v = _storage._mActiveSwing {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 20)
-      }
-      if let v = _storage._mActiveMinHr {
+      } }()
+      try { if let v = _storage._mActiveMinHr {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 21)
-      }
-      if let v = _storage._mActiveSkipTimes {
+      } }()
+      try { if let v = _storage._mActiveSkipTimes {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 22)
-      }
-      if let v = _storage._mActiveGpsCount {
+      } }()
+      try { if let v = _storage._mActiveGpsCount {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 23)
-      }
-      if let v = _storage._mTotalGpsNum {
+      } }()
+      try { if let v = _storage._mTotalGpsNum {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 24)
-      }
+      } }()
+      try { if let v = _storage._mActiveSpaceCount {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 25)
+      } }()
+      try { if let v = _storage._mActiveSpeedCount {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 26)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -6478,6 +7207,8 @@ extension r_get_active_record_data_t: SwiftProtobuf.Message, SwiftProtobuf._Mess
         if _storage._mActiveSkipTimes != rhs_storage._mActiveSkipTimes {return false}
         if _storage._mActiveGpsCount != rhs_storage._mActiveGpsCount {return false}
         if _storage._mTotalGpsNum != rhs_storage._mTotalGpsNum {return false}
+        if _storage._mActiveSpaceCount != rhs_storage._mActiveSpaceCount {return false}
+        if _storage._mActiveSpeedCount != rhs_storage._mActiveSpeedCount {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6517,15 +7248,19 @@ extension r_get_ui_hrs_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mUiActHr {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mUiActHr {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mUiMaxHr {
+    } }()
+    try { if let v = self._mUiMaxHr {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mUiMinHr {
+    } }()
+    try { if let v = self._mUiMinHr {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6555,7 +7290,7 @@ extension set_nfc_operate_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     return true
   }
 
-    public  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -6572,21 +7307,25 @@ extension set_nfc_operate_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
     public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNfcOperateCode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNfcOperateCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mNfcData {
+    } }()
+    try { if let v = self._mNfcData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-    }
-    if let v = self._mNfcErrCode {
+    } }()
+    try { if let v = self._mNfcErrCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mNfcSubOperateCode {
+    } }()
+    try { if let v = self._mNfcSubOperateCode {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mNfcCity {
+    } }()
+    try { if let v = self._mNfcCity {
       try visitor.visitSingularUInt64Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6628,12 +7367,16 @@ extension set_page_switch_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mOperateType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mOperateType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mPageSwitch {
+    } }()
+    try { if let v = self._mPageSwitch {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6678,18 +7421,22 @@ extension set_check_gps_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mCheckType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mCheckType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mFileNum {
+    } }()
+    try { if let v = self._mFileNum {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSecond {
+    } }()
+    try { if let v = self._mSecond {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mNewVersion {
+    } }()
+    try { if let v = self._mNewVersion {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6736,18 +7483,22 @@ extension set_update_gps_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mFileName {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mFileName {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mFileLength {
+    } }()
+    try { if let v = self._mFileLength {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSn {
+    } }()
+    try { if let v = self._mSn {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mData {
+    } }()
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6788,12 +7539,16 @@ extension set_update_spo2_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mSpo2Value {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mSpo2Value {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSeconds {
+    } }()
+    try { if let v = self._mSeconds {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6841,21 +7596,25 @@ extension get_dial_config_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mDialID {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mDialID {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mDialWidth {
+    } }()
+    try { if let v = self._mDialWidth {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mDialHeight {
+    } }()
+    try { if let v = self._mDialHeight {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mDialForm {
+    } }()
+    try { if let v = self._mDialForm {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mDialMaxSize {
+    } }()
+    try { if let v = self._mDialMaxSize {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6900,15 +7659,19 @@ extension set_warming_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mMin {
+    } }()
+    try { if let v = self._mMin {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mMax {
+    } }()
+    try { if let v = self._mMax {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6951,15 +7714,19 @@ extension set_menu_sequence_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mCount {
+    } }()
+    try { if let v = self._mCount {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mData {
+    } }()
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6996,9 +7763,13 @@ extension get_menu_sequence_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7045,21 +7816,25 @@ extension r_get_menu_sequence_t: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mSupportCount {
+    } }()
+    try { if let v = self._mSupportCount {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mSupport {
+    } }()
+    try { if let v = self._mSupport {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mCount {
+    } }()
+    try { if let v = self._mCount {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mData {
+    } }()
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7075,17 +7850,17 @@ extension r_get_menu_sequence_t: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
 }
 
 extension get_nfc_card_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = "get_nfc_card_data_t"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = "get_nfc_card_data_t"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "m_data"),
   ]
 
-  public var isInitialized: Bool {
+    public var isInitialized: Bool {
     if self._mData == nil {return false}
     return true
   }
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -7097,14 +7872,18 @@ extension get_nfc_card_data_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mData {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mData {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: get_nfc_card_data_t, rhs: get_nfc_card_data_t) -> Bool {
+    public static func ==(lhs: get_nfc_card_data_t, rhs: get_nfc_card_data_t) -> Bool {
     if lhs._mData != rhs._mData {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -7138,12 +7917,16 @@ extension set_spo2_detect_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNightEnable {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNightEnable {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mNightIntersec {
+    } }()
+    try { if let v = self._mNightIntersec {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7182,12 +7965,16 @@ extension r_get_spo2_detect_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mNightEnable {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mNightEnable {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mNightIntersec {
+    } }()
+    try { if let v = self._mNightIntersec {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7235,21 +8022,25 @@ extension swsn_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._swsn {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._swsn {
       try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-    }
-    if let v = self._funcSwitch {
+    } }()
+    try { if let v = self._funcSwitch {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._langsSwitch {
+    } }()
+    try { if let v = self._langsSwitch {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._defaultLang {
+    } }()
+    try { if let v = self._defaultLang {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._projectNum {
+    } }()
+    try { if let v = self._projectNum {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7288,9 +8079,13 @@ extension set_phone_app_status_t: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mStatus {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mStatus {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7352,36 +8147,40 @@ extension set_female_health_info_t: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._mDuration {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mDuration {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
-    }
-    if let v = self._mPeriod {
+    } }()
+    try { if let v = self._mPeriod {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    if let v = self._mLastYear {
+    } }()
+    try { if let v = self._mLastYear {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-    }
-    if let v = self._mLastMonth {
+    } }()
+    try { if let v = self._mLastMonth {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    }
-    if let v = self._mLastDay {
+    } }()
+    try { if let v = self._mLastDay {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-    }
-    if let v = self._mSetTimestamps {
+    } }()
+    try { if let v = self._mSetTimestamps {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
-    }
-    if let v = self._mSetYear {
+    } }()
+    try { if let v = self._mSetYear {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
-    }
-    if let v = self._mSetMonth {
+    } }()
+    try { if let v = self._mSetMonth {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    }
-    if let v = self._mSetDay {
+    } }()
+    try { if let v = self._mSetDay {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    }
-    if let v = self._mCheck {
+    } }()
+    try { if let v = self._mCheck {
       try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7396,6 +8195,458 @@ extension set_female_health_info_t: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if lhs._mSetMonth != rhs._mSetMonth {return false}
     if lhs._mSetDay != rhs._mSetDay {return false}
     if lhs._mCheck != rhs._mCheck {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension r_get_record_info_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "r_get_record_info_t"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "m_reboot_cnt"),
+    2: .standard(proto: "m_key1_press_cnt"),
+    3: .standard(proto: "m_msg_cnt"),
+    4: .standard(proto: "m_call_cnt"),
+    5: .standard(proto: "m_longsit_cnt"),
+    6: .standard(proto: "m_update_dial_cnt"),
+    7: .standard(proto: "m_raise_up_cnt"),
+    8: .standard(proto: "m_music_page_cnt"),
+    9: .standard(proto: "m_hr_page_cnt"),
+    10: .standard(proto: "m_spo2_page_cnt"),
+    11: .standard(proto: "m_alipay_page_cnt"),
+    12: .standard(proto: "m_weather_page_cnt"),
+    13: .standard(proto: "m_breath_page_cnt"),
+    14: .standard(proto: "m_stopwatch_page_cnt"),
+    15: .standard(proto: "m_countdown_page_cnt"),
+    16: .standard(proto: "m_status_page_cnt"),
+    17: .standard(proto: "m_sleep_page_cnt"),
+    18: .standard(proto: "m_findphone_page_cnt"),
+    19: .standard(proto: "m_mulspt_page_cnt"),
+    20: .standard(proto: "m_motor_cnt"),
+    21: .standard(proto: "m_motor_work_time_sec"),
+    22: .standard(proto: "m_lcd_on_time_sec"),
+    23: .standard(proto: "m_last_charge_timestamps"),
+    24: .standard(proto: "m_last_charge_second"),
+    25: .standard(proto: "m_last_used_second"),
+    26: .standard(proto: "m_dial_id"),
+    27: .standard(proto: "m_page_style"),
+    28: .standard(proto: "m_call_onoff"),
+    29: .standard(proto: "m_msg_onoff"),
+    30: .standard(proto: "m_longsit_onoff"),
+    31: .standard(proto: "m_raise_up_onoff"),
+    32: .standard(proto: "m_lcd_on_level"),
+    33: .standard(proto: "m_lcd_on_second"),
+  ]
+
+  fileprivate class _StorageClass {
+    var _mRebootCnt: UInt32? = nil
+    var _mKey1PressCnt: UInt32? = nil
+    var _mMsgCnt: UInt32? = nil
+    var _mCallCnt: UInt32? = nil
+    var _mLongsitCnt: UInt32? = nil
+    var _mUpdateDialCnt: UInt32? = nil
+    var _mRaiseUpCnt: UInt32? = nil
+    var _mMusicPageCnt: UInt32? = nil
+    var _mHrPageCnt: UInt32? = nil
+    var _mSpo2PageCnt: UInt32? = nil
+    var _mAlipayPageCnt: UInt32? = nil
+    var _mWeatherPageCnt: UInt32? = nil
+    var _mBreathPageCnt: UInt32? = nil
+    var _mStopwatchPageCnt: UInt32? = nil
+    var _mCountdownPageCnt: UInt32? = nil
+    var _mStatusPageCnt: UInt32? = nil
+    var _mSleepPageCnt: UInt32? = nil
+    var _mFindphonePageCnt: UInt32? = nil
+    var _mMulsptPageCnt: UInt32? = nil
+    var _mMotorCnt: UInt32? = nil
+    var _mMotorWorkTimeSec: UInt32? = nil
+    var _mLcdOnTimeSec: UInt32? = nil
+    var _mLastChargeTimestamps: UInt32? = nil
+    var _mLastChargeSecond: UInt32? = nil
+    var _mLastUsedSecond: UInt32? = nil
+    var _mDialID: UInt32? = nil
+    var _mPageStyle: UInt32? = nil
+    var _mCallOnoff: UInt32? = nil
+    var _mMsgOnoff: UInt32? = nil
+    var _mLongsitOnoff: UInt32? = nil
+    var _mRaiseUpOnoff: UInt32? = nil
+    var _mLcdOnLevel: UInt32? = nil
+    var _mLcdOnSecond: UInt32? = nil
+
+    static let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _mRebootCnt = source._mRebootCnt
+      _mKey1PressCnt = source._mKey1PressCnt
+      _mMsgCnt = source._mMsgCnt
+      _mCallCnt = source._mCallCnt
+      _mLongsitCnt = source._mLongsitCnt
+      _mUpdateDialCnt = source._mUpdateDialCnt
+      _mRaiseUpCnt = source._mRaiseUpCnt
+      _mMusicPageCnt = source._mMusicPageCnt
+      _mHrPageCnt = source._mHrPageCnt
+      _mSpo2PageCnt = source._mSpo2PageCnt
+      _mAlipayPageCnt = source._mAlipayPageCnt
+      _mWeatherPageCnt = source._mWeatherPageCnt
+      _mBreathPageCnt = source._mBreathPageCnt
+      _mStopwatchPageCnt = source._mStopwatchPageCnt
+      _mCountdownPageCnt = source._mCountdownPageCnt
+      _mStatusPageCnt = source._mStatusPageCnt
+      _mSleepPageCnt = source._mSleepPageCnt
+      _mFindphonePageCnt = source._mFindphonePageCnt
+      _mMulsptPageCnt = source._mMulsptPageCnt
+      _mMotorCnt = source._mMotorCnt
+      _mMotorWorkTimeSec = source._mMotorWorkTimeSec
+      _mLcdOnTimeSec = source._mLcdOnTimeSec
+      _mLastChargeTimestamps = source._mLastChargeTimestamps
+      _mLastChargeSecond = source._mLastChargeSecond
+      _mLastUsedSecond = source._mLastUsedSecond
+      _mDialID = source._mDialID
+      _mPageStyle = source._mPageStyle
+      _mCallOnoff = source._mCallOnoff
+      _mMsgOnoff = source._mMsgOnoff
+      _mLongsitOnoff = source._mLongsitOnoff
+      _mRaiseUpOnoff = source._mRaiseUpOnoff
+      _mLcdOnLevel = source._mLcdOnLevel
+      _mLcdOnSecond = source._mLcdOnSecond
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
+
+  public var isInitialized: Bool {
+    return withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      if _storage._mRebootCnt == nil {return false}
+      if _storage._mKey1PressCnt == nil {return false}
+      if _storage._mMsgCnt == nil {return false}
+      if _storage._mCallCnt == nil {return false}
+      if _storage._mLongsitCnt == nil {return false}
+      if _storage._mUpdateDialCnt == nil {return false}
+      if _storage._mRaiseUpCnt == nil {return false}
+      if _storage._mMusicPageCnt == nil {return false}
+      if _storage._mHrPageCnt == nil {return false}
+      if _storage._mSpo2PageCnt == nil {return false}
+      if _storage._mAlipayPageCnt == nil {return false}
+      if _storage._mWeatherPageCnt == nil {return false}
+      if _storage._mBreathPageCnt == nil {return false}
+      if _storage._mStopwatchPageCnt == nil {return false}
+      if _storage._mCountdownPageCnt == nil {return false}
+      if _storage._mStatusPageCnt == nil {return false}
+      if _storage._mSleepPageCnt == nil {return false}
+      if _storage._mFindphonePageCnt == nil {return false}
+      if _storage._mMulsptPageCnt == nil {return false}
+      if _storage._mMotorCnt == nil {return false}
+      if _storage._mMotorWorkTimeSec == nil {return false}
+      if _storage._mLcdOnTimeSec == nil {return false}
+      if _storage._mLastChargeTimestamps == nil {return false}
+      if _storage._mLastChargeSecond == nil {return false}
+      if _storage._mLastUsedSecond == nil {return false}
+      if _storage._mDialID == nil {return false}
+      if _storage._mPageStyle == nil {return false}
+      if _storage._mCallOnoff == nil {return false}
+      if _storage._mMsgOnoff == nil {return false}
+      if _storage._mLongsitOnoff == nil {return false}
+      if _storage._mRaiseUpOnoff == nil {return false}
+      if _storage._mLcdOnLevel == nil {return false}
+      if _storage._mLcdOnSecond == nil {return false}
+      return true
+    }
+  }
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularUInt32Field(value: &_storage._mRebootCnt) }()
+        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._mKey1PressCnt) }()
+        case 3: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMsgCnt) }()
+        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._mCallCnt) }()
+        case 5: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLongsitCnt) }()
+        case 6: try { try decoder.decodeSingularUInt32Field(value: &_storage._mUpdateDialCnt) }()
+        case 7: try { try decoder.decodeSingularUInt32Field(value: &_storage._mRaiseUpCnt) }()
+        case 8: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMusicPageCnt) }()
+        case 9: try { try decoder.decodeSingularUInt32Field(value: &_storage._mHrPageCnt) }()
+        case 10: try { try decoder.decodeSingularUInt32Field(value: &_storage._mSpo2PageCnt) }()
+        case 11: try { try decoder.decodeSingularUInt32Field(value: &_storage._mAlipayPageCnt) }()
+        case 12: try { try decoder.decodeSingularUInt32Field(value: &_storage._mWeatherPageCnt) }()
+        case 13: try { try decoder.decodeSingularUInt32Field(value: &_storage._mBreathPageCnt) }()
+        case 14: try { try decoder.decodeSingularUInt32Field(value: &_storage._mStopwatchPageCnt) }()
+        case 15: try { try decoder.decodeSingularUInt32Field(value: &_storage._mCountdownPageCnt) }()
+        case 16: try { try decoder.decodeSingularUInt32Field(value: &_storage._mStatusPageCnt) }()
+        case 17: try { try decoder.decodeSingularUInt32Field(value: &_storage._mSleepPageCnt) }()
+        case 18: try { try decoder.decodeSingularUInt32Field(value: &_storage._mFindphonePageCnt) }()
+        case 19: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMulsptPageCnt) }()
+        case 20: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMotorCnt) }()
+        case 21: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMotorWorkTimeSec) }()
+        case 22: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLcdOnTimeSec) }()
+        case 23: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLastChargeTimestamps) }()
+        case 24: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLastChargeSecond) }()
+        case 25: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLastUsedSecond) }()
+        case 26: try { try decoder.decodeSingularUInt32Field(value: &_storage._mDialID) }()
+        case 27: try { try decoder.decodeSingularUInt32Field(value: &_storage._mPageStyle) }()
+        case 28: try { try decoder.decodeSingularUInt32Field(value: &_storage._mCallOnoff) }()
+        case 29: try { try decoder.decodeSingularUInt32Field(value: &_storage._mMsgOnoff) }()
+        case 30: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLongsitOnoff) }()
+        case 31: try { try decoder.decodeSingularUInt32Field(value: &_storage._mRaiseUpOnoff) }()
+        case 32: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLcdOnLevel) }()
+        case 33: try { try decoder.decodeSingularUInt32Field(value: &_storage._mLcdOnSecond) }()
+        default: break
+        }
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._mRebootCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
+      } }()
+      try { if let v = _storage._mKey1PressCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
+      } }()
+      try { if let v = _storage._mMsgCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
+      } }()
+      try { if let v = _storage._mCallCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
+      } }()
+      try { if let v = _storage._mLongsitCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
+      } }()
+      try { if let v = _storage._mUpdateDialCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 6)
+      } }()
+      try { if let v = _storage._mRaiseUpCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 7)
+      } }()
+      try { if let v = _storage._mMusicPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
+      } }()
+      try { if let v = _storage._mHrPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
+      } }()
+      try { if let v = _storage._mSpo2PageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
+      } }()
+      try { if let v = _storage._mAlipayPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 11)
+      } }()
+      try { if let v = _storage._mWeatherPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 12)
+      } }()
+      try { if let v = _storage._mBreathPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 13)
+      } }()
+      try { if let v = _storage._mStopwatchPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 14)
+      } }()
+      try { if let v = _storage._mCountdownPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 15)
+      } }()
+      try { if let v = _storage._mStatusPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 16)
+      } }()
+      try { if let v = _storage._mSleepPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 17)
+      } }()
+      try { if let v = _storage._mFindphonePageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 18)
+      } }()
+      try { if let v = _storage._mMulsptPageCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 19)
+      } }()
+      try { if let v = _storage._mMotorCnt {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 20)
+      } }()
+      try { if let v = _storage._mMotorWorkTimeSec {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 21)
+      } }()
+      try { if let v = _storage._mLcdOnTimeSec {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 22)
+      } }()
+      try { if let v = _storage._mLastChargeTimestamps {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 23)
+      } }()
+      try { if let v = _storage._mLastChargeSecond {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 24)
+      } }()
+      try { if let v = _storage._mLastUsedSecond {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 25)
+      } }()
+      try { if let v = _storage._mDialID {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 26)
+      } }()
+      try { if let v = _storage._mPageStyle {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 27)
+      } }()
+      try { if let v = _storage._mCallOnoff {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 28)
+      } }()
+      try { if let v = _storage._mMsgOnoff {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 29)
+      } }()
+      try { if let v = _storage._mLongsitOnoff {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 30)
+      } }()
+      try { if let v = _storage._mRaiseUpOnoff {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 31)
+      } }()
+      try { if let v = _storage._mLcdOnLevel {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 32)
+      } }()
+      try { if let v = _storage._mLcdOnSecond {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 33)
+      } }()
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: r_get_record_info_t, rhs: r_get_record_info_t) -> Bool {
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._mRebootCnt != rhs_storage._mRebootCnt {return false}
+        if _storage._mKey1PressCnt != rhs_storage._mKey1PressCnt {return false}
+        if _storage._mMsgCnt != rhs_storage._mMsgCnt {return false}
+        if _storage._mCallCnt != rhs_storage._mCallCnt {return false}
+        if _storage._mLongsitCnt != rhs_storage._mLongsitCnt {return false}
+        if _storage._mUpdateDialCnt != rhs_storage._mUpdateDialCnt {return false}
+        if _storage._mRaiseUpCnt != rhs_storage._mRaiseUpCnt {return false}
+        if _storage._mMusicPageCnt != rhs_storage._mMusicPageCnt {return false}
+        if _storage._mHrPageCnt != rhs_storage._mHrPageCnt {return false}
+        if _storage._mSpo2PageCnt != rhs_storage._mSpo2PageCnt {return false}
+        if _storage._mAlipayPageCnt != rhs_storage._mAlipayPageCnt {return false}
+        if _storage._mWeatherPageCnt != rhs_storage._mWeatherPageCnt {return false}
+        if _storage._mBreathPageCnt != rhs_storage._mBreathPageCnt {return false}
+        if _storage._mStopwatchPageCnt != rhs_storage._mStopwatchPageCnt {return false}
+        if _storage._mCountdownPageCnt != rhs_storage._mCountdownPageCnt {return false}
+        if _storage._mStatusPageCnt != rhs_storage._mStatusPageCnt {return false}
+        if _storage._mSleepPageCnt != rhs_storage._mSleepPageCnt {return false}
+        if _storage._mFindphonePageCnt != rhs_storage._mFindphonePageCnt {return false}
+        if _storage._mMulsptPageCnt != rhs_storage._mMulsptPageCnt {return false}
+        if _storage._mMotorCnt != rhs_storage._mMotorCnt {return false}
+        if _storage._mMotorWorkTimeSec != rhs_storage._mMotorWorkTimeSec {return false}
+        if _storage._mLcdOnTimeSec != rhs_storage._mLcdOnTimeSec {return false}
+        if _storage._mLastChargeTimestamps != rhs_storage._mLastChargeTimestamps {return false}
+        if _storage._mLastChargeSecond != rhs_storage._mLastChargeSecond {return false}
+        if _storage._mLastUsedSecond != rhs_storage._mLastUsedSecond {return false}
+        if _storage._mDialID != rhs_storage._mDialID {return false}
+        if _storage._mPageStyle != rhs_storage._mPageStyle {return false}
+        if _storage._mCallOnoff != rhs_storage._mCallOnoff {return false}
+        if _storage._mMsgOnoff != rhs_storage._mMsgOnoff {return false}
+        if _storage._mLongsitOnoff != rhs_storage._mLongsitOnoff {return false}
+        if _storage._mRaiseUpOnoff != rhs_storage._mRaiseUpOnoff {return false}
+        if _storage._mLcdOnLevel != rhs_storage._mLcdOnLevel {return false}
+        if _storage._mLcdOnSecond != rhs_storage._mLcdOnSecond {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension r_get_shell_temperature_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "r_get_shell_temperature_t"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "m_data"),
+  ]
+
+  public var isInitialized: Bool {
+    if self._mData == nil {return false}
+    return true
+  }
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._mData) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mData {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: r_get_shell_temperature_t, rhs: r_get_shell_temperature_t) -> Bool {
+    if lhs._mData != rhs._mData {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension set_dev_config_t: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = "set_dev_config_t"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "m_type"),
+    2: .standard(proto: "m_param"),
+  ]
+
+  public var isInitialized: Bool {
+    if self._mType == nil {return false}
+    if self._mParam == nil {return false}
+    return true
+  }
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self._mType) }()
+      case 2: try { try decoder.decodeSingularBytesField(value: &self._mParam) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._mType {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._mParam {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: set_dev_config_t, rhs: set_dev_config_t) -> Bool {
+    if lhs._mType != rhs._mType {return false}
+    if lhs._mParam != rhs._mParam {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -7468,6 +8719,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
     62: .standard(proto: "swsn_info"),
     63: .standard(proto: "set_phone_app_status"),
     64: .standard(proto: "set_female_health_info"),
+    65: .standard(proto: "r_get_record_info"),
+    66: .standard(proto: "r_get_shell_temperature"),
+    67: .standard(proto: "set_dev_config"),
   ]
 
   fileprivate class _StorageClass {
@@ -7535,6 +8789,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
     var _swsnInfo: swsn_info_t? = nil
     var _setPhoneAppStatus: set_phone_app_status_t? = nil
     var _setFemaleHealthInfo: set_female_health_info_t? = nil
+    var _rGetRecordInfo: r_get_record_info_t? = nil
+    var _rGetShellTemperature: r_get_shell_temperature_t? = nil
+    var _setDevConfig: set_dev_config_t? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -7605,6 +8862,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
       _swsnInfo = source._swsnInfo
       _setPhoneAppStatus = source._setPhoneAppStatus
       _setFemaleHealthInfo = source._setFemaleHealthInfo
+      _rGetRecordInfo = source._rGetRecordInfo
+      _rGetShellTemperature = source._rGetShellTemperature
+      _setDevConfig = source._setDevConfig
     }
   }
 
@@ -7681,6 +8941,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
       if let v = _storage._swsnInfo, !v.isInitialized {return false}
       if let v = _storage._setPhoneAppStatus, !v.isInitialized {return false}
       if let v = _storage._setFemaleHealthInfo, !v.isInitialized {return false}
+      if let v = _storage._rGetRecordInfo, !v.isInitialized {return false}
+      if let v = _storage._rGetShellTemperature, !v.isInitialized {return false}
+      if let v = _storage._setDevConfig, !v.isInitialized {return false}
       return true
     }
   }
@@ -7757,6 +9020,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
         case 62: try { try decoder.decodeSingularMessageField(value: &_storage._swsnInfo) }()
         case 63: try { try decoder.decodeSingularMessageField(value: &_storage._setPhoneAppStatus) }()
         case 64: try { try decoder.decodeSingularMessageField(value: &_storage._setFemaleHealthInfo) }()
+        case 65: try { try decoder.decodeSingularMessageField(value: &_storage._rGetRecordInfo) }()
+        case 66: try { try decoder.decodeSingularMessageField(value: &_storage._rGetShellTemperature) }()
+        case 67: try { try decoder.decodeSingularMessageField(value: &_storage._setDevConfig) }()
         default: break
         }
       }
@@ -7765,198 +9031,211 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
 
     public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._cmd {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._cmd {
         try visitor.visitSingularEnumField(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._response {
+      } }()
+      try { if let v = _storage._response {
         try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
-      }
-      if let v = _storage._seconds {
+      } }()
+      try { if let v = _storage._seconds {
         try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-      }
-      if let v = _storage._setAppInfo {
+      } }()
+      try { if let v = _storage._setAppInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-      }
-      if let v = _storage._rBindDevice {
+      } }()
+      try { if let v = _storage._rBindDevice {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-      }
-      if let v = _storage._rGetDeviceInfo {
+      } }()
+      try { if let v = _storage._rGetDeviceInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
-      }
-      if let v = _storage._syncPhoneInfo {
+      } }()
+      try { if let v = _storage._syncPhoneInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
-      }
-      if let v = _storage._syncUserInfo {
+      } }()
+      try { if let v = _storage._syncUserInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
-      }
-      if let v = _storage._syncSwitch {
+      } }()
+      try { if let v = _storage._syncSwitch {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
-      }
-      if let v = _storage._setHrSampleSlot {
+      } }()
+      try { if let v = _storage._setHrSampleSlot {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
-      }
-      if let v = _storage._setLongsitDuration {
+      } }()
+      try { if let v = _storage._setLongsitDuration {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 11)
-      }
-      if let v = _storage._setDrinkSlot {
+      } }()
+      try { if let v = _storage._setDrinkSlot {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
-      }
-      if let v = _storage._setAlarms {
+      } }()
+      try { if let v = _storage._setAlarms {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
-      }
-      if let v = _storage._setNotdisturb {
+      } }()
+      try { if let v = _storage._setNotdisturb {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 14)
-      }
-      if let v = _storage._setCountryInfo {
+      } }()
+      try { if let v = _storage._setCountryInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
-      }
-      if let v = _storage._setUiStyle {
+      } }()
+      try { if let v = _storage._setUiStyle {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 16)
-      }
-      if let v = _storage._setSportTarget {
+      } }()
+      try { if let v = _storage._setSportTarget {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 17)
-      }
-      if let v = _storage._setTimeFormat {
+      } }()
+      try { if let v = _storage._setTimeFormat {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
-      }
-      if let v = _storage._setMetricInch {
+      } }()
+      try { if let v = _storage._setMetricInch {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
-      }
-      if let v = _storage._setBrightTimes {
+      } }()
+      try { if let v = _storage._setBrightTimes {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
-      }
-      if let v = _storage._setSetHrWarning {
+      } }()
+      try { if let v = _storage._setSetHrWarning {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 21)
-      }
-      if let v = _storage._rGetHrValue {
+      } }()
+      try { if let v = _storage._rGetHrValue {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 22)
-      }
-      if let v = _storage._setNotifyWarnInfo {
+      } }()
+      try { if let v = _storage._setNotifyWarnInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 23)
-      }
-      if let v = _storage._setHealthDataInfo {
+      } }()
+      try { if let v = _storage._setHealthDataInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 24)
-      }
-      if let v = _storage._rGetPowerValue {
+      } }()
+      try { if let v = _storage._rGetPowerValue {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
-      }
-      if let v = _storage._setUpdataFw {
+      } }()
+      try { if let v = _storage._setUpdataFw {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 26)
-      }
-      if let v = _storage._setWeatherInfo {
+      } }()
+      try { if let v = _storage._setWeatherInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 27)
-      }
-      if let v = _storage._setResetMachine {
+      } }()
+      try { if let v = _storage._setResetMachine {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 28)
-      }
-      if let v = _storage._setSportStatus {
+      } }()
+      try { if let v = _storage._setSportStatus {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 29)
-      }
-      if let v = _storage._rGetHealthData {
+      } }()
+      try { if let v = _storage._rGetHealthData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 30)
-      }
-      if let v = _storage._setMusicInfo {
+      } }()
+      try { if let v = _storage._setMusicInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 31)
-      }
-      if let v = _storage._rGetMtuSize {
+      } }()
+      try { if let v = _storage._rGetMtuSize {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 32)
-      }
-      if let v = _storage._setBinData {
+      } }()
+      try { if let v = _storage._setBinData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 33)
-      }
-      if let v = _storage._setBigData {
+      } }()
+      try { if let v = _storage._setBigData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 34)
-      }
-      if let v = _storage._rFindPhone {
+      } }()
+      try { if let v = _storage._rFindPhone {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 35)
-      }
-      if let v = _storage._setHrDur {
+      } }()
+      try { if let v = _storage._setHrDur {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 36)
-      }
-      if let v = _storage._rHrValue {
+      } }()
+      try { if let v = _storage._rHrValue {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 37)
-      }
-      if let v = _storage._rGetSprotData {
+      } }()
+      try { if let v = _storage._rGetSprotData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 38)
-      }
-      if let v = _storage._rGetDisturbEn {
+      } }()
+      try { if let v = _storage._rGetDisturbEn {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 39)
-      }
-      if let v = _storage._rGetStepCount {
+      } }()
+      try { if let v = _storage._rGetStepCount {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 40)
-      }
-      if let v = _storage._rGetCurrentHr {
+      } }()
+      try { if let v = _storage._rGetCurrentHr {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 41)
-      }
-      if let v = _storage._rSetLightResult {
+      } }()
+      try { if let v = _storage._rSetLightResult {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 42)
-      }
-      if let v = _storage._rGetActiveRecord {
+      } }()
+      try { if let v = _storage._rGetActiveRecord {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 43)
-      }
-      if let v = _storage._rSetActiveInfo {
+      } }()
+      try { if let v = _storage._rSetActiveInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 44)
-      }
-      if let v = _storage._timezone {
+      } }()
+      try { if let v = _storage._timezone {
         try visitor.visitSingularInt32Field(value: v, fieldNumber: 45)
-      }
-      if let v = _storage._rGetLogInfo {
+      } }()
+      try { if let v = _storage._rGetLogInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 46)
-      }
-      if let v = _storage._rGetUiHrs {
+      } }()
+      try { if let v = _storage._rGetUiHrs {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 47)
-      }
-      if let v = _storage._rErrorCode {
+      } }()
+      try { if let v = _storage._rErrorCode {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 48)
-      }
-      if let v = _storage._setNfcOperate {
+      } }()
+      try { if let v = _storage._setNfcOperate {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 49)
-      }
-      if let v = _storage._setPageSwitch {
+      } }()
+      try { if let v = _storage._setPageSwitch {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 50)
-      }
-      if let v = _storage._setCheckGpsInfo {
+      } }()
+      try { if let v = _storage._setCheckGpsInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 51)
-      }
-      if let v = _storage._setUpdateGpsData {
+      } }()
+      try { if let v = _storage._setUpdateGpsData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 52)
-      }
-      if let v = _storage._setUpdateSpo2Data {
+      } }()
+      try { if let v = _storage._setUpdateSpo2Data {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 53)
-      }
-      if let v = _storage._getDialConfigData {
+      } }()
+      try { if let v = _storage._getDialConfigData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 54)
-      }
-      if let v = _storage._setWarmingData {
+      } }()
+      try { if let v = _storage._setWarmingData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 55)
-      }
-      if let v = _storage._setMenuSeqData {
+      } }()
+      try { if let v = _storage._setMenuSeqData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 56)
-      }
-      if let v = _storage._getMenuSeqData {
+      } }()
+      try { if let v = _storage._getMenuSeqData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 57)
-      }
-      if let v = _storage._rGetMenuSeqData {
+      } }()
+      try { if let v = _storage._rGetMenuSeqData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 58)
-      }
-      if let v = _storage._getNfcCardData {
+      } }()
+      try { if let v = _storage._getNfcCardData {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 59)
-      }
-      if let v = _storage._setSpo2Detect {
+      } }()
+      try { if let v = _storage._setSpo2Detect {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 60)
-      }
-      if let v = _storage._rGetSpo2Detect {
+      } }()
+      try { if let v = _storage._rGetSpo2Detect {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 61)
-      }
-      if let v = _storage._swsnInfo {
+      } }()
+      try { if let v = _storage._swsnInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 62)
-      }
-      if let v = _storage._setPhoneAppStatus {
+      } }()
+      try { if let v = _storage._setPhoneAppStatus {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 63)
-      }
-      if let v = _storage._setFemaleHealthInfo {
+      } }()
+      try { if let v = _storage._setFemaleHealthInfo {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 64)
-      }
+      } }()
+      try { if let v = _storage._rGetRecordInfo {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 65)
+      } }()
+      try { if let v = _storage._rGetShellTemperature {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 66)
+      } }()
+      try { if let v = _storage._setDevConfig {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 67)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -8030,6 +9309,9 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
         if _storage._swsnInfo != rhs_storage._swsnInfo {return false}
         if _storage._setPhoneAppStatus != rhs_storage._setPhoneAppStatus {return false}
         if _storage._setFemaleHealthInfo != rhs_storage._setFemaleHealthInfo {return false}
+        if _storage._rGetRecordInfo != rhs_storage._rGetRecordInfo {return false}
+        if _storage._rGetShellTemperature != rhs_storage._rGetShellTemperature {return false}
+        if _storage._setDevConfig != rhs_storage._setDevConfig {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -8040,7 +9322,7 @@ extension hl_cmds: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBa
 }
 
 extension hl_cmds.cmd_t: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "CMD_BIND_DEVICE"),
     2: .same(proto: "CMD_GET_DEVICE_INFO"),
     3: .same(proto: "CMD_SYNC_PHONE_INFO"),
@@ -8108,5 +9390,8 @@ extension hl_cmds.cmd_t: SwiftProtobuf._ProtoNameProviding {
     65: .same(proto: "CMD_PHONE_APP_SET_STATUS"),
     66: .same(proto: "CMD_GET_ALARMS"),
     67: .same(proto: "CMD_SET_FEMALE_HEALTH_INFO"),
+    68: .same(proto: "CMD_GET_RECORD_INFO"),
+    69: .same(proto: "CMD_GET_SHELL_TEMPERATURE_INFO"),
+    70: .same(proto: "CMD_SET_DEV_CONFIG_INFO"),
   ]
 }

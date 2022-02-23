@@ -15,6 +15,7 @@ public enum ScanState: Int {
     case nomal
     case powerOn
     case end
+    case failed
 }
 
 enum ScanError: Error {
@@ -35,12 +36,12 @@ public class ScanResponse {
 }
 
 public protocol BluetoothScanable {
-    var scanInfo: (services: [CBUUID], deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType]) { get }
+    var scanInfo: (services: [CBUUID]?, deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType]) { get }
     var centralManager : CBCentralManager { get }
     
     typealias Input = (
         centralManager: CBCentralManager,
-        scanInfo: (services: [CBUUID], deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])
+        scanInfo: (services: [CBUUID]?, deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])
     )
     
     typealias ScanBuilder = (BluetoothScanable.Input) -> BluetoothScanable
@@ -49,10 +50,10 @@ public protocol BluetoothScanable {
 }
 
 public class BluetoothScan: BluetoothScanable {
-    public var scanInfo: (services: [CBUUID], deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])
+    public var scanInfo: (services: [CBUUID]?, deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])
     public var centralManager: CBCentralManager
     
-    public init(centralManager: CBCentralManager, scanInfo: (services: [CBUUID],deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])) {
+    public init(centralManager: CBCentralManager, scanInfo: (services: [CBUUID]?,deviceCategory: [LSDeviceCategory], deviceType: [LSSportWatchType])) {
         self.centralManager = centralManager
         self.scanInfo = scanInfo
     }
@@ -64,29 +65,50 @@ public class BluetoothScan: BluetoothScanable {
                 subscriber.onError(ScanError.error(messae: "Bluetooth state error", BluetoothState(rawValue: centralManager.state.rawValue)))
                 return Disposables.create()
             }
+                       
             // 获取已连接
-            let connected = centralManager.retrieveConnectedPeripherals(withServices: scanInfo.services)
-            //            connected = connected.filter({ p in
-            //                return (scanInfo.scanPrefix.filter({(p.name?.hasPrefix($0) ?? false)}).count) > 0
-            //            })
-            let scanResponses = connected.map({ ScanResponse(peripheral: $0) })
-            if scanResponses.count > 0 {
-                subscriber.onNext((state: .nomal, response: scanResponses))
+            if let identifier = UserDefaults.standard.object(forKey: peripheralIdentifierCurrent) as? String,
+                let uuid = UUID.init(uuidString: identifier) {
+                let connected =  centralManager.retrievePeripherals(withIdentifiers: [uuid])
+                
+                let scanResponses = connected.map({ ScanResponse(peripheral: $0) })
+                if !scanResponses.isEmpty {
+                    subscriber.onNext((state: .nomal, response: scanResponses))
+                }
+                
             }
+
             // 订阅扫描结果
-            _ = centralManager.rx.didDiscoverPeripheral
+            let sub = centralManager.rx.didDiscoverPeripheral
                 .subscribe(onNext: { (response) in
-                    
-                    guard let advData = response.advertisementData, let manufacturerData = advData[CBAdvertisementDataManufacturerDataKey] as? Data, manufacturerData.count > 4 else {
+                    guard let advData = response.advertisementData, let manufacturerData = advData[CBAdvertisementDataManufacturerDataKey] as? Data, manufacturerData.count > 10 else {
                         return
                     }
                     
+                    if scanInfo.deviceCategory.isEmpty || scanInfo.deviceType.isEmpty {
+                        subscriber.onNext((state: .nomal, response: [response]))
+                        return
+                    }
+                
+                    
                     let deviceCategory = Int(manufacturerData[3])
                     let deviceType = Int(manufacturerData[4])
-                    
+                
                     let isContainCaegory = scanInfo.deviceCategory.contains { cat in
                         return cat.rawValue == deviceCategory
                     }
+                    
+                    if isContainCaegory {
+//                        print("搜索到的ID，", deviceCategory)
+                    }
+                    
+                    //包含了体脂秤，就不用判断具体的设备型号了
+                    //4c533c03 01070000 9a333620 d80ca0c8 b95a0da8
+                    if isContainCaegory, deviceCategory == LSDeviceCategory.BodyFatScale.rawValue {
+                        subscriber.onNext((state: .nomal, response: [response]))
+                        return
+                    }
+                    
                     
                     let isContainType = scanInfo.deviceType.contains { cat in
                         return cat.rawValue == deviceType
@@ -101,7 +123,11 @@ public class BluetoothScan: BluetoothScanable {
             
             // 开始扫描
             if UIApplication.shared.applicationState == .background {
-                centralManager.scanForPeripherals(withServices: scanInfo.services , options: nil)
+                if scanInfo.services == nil {
+                    printLog("后台扫描要有Services")
+                }
+//                assert(scanInfo.services != nil, "后台扫描要有Services")
+                centralManager.scanForPeripherals(withServices: scanInfo.services, options: nil)
             } else {
                 centralManager.scanForPeripherals(withServices: nil, options: nil)
             }
@@ -115,7 +141,47 @@ public class BluetoothScan: BluetoothScanable {
                 }
             }
 
-            return Disposables.create()
+            return Disposables.create([sub])
         }
     }
+}
+
+
+extension BluetoothScan {
+    
+    func asyncState() ->Observable<AsyncCentralState> {
+        
+        return Observable<AsyncCentralState>.create { [unowned self] observer in
+            
+            switch self.centralManager.state {
+            case .unknown:
+                observer.onNext(.unknown)
+            case .resetting:
+                observer.onNext(.unknown)
+            case .unsupported:
+                observer.onNext(.unsupported)
+            case .unauthorized:
+                observer.onNext(.unauthorized)
+            case .poweredOff:
+                observer.onNext(.poweredOff)
+            case .poweredOn:
+                observer.onNext(.poweredOn)
+            @unknown default:
+                observer.onNext(.unknown)
+            }
+            
+            return Disposables.create()
+        }
+        
+    }
+
+}
+
+
+public enum AsyncCentralState: Int {
+    case unsupported = 2
+    case unauthorized = 3
+    case poweredOff = 4
+    case poweredOn = 5
+    case unknown = -1
 }

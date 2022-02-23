@@ -9,16 +9,16 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-enum NFCServiceOperate: UInt32 {
+public enum NFCServiceOperate: UInt32 {
     case None = 0x00
     case Start
     case End = 0xFF
+
 }
 
+public class NFCPBTool: NSObject {
 
-class NFCPBTool: NSObject {
-
-    static let shared: NFCPBTool = NFCPBTool()
+    public static let shared: NFCPBTool = NFCPBTool()
     private let bag: DisposeBag = DisposeBag()
 
     private override init() {
@@ -28,7 +28,7 @@ class NFCPBTool: NSObject {
     /**
      告知SE 开始 某业务
      */
-    func openWriteChanel(service: NFCService) -> Observable<Bool> {
+    public func openWriteChanel(service: NFCService) -> Observable<Bool> {
         printLog("open Write Chanel")
         return self.handleOperateEvent(service: service, operate: .Start)
     }
@@ -36,7 +36,7 @@ class NFCPBTool: NSObject {
     /**
      告知SE 结束 某业务
      */
-    func closeWriteChanel(service: NFCService) -> Observable<Bool> {
+    public func closeWriteChanel(service: NFCService) -> Observable<Bool> {
         printLog("执行关闭通道指令")
         return self.handleOperateEvent(service: service, operate: .End)
     }
@@ -44,7 +44,7 @@ class NFCPBTool: NSObject {
     /**
      执行 告知 se 开始 和 结束 业务
      */
-    func handleOperateEvent(service: NFCService, operate: NFCServiceOperate) -> Observable<Bool> {
+    public func handleOperateEvent(service: NFCService, operate: NFCServiceOperate) -> Observable<Bool> {
 
         let bytes: [UInt8] = []
 
@@ -93,7 +93,7 @@ class NFCPBTool: NSObject {
     /**
      初始化 hl_cmds 对象
      */
-    func buildCmdWithType(_ cmdType: hl_cmds.cmd_t) -> hl_cmds {
+  public  func buildCmdWithType(_ cmdType: hl_cmds.cmd_t) -> hl_cmds {
         var tcmd = hl_cmds()
         tcmd.seconds = UInt32(Date().timeIntervalSince1970)
         tcmd.response = false
@@ -105,7 +105,7 @@ class NFCPBTool: NSObject {
     /**
      构建 NFC 操作 hl_cmds
      */
-    func buildNfcOperateEvent(service: NFCService, operate: NFCServiceOperate, nfcData: Data) -> hl_cmds {
+    public func buildNfcOperateEvent(service: NFCService, operate: NFCServiceOperate, nfcData: Data) -> hl_cmds {
         
         let writeDataBytes = [UInt8](nfcData)
         
@@ -124,7 +124,7 @@ class NFCPBTool: NSObject {
     /**
      构建 NFC 操作 hl_cmds
      */
-    func buildNfcSyncCityList(service: NFCService, operate: NFCServiceOperate, cityCodes: UInt64) -> hl_cmds {
+    public func buildNfcSyncCityList(service: NFCService, operate: NFCServiceOperate, cityCodes: UInt64) -> hl_cmds {
         var info = set_nfc_operate_t()
         info.mNfcOperateCode = service.rawValue
         info.mNfcErrCode = 0
@@ -139,53 +139,53 @@ class NFCPBTool: NSObject {
     /**
         序列化 hl_cmds  pb 对象
      */
-//    func serializePbObj(nfcCmd: hl_cmds, expectNum: Int = 1, duration: Int = 20, _ endRecognition: ((Any) -> Bool)? = nil) -> Observable<[hl_cmds]> {
-//        return Observable.create { [weak self] (observer) -> Disposable in
-//            guard let `self` = self else {
-//                observer.onError(BleError.error("self == nil"))
-//                return Disposables.create()
-//            }
-//            var tpbData: Data?
-//            do {
-//                tpbData = try nfcCmd.serializedData()
-//            } catch {
-//                print("cmd to pb: \(error)")
-//                observer.onError(BleError.error("NFC PB 序列化错误"))
-//                return Disposables.create()
-//            }
-//
-//            guard let nfcPbData = tpbData else {
-//                observer.onError(BleError.error("NFC PB 序列化数据 为 nil"))
-//                return Disposables.create()
-//            }
-//
-//            do {
-//
-//                try self.buildPBContent(nfcPbData, expectNum: expectNum, ackInInterval: true, duration: duration, cmdType: nfcCmd.cmd, endRecognition: endRecognition)
-//                    .subscribe(onNext: { (bleResponse) in
-//                        guard let pbDatas = bleResponse.pbDatas else {
-//                            observer.onError(BleError.error("Nfc Pb Data 异常"))
-//                            return
-//                        }
-//                        observer.onNext(pbDatas)
-////                        observer.onCompleted()
-//                    }, onError: { (error) in
-//                        observer.onError(error)
-//                    })
-//                    .disposed(by: self.bag)
-//
-//            } catch {
-//                observer.onError(BleError.error("\(error.localizedDescription)"))   // 蓝牙错误
-//            }
-//            return Disposables.create()
-//        }
-//    }
+  public  func serializePbObj(nfcCmd: hl_cmds, expectNum: Int = 1, duration: Int = 20, _ endRecognition: ((Any) -> Bool)? = nil) -> Observable<[hl_cmds]> {
+        return Observable.create { [weak self] (observer) -> Disposable in
+            guard let `self` = self else {
+                observer.onError(BleError.error("self == nil"))
+                return Disposables.create()
+            }
+            var tpbData: Data?
+            do {
+                tpbData = try nfcCmd.serializedData()
+            } catch {
+                print("cmd to pb: \(error)")
+                observer.onError(BleError.error("NFC PB 序列化错误"))
+                return Disposables.create()
+            }
+
+            guard let nfcPbData = tpbData else {
+                observer.onError(BleError.error("NFC PB 序列化数据 为 nil"))
+                return Disposables.create()
+            }
+
+            do {
+
+                try self.buildPBContent(nfcPbData, expectNum: expectNum, ackInInterval: true, duration: duration, cmdType: nfcCmd.cmd, endRecognition: endRecognition)
+                    .subscribe(onNext: { (bleResponse) in
+                        guard let pbDatas = bleResponse.pbDatas else {
+                            observer.onError(BleError.error("Nfc Pb Data 异常"))
+                            return
+                        }
+                        observer.onNext(pbDatas)
+//                        observer.onCompleted()
+                    }, onError: { (error) in
+                        observer.onError(error)
+                    })
+                    .disposed(by: self.bag)
+
+            } catch {
+                observer.onError(BleError.error("\(error.localizedDescription)"))   // 蓝牙错误
+            }
+            return Disposables.create()
+        }
+    }
     
     
     /*
      解析出设备返回 Pb content Data
      */
-    func analyticalPbData(hlObjs: [hl_cmds]) -> Observable<[Data]> {
+    public func analyticalPbData(hlObjs: [hl_cmds]) -> Observable<[Data]> {
         return Observable.create { (observer) -> Disposable in
             guard hlObjs.count > 0 else {
                 observer.onError(BleError.error("analytical pbs is empty "))
@@ -217,7 +217,7 @@ class NFCPBTool: NSObject {
     }
     
     
-    func buildCommandPbAndWrie(_ commands: [NFCCommand]) -> Observable<[hl_cmds]> {
+    public func buildCommandPbAndWrie(_ commands: [NFCCommand]) -> Observable<[hl_cmds]> {
         return Observable.create { [weak self] (observer) -> Disposable in
             guard let `self` = self else {
                 observer.onError(BleError.error("self == nil"))
@@ -274,7 +274,7 @@ class NFCPBTool: NSObject {
     /**
         将 Command 组装固定格式，并转 PB
      */
-    func buildCommandPbAndWrite(_ commands: [NFCCommand]) -> Observable<[hl_cmds]> {
+    public func buildCommandPbAndWrite(_ commands: [NFCCommand]) -> Observable<[hl_cmds]> {
         return Observable.create { [weak self] (observer) -> Disposable in
             guard let `self` = self else {
                 observer.onError(BleError.error("self == nil"))
@@ -330,7 +330,7 @@ class NFCPBTool: NSObject {
     /**
         组装 协议 + PB 内容 并执行蓝牙发送
      */
-    func buildPBContent(_ commandData: Data, expectNum: Int = 1, ackInInterval: Bool = false, duration: Int = 20, cmdType: hl_cmds.cmd_t?,  endRecognition: ((Any) -> Bool)? = nil) throws -> Observable<BleResponse> {
+    public func buildPBContent(_ commandData: Data, expectNum: Int = 1, ackInInterval: Bool = false, duration: Int = 20, cmdType: hl_cmds.cmd_t?,  endRecognition: ((Any) -> Bool)? = nil) throws -> Observable<BleResponse> {
         //MARK: 构建最终需要发送的Data
         let commandContentData: Data = commandData
         var contentData = Data()
@@ -357,11 +357,11 @@ class NFCPBTool: NSObject {
         contentData.append(contentSumData)                       //(header) sum with out pb
         contentData.append(commandContentData)                   // pb data
         let data = contentData
-//        return BleOperator.shared.sendNFCData(writeData: data, characteristic:0, expectNum:expectNum, ackInInterval:ackInInterval, cmdType:cmdType, duration:duration, typeData: data, endRecognition:endRecognition)
+//        return handler.shared.sendNFCData(writeData: data, characteristic:0, expectNum:expectNum, ackInInterval:ackInInterval, cmdType:cmdType, duration:duration, typeData: data, endRecognition:endRecognition)
         
-        return BleFacade.shared.write(contentData, "11")
+        return BleFacade.shared.write(commandData, 0, "buildPBContent", duration, endRecognition)
         
-//        return BleOperator.shared.sendNFCData(writeData: <#T##Data#>, characteristic: <#T##Int#>, duration: <#T##Int#>, endRecognition: <#T##((Any) -> Bool)?##((Any) -> Bool)?##(Any) -> Bool#>)
+//        return handler.shared.sendNFCData(writeData: <#T##Data#>, characteristic: <#T##Int#>, duration: <#T##Int#>, endRecognition: <#T##((Any) -> Bool)?##((Any) -> Bool)?##(Any) -> Bool#>)
     }
     
 

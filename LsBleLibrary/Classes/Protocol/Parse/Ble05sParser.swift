@@ -27,7 +27,6 @@ enum ParserState {
     case dataEnd
     case noData
     case bigDataEnd
-    case binInTransit
 }
 
 enum BigDataParserState {
@@ -36,6 +35,13 @@ enum BigDataParserState {
     case invalid
     case dataContinue
     case end
+}
+
+enum DataType {
+    case historicalData
+    case sportData
+    case invalid
+    case nomal
 }
 
 class Ble05sParser {
@@ -51,10 +57,12 @@ class Ble05sParser {
     var receiveArray: [hl_cmds] = []
     
     var bigDataParserState: BigDataParserState = .invalid
+    var dataType: DataType = .invalid
     
     var bigDataItems = [BigDataProtocol]()
     var bigSportDataItems = [SportModelItem]()
     var currentSportDataCount = 0
+    var isDataTransmission = true
     
     func resetAcceptancePackage() {
         self.receiveData.removeAll()
@@ -64,6 +72,7 @@ class Ble05sParser {
         self.bigDataItems.removeAll()
         
         self.bigDataParserState = .invalid
+        dataType = .invalid
         
         currentSportDataCount = 0
         bigSportDataItems.removeAll()
@@ -74,11 +83,8 @@ class Ble05sParser {
         
         let acceptBytes = [UInt8](data)
         
-        guard acceptBytes.count > 9 else {
-            return .dataError
-        }
+        if acceptBytes.count > 1, acceptBytes[0] == 0x7E && acceptBytes[1] == 0x6D {
         
-        if acceptBytes[0] == 0x7E && acceptBytes[1] == 0x6D {
             receiveData = Data()
         }
         
@@ -115,6 +121,8 @@ class Ble05sParser {
         
         print("callback pbObj:",pbObj)
         
+        dataType = .nomal
+        
         // 符合校验的 PB 数据集合
         self.receiveArray.append(pbObj)
         
@@ -122,8 +130,10 @@ class Ble05sParser {
             return .dataItemEnd
         }
         
+        
         if responseObj.cmd == .cmdSetUpdateGpsData ||
-            responseObj.cmd == .cmdSetSyncHealthData  {
+            responseObj.cmd == .cmdSetSyncHealthData ||
+            responseObj.cmd == .cmdSetActiveRecordData {
             bigDataParserState = .start
             print("开始接受大数据")
             let errCode = UInt32(pbObj.rErrorCode.err)
@@ -133,26 +143,17 @@ class Ble05sParser {
                 print("没有大数据")
                 bigDataParserState = .end
                 
-            }
-            
-        }
-        
-        if responseObj.cmd == .cmdSetActiveRecordData {
-            bigDataParserState = .start
-            print("开始接受大数据")
-            let errCode = UInt32(pbObj.rErrorCode.err)
-            
-            //没有数据
-            if errCode == BleDataSymbol.noBigData.rawValue || errCode == BleDataSymbol.parameterError.rawValue {
-                print("没有大数据")
-                bigDataParserState = .end
+                return .dataItemEnd
                 
             }
+            
         }
         
-        
+
         if responseObj.cmd == .cmdGetHealthData ||
             responseObj.cmd == .cmdGetLogInfoData {
+            
+            dataType = .historicalData
             
             self.receiveBigData.append(responseObj.rGetHealthData.mData)
             
@@ -163,19 +164,21 @@ class Ble05sParser {
                 let typeData: UInt8 = receiveBigData.scanValue(at: 0)
                 let timestamp: UInt32 = receiveBigData.scanValue(at: 1)
                 print("timestampe", timestamp)
-                let UTC = handleBackTimestamp(original: timestamp)
+                let UTC = handleBackTimestamp(timestamp)
                 let dataTotalLength: UInt16 = receiveBigData.scanValue(at: 5)
                 let daysTotal: UInt16 = receiveBigData.scanValue(at: 7)
                 let dataUnitLength: UInt8 = receiveBigData.scanValue(at: 9)
-                
-                let dataArr = Ble05sCmdsConfig.shared.chunked(data: Data(receiveBigData.suffix(from: 10)), chunkSize: Int(dataUnitLength))
-                
+            
                 //接受下一个包块
+                var dataArr = [Data]()
+                if dataUnitLength != 0 {
+                    dataArr = Ble05sCmdsConfig.shared.chunked(data: Data(receiveBigData.suffix(from: 10)), chunkSize: Int(dataUnitLength))
+                }
                 receiveBigData.removeAll()
                 
                 if typeData == HealthDataSyncType.stepsBack {
                     
-                    handleStepData(dataArr: dataArr, timeStamp: UTC)
+                    handleStepData(dataArr: dataArr, timestamp: UTC)
                 }else if typeData == HealthDataSyncType.heartRateBack  {
                     handleHRData(dataArr,UTC)
                 }else if typeData == HealthDataSyncType.sleepBack  {
@@ -202,6 +205,7 @@ class Ble05sParser {
         
         
         if responseObj.cmd == .cmdGetActiveRecordData {
+            dataType = .sportData
             self.receiveBigData.append(responseObj.rGetActiveRecord.mHrData)
             
             if responseObj.rGetActiveRecord.mSn == BleDataSymbol.SNEndSymbol.rawValue {
@@ -225,7 +229,10 @@ class Ble05sParser {
 }
 
 extension Ble05sParser {
-   private func handleStepData(dataArr: [Data], timeStamp: UInt32) {
+    //MARK: 步数
+   private func handleStepData(dataArr: [Data], timestamp: UInt32) {
+       
+       guard timestamp > 0 else { return }
         
        var steps: [Float] = [Float]()
        var calories: [Float] = [Float]()
@@ -254,21 +261,31 @@ extension Ble05sParser {
        let caloriesDetail = Ble05sCmdsConfig.shared.chunked(dataArray: calories, chunkSize: chunkSize)
        let distanceDetail = Ble05sCmdsConfig.shared.chunked(dataArray: distance, chunkSize: chunkSize)
        
-       bigDataItems.append(DayStepModel.init(timeStamp: timeStamp,
+       let defaultActivity = Array.init(repeating: 0, count: 48)
+       
+       bigDataItems.append(DayStepModel.init(timeStamp: timestamp,
                                              steps: stepsDetail.description,
                                              calories: caloriesDetail.description,
-                                             distance: distanceDetail.description))
+                                             distance: distanceDetail.description,
+                                             activity: defaultActivity.description))
         
     }
-    
+    //MARK: 心率
     func handleHRData(_ dataArr: [Data], _ timestamp: UInt32) {
+        
+        guard timestamp > 0 else { return }
+        
         var heartRates = [Int](repeating: 0, count: 144)
         
         for (index, subData) in dataArr.enumerated() {
             
             if subData.isEmpty { continue } // 接受到的数据可能是错乱的
             
-            let heartRate = [UInt8](subData).first ?? 0
+            var heartRate = [UInt8](subData).first ?? 0
+            
+            if heartRate == BleReceiveErrorCode.ERROR_INVALID.rawValue {
+                heartRate = 0
+            }
             
             if BleDataStatus.isLessHistoryData {
                 let order = Int(index)
@@ -282,7 +299,10 @@ extension Ble05sParser {
         
         bigDataItems.append(DayHRModel.init(timeStamp: timestamp, heartRates: heartRates.description))
     }
+    //MARK: 睡眠
     func handleSleepData(_ dataArr: [Data], _ timestamp: UInt32) {
+        
+        guard timestamp > 0 else { return }
     
         var startSleepIndex = 0 , endSleepIndex = 0
         
@@ -423,7 +443,7 @@ extension Ble05sParser {
         //去掉无效的数据分钟
         lightSleepMinutes -= invalidSleepMinutes
         
-        totalMinutes = lightSleepMinutes + deepSleepMinutes + awakeSleepMinutes + activityMinutes
+        totalMinutes = lightSleepMinutes + deepSleepMinutes + awakeSleepMinutes
         
         let offsetTimeStamp = 6 * 60 * 60 //从前一天的18时开始计算的
         let startSleepTimestamp = UInt32(Int(timestamp) - offsetTimeStamp + startSleepIndex * 60)
@@ -431,33 +451,35 @@ extension Ble05sParser {
         //1608739200 - 21600 + 25560 26730 （445.5）
         let endSleepTimestamp = UInt32(Int(timestamp) - offsetTimeStamp + endSleepIndex * 60)
         
-        bigDataItems.append(DaySleepModel.init(timeStamp: timestamp, startTimestamp: startSleepTimestamp, endTimestamp: endSleepTimestamp, lightSleepMinutes: lightSleepMinutes, deepSleepMinutes: deepSleepMinutes, awakeSleepMinutes: awakeSleepMinutes, awakeTimes: awakeTimes, deviceId: "", sleepDetails: sleepArr.description))
+        bigDataItems.append(DaySleepModel.init(timeStamp: timestamp, startTimestamp: startSleepTimestamp, endTimestamp: endSleepTimestamp, totalMinutes: totalMinutes, lightSleepMinutes: lightSleepMinutes, deepSleepMinutes: deepSleepMinutes, awakeSleepMinutes: awakeSleepMinutes, awakeTimes: awakeTimes, macAddress: "", sleepDetails: sleepArr.description))
 
     }
+    //MARK: 血氧
     func handleBloodOxygenData(_ dataArr: [Data], _ timestamp: UInt32) {
-        var bloodOxygens = [Int](repeating: 0, count: 144)
+        
+        guard timestamp > 0 else { return }
+        
+        var list = [DayBloodOxygenItemModel]()
         
         for (index, subData) in dataArr.enumerated() {
             
             if subData.isEmpty { continue } // 接受到的数据可能是错乱的
             
-            let bloodOxygen = [UInt8](subData).first ?? 0
+            let timestampCurrent = Data(subData).subdata(in: Range(0 ... 3)).uint32
+            let bloodOxygenValue = Data(subData).subdata(in: Range(4 ... 4)).uint8
             
-            if BleDataStatus.isLessHistoryData {
-                let order = Int(index)
-                if order < bloodOxygens.count { bloodOxygens[order] = Int(bloodOxygen) }
-                
-            }else {
-                if index % 10 != 0 { continue }
-                bloodOxygens[Int(index/10)] = Int(bloodOxygen)
-            }
+            
+            list.append(DayBloodOxygenItemModel.init(timeStamp: handleBackTimestamp(timestampCurrent), bloodOxygens: bloodOxygenValue))
+            
         }
         
-        bigDataItems.append(DayBloodOxygenModel.init(timeStamp: timestamp, bloodOxygens: bloodOxygens.description))
+        bigDataItems.append(DayBloodOxygenModel.init(timeStamp: timestamp, list: list))
     }
+    //MARK: 活动统计
     func handleActivityStatisticsData(_ dataArr: [Data], _ timestamp: UInt32) {
         
-
+        guard timestamp > 0 else { return }
+        
         var durationDetailsArr:[UInt16] = []
         for item in dataArr {
             var time: UInt16 = Data(item).scanValue(at: 0)
@@ -482,7 +504,7 @@ extension Ble05sParser {
         
     }
     
-    //运动历史的
+    //MARK: 运动历史
     private func handleSportRecordHRData(hrData: Data, decodedInfo:hl_cmds) {
         let heartRates = Ble05sCmdsConfig.shared.chunked(data: hrData, chunkSize: 1).map { (data: Data) -> UInt8 in
             return [UInt8](data).first ?? UInt8(0)
@@ -490,9 +512,27 @@ extension Ble05sParser {
         
         let activeRecord = decodedInfo.rGetActiveRecord
         
-        let startTime = handleBackTimestamp(original: activeRecord.mActiveStartSecond)
+        let startTime = handleBackTimestamp(activeRecord.mActiveStartSecond)
         
-        let sportModelItem = SportModelItem.init(sportModel: .badminton, heartRateNum: 1, startTime: "", endTime: "", step: Int(activeRecord.mActiveStep), count: 0, cal: Int(activeRecord.mActiveCalories), distance: activeRecord.mActiveDistance.description, hrAvg: Int(activeRecord.mActiveAvgHr), hrMax: Int(activeRecord.mActiveMaxHr), hrMin: Int(activeRecord.mActiveMinHr), pace: Int(activeRecord.mActiveSpeed), hrInterval: Int(activeRecord.mActiveHrCount), heartRateData: Data())
+        guard startTime > 0 else { return }
+        
+        //距离要返回Km和UTE的保持一致 
+        let distanceKm = CGFloat(activeRecord.mActiveDistance)/CGFloat(1000)
+        
+        
+        let sportModelItem = SportModelItem.init(sportModel: Int(activeRecord.mActiveType),
+                                                 heartRateNum: Int(activeRecord.mActiveHrCount),
+                                                 startTimestamp: Int(handleBackTimestamp(activeRecord.mActiveStartSecond)),
+                                                 step: Int(activeRecord.mActiveStep),
+                                                 cal: Int(activeRecord.mActiveCalories),
+                                                 distance: distanceKm.description,
+                                                 hrAvg: Int(activeRecord.mActiveAvgHr),
+                                                 hrMax: Int(activeRecord.mActiveMaxHr),
+                                                 hrMin: Int(activeRecord.mActiveMinHr),
+                                                 pace: Int(activeRecord.mActiveSpeed),
+                                                 hrInterval: Int(activeRecord.mActiveHrCount),
+                                                 heartRateData: hrData,
+                                                 durations: Int(activeRecord.mActiveDurations))
         
         
         
@@ -502,8 +542,12 @@ extension Ble05sParser {
     
 }
 
-private extension Ble05sParser {
-     func handleBackTimestamp(original: UInt32) ->UInt32 {
+extension Ble05sParser {
+    
+    /// 处理手表返回的时间戳
+    /// - Parameter original: 手表的原始时间戳
+    /// - Returns: APP本地可使用的时间戳
+     func handleBackTimestamp(_ original: UInt32) ->UInt32 {
         
          guard original > 0 else {
              return 0
@@ -513,6 +557,24 @@ private extension Ble05sParser {
         let secondsFromGMT = UInt32(TimeZone.current.secondsFromGMT())
         
         if secondsFromGMT < 0 {
+            localTimestamp += secondsFromGMT
+        } else {
+            localTimestamp -= secondsFromGMT
+        }
+        
+        return localTimestamp
+        
+    }
+    
+    /// 处理发送到手表的时间戳
+    /// - Parameter original: APP本地shen c
+    /// - Returns: 手表可使用的时间戳
+    func handleSendTimestamp(_ original: UInt32) ->UInt32 {
+        
+        var localTimestamp = original
+        let secondsFromGMT = UInt32(TimeZone.current.secondsFromGMT())
+        
+        if secondsFromGMT > 0 {
             localTimestamp += secondsFromGMT
         } else {
             localTimestamp -= secondsFromGMT

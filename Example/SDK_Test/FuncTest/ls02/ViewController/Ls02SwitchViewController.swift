@@ -24,7 +24,7 @@ class Ls02SwitchViewController: UIViewController, Storyboardable {
     let bag: DisposeBag = DisposeBag()
     
     @IBAction func switchStatus(_ sender: Any) {
-        BleOperator.shared.requesFunctionStatus().subscribe { value in
+        BleHandler.shared.requesFunctionStatus().subscribe { value in
             print(value)
             print("switchStatus",value)
         } onError: { e in
@@ -34,7 +34,7 @@ class Ls02SwitchViewController: UIViewController, Storyboardable {
     }
     @IBAction func quickSwitchSetting(_ sender: Any) {
         
-        BleOperator.shared.requestQuickFunctionSetting().subscribe { value in
+        BleHandler.shared.requestQuickFunctionSetting().subscribe { value in
             print(value)
             print("quickSwitchSetting",value)
         } onError: { e in
@@ -44,9 +44,9 @@ class Ls02SwitchViewController: UIViewController, Storyboardable {
         
     }
     @IBAction func clickAnccNotificationBtn(_ sender: UIButton) {
-        BleOperator.shared.setANCCItemSwitch(.instagram, .close)
+        BleHandler.shared.setANCCItemSwitch(.unknown, .close,  switchConfigValue: 0)
             .subscribe { (flag) in
-                print("ancc  \(flag)")
+                print("ancs  \(flag)")
             } onError: { (error) in
                 print("param error \(error)")
             }
@@ -64,7 +64,7 @@ class Ls02SwitchViewController: UIViewController, Storyboardable {
         
         // 开关状态，开始时  开始分钟  结束时 结束分钟 子开关
         //
-        BleOperator.shared.setNotDisturb(.open, 12, 0, 14, 0, (screenEnable, shockEnable, messageEnable, callEnable))
+        BleHandler.shared.setNotDisturb(.open, 12, 0, 14, 0, (screenEnable, shockEnable, messageEnable, callEnable))
             .subscribe { (flag) in
                 print("setNotDisturb  \(flag)")
             } onError: { (error) in
@@ -76,7 +76,7 @@ class Ls02SwitchViewController: UIViewController, Storyboardable {
     @IBAction func enterFactoryTest(_ sender: Any) {
         
 
-        BleOperator.shared.deviceEntersTestMode(mode: .screenOff).subscribe { status in
+        BleHandler.shared.deviceEntersTestMode(mode: .screenOff).subscribe { status in
             print("enterFactoryTest", status)
         } onError: { er in
             

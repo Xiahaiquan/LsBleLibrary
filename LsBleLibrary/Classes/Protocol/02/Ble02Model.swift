@@ -8,10 +8,23 @@
 import Foundation
 
 
+public protocol Monitored { }
+
 struct Characteristic02 {
+    static let char6001 = "6001"
+    static let char6002 = "6002"
     static let char6101 = "6101"
     static let char33F1 = "33F1"
 }
+
+public enum Channel {
+    case ute6001
+    case ute6101
+    case ute33F1
+}
+
+
+public typealias HistoryHeartRateData = (datetime: String, max: UInt8, min: UInt8, avg: UInt8)
 
 public enum LsBleBindState : Int {
     case success = 1
@@ -22,6 +35,7 @@ public enum LsBleBindState : Int {
     case exsitValidId = 6
     case notExsitValidId = 7
     case error = 8
+    case unkowned = 9
     
     public init(uteType: Int) {
         if uteType == 1 {
@@ -42,19 +56,26 @@ public enum LsBleBindState : Int {
 }
 
 
-public enum Ls02Units : Int {
+public enum DeviceUnitsFormat : Int {
     case metric = 1             // 公
     case imperial = 2           // 英
 }
 
-public enum Ls02TimeFormat : Int {
+public enum DeviceTimeFormat : Int {
     case h12 = 1                // 12 小时制
     case h24 = 2                // 24 小时制
 }
 
-public enum Ls02Switch : UInt8 {
-    case open = 0                   // 打开
-    case close = 1                  // 关闭
+public enum DeviceSwitch : UInt8 {
+    case open = 1                   // 打开
+    case close = 0                  // 关闭
+    public init(bool: Bool) {
+        if bool {
+            self = .open
+        }else {
+            self = .close
+        }
+    }
 }
 
 public enum Ls02SwitchReverse : UInt8 {
@@ -67,21 +88,17 @@ public enum WearstyleEnum: Int {
     case right = 1
 }
 
-public enum Ls02Gender : Int {
+public enum LsGender : Int {
     case male = 1                   // 男
     case female = 2                  // 女
 }
 
-public enum Ls02Language : Int {
-    case english = 1                   // 英文
-    case chinese = 2                   // 中文
-}
-
 public enum Ls02TemperatureUnit : Int {
-    case c = 1                   // 摄氏度
-    case f = 2                   // 华氏度
+    case celsius = 1                   // 摄氏度
+    case fahrenheit = 2                   // 华氏度
 }
 
+//REMARK: 以后要废弃掉的
 public enum Ls02DeviceUploadDataType : Int {
     case realtimesport                               // 实时运动
     case sleepdetail
@@ -92,7 +109,6 @@ public enum Ls02DeviceUploadDataType : Int {
     case heartratedetail
     case u6101maxvalue
     case cloudwatchface
-    case sportmodeling
     case sportmodestatechange
     case functionTag
     case bindState
@@ -102,12 +118,16 @@ public enum Ls02DeviceUploadDataType : Int {
     case watchKeyEvent
 }
 
-public struct Ls02SportInfo {
-    public let year, month, day, hour, totalStep, runStart, runEnd, runDuration, runStep, walkStart, walkEnd, walkDuration, walkStep: Int
+extension UInt32: Monitored {
+    
 }
 
-public struct FunctionTag {
-    public let muLanguageShow, queryLanguage, updateLanguage, languageMenu, sportModelStatiStepAndCal, sportControlSyn, bloodOxygen, GPS, NFC, gPSAndAGPSUpdate, CustomDataTransfer, PumpBloodOxygen : Bool
+public struct Ls02SportInfo: Monitored {
+    public let year, month, day, hour, totalStep, runStart, runEnd, runDuration, runStep, walkStart, walkEnd, walkDuration, walkStep,  calorieTotal, distanceTotal, durationTotal, activityTotal: Int
+}
+
+public struct UTEFunctionTag: Monitored {
+    public let muLanguageShow, queryLanguage, updateLanguage, languageMenu, sportModelStatiStepAndCal, sportControlSyn, bloodOxygen, GPS, NFC, gPSAndAGPSUpdate, CustomDataTransfer, PumpBloodOxygen, multiSportDuration: Bool
 }
 
 public enum Ls02SleepState : Int {
@@ -128,6 +148,9 @@ public struct Ls02SleepInfo {
     public let year, month, day, dataCount: Int
     public let sleepItems: [Ls02SleepItem]
 }
+public struct LS02SleepData: Monitored {
+    var data: [Ls02SleepItem]
+}
 
 public struct Ls02SleepItem {
     public let startHour, startMin, sleepDuration: Int
@@ -135,87 +158,93 @@ public struct Ls02SleepItem {
     public let flag: Ls02SleepFlag
 }
 
-enum Ls02BraceletKeyEvent: UInt8 {
+public enum Ls02BraceletKeyEvent: UInt8, Monitored {
     case button1ShortPrees = 0x01
     case button1LongPrees = 0x02
     case button2ShortPrees = 0x03
     case button2SLongPrees = 0x04
     case button3ShortPrees = 0x05
     case button3LongPrees = 0x06
-//    case button1LongPrees = 0x07
-//    case button1ShortPrees = 0x08
-//    case button1ShortPrees = 0x09
+    //    case button1LongPrees = 0x07
+    //    case button1ShortPrees = 0x08
+    //    case button1ShortPrees = 0x09
     case findPhonePrees = 0x0A
-//    case button1ShortPrees = 0x0B
-//    case button1ShortPrees = 0x0C
-//    case button1ShortPrees = 0x0D
-//    case button1ShortPrees = 0x0E
-    
-    
-    
+    //    case button1ShortPrees = 0x0B
+    //    case button1ShortPrees = 0x0C
+    //    case button1ShortPrees = 0x0D
+    //    case button1ShortPrees = 0x0E
     
 }
 
-public protocol Ls02sShortcutSwitchsProtocol { }
-
-public struct Ls02sShortcutSwitchsSupporedStatus: Ls02sShortcutSwitchsProtocol {
-    public let foundWristband, lightWhenWristUp, longSitNotification, noDisturb, lossPrevent, messageNotification, heartRate: Bool
-}
-
-public struct Ls02sShortcutSwitchsOpenStatus: Ls02sShortcutSwitchsProtocol {
+public struct Ls02sShortcutSwitchsOpenStatus {
     public let foundWristband, lightWhenWristUp, longSitNotification, noDisturb, lossPrevent, messageNotification, heartRate: Bool
 }
 
 
 public class LSWeather {
-    var date: String = ""
-    var city: String
-    var weatherTag: Int = 0
-    var temperature: Int = 0
-    var maxTemp: Int = 0
-    var minTemp: Int = 0
-    var pm25: Int = 0
-    var aqi: Int = 0
+    //时间戳
+    var timestamp: Int = 0
+    //城市
+    var city: String = ""
     
-    var air: Int = 0
+    var currTem: Int = 0
+    var highTem: Int = 0
+    var lowTem: Int = 0
     
-    var humidity: Int = 0
+    //天气 tag
+    var wea: Int = 0
+    var weaDesc:String = ""
     
-    var uvIndex: Int = 0
+    //空气
+    var air:Int = 0
+    //空气质量指数
+    var airLevel:Int = 0
+    //空气质量描述
+    var airDesc:String = ""
+    
+    var pm25:Int = 0
+    //空气中的湿度
+    var humidity:Int = 0
+    //紫外线
+    var uvIndex:Int = 0
     
     var weatherState: Ls02WeatherState = .cloudy
-    var timestamp: UInt64 = 0
     
-    public init(date: String,
-         city: String,
-         weatherTag: Int,
-         temperature:Int,
-         maxTemp: Int,
-         minTemp: Int,
-         pm25: Int = 100,
-         aqi: Int = 100,
-         air:Int,
-         humidity:Int,
-         uvIndex:Int,
-         weatherState: Ls02WeatherState,
-        timestamp: UInt64) {
-        self.date = date
-        self.city = city
-        self.weatherTag = weatherTag
-        self.temperature = temperature
-        self.maxTemp = maxTemp
-        self.minTemp = minTemp
-        self.pm25 = pm25
-        self.aqi = aqi
+    public init(timestamp: Int = 0,
+                city: String = "",
+                air: Int = 0,
+                weaDesc: String = "",
+                airDesc: String = "",
+                humidity: Int = 0,
+                uvIndex: Int = 0,
+                currTem: Int,
+                highTem: Int,
+                lowTem: Int,
+                wea: Int,
+                airLevel: Int,
+                pm25:Int,
+                weatherState: Ls02WeatherState) {
         
-        self.humidity = humidity
-        self.air = air
-        self.uvIndex = uvIndex
-        self.weatherState = weatherState
         self.timestamp = timestamp
+        self.city = city
         
-//        super.init()
-
+        self.currTem = currTem
+        self.highTem = highTem
+        self.lowTem = lowTem
+        
+        self.wea = wea
+        self.weaDesc = weaDesc
+        
+        self.air = air
+        self.airLevel = airLevel
+        self.airDesc = airDesc
+        
+        self.pm25 = pm25
+        self.humidity = humidity
+        self.uvIndex = uvIndex
+        
+        self.weatherState = weatherState
+        
     }
     
 }
@@ -266,7 +295,7 @@ public enum Ls02WeatherState : Int {
     }
 }
 
-public enum Ls02ANCCItem : UInt32 {
+public enum LsANCSItem : UInt32 {
     
     case message            = 0x00000001
     case qq                 = 0x00000002
@@ -292,13 +321,70 @@ public enum Ls02ANCCItem : UInt32 {
     case tumblr             = 0x00200000
     case pintrrest          = 0x00400000
     case youtube            = 0x00800000
-    case unowned            = 0100000000
+    case unknown            = 0x10000000
+    
+    case allNotify          = 0x10000001
+    case facetime           = 0x10000010
+    case feixin             = 0x10000011
+    case sound              = 0x10000100
+    case dingtalk           = 0x10000101
+    case aliwangwang        = 0x10000111
+    case alipay             = 0x10001000
+    case kakaotalk          = 0x10001001
+    case qianniu            = 0x10001010
+    case pinterest          = 0x10001011
+    case fbMessage          = 0x10001111
+    
+    //以下是05特有的,是普通的开关
+    case handUpBright       = 0x10010000
+    case hrSeriesDetect     = 0x10010001
+    case hrWarn             = 0x10010011
     
 }
-
-public enum Ls02ANCCSwitch : Int {
+public enum UTEDeviceLanguageEnum: UInt8 {
+    case zh = 0x01    //该编号代表，中文
+    case en = 0x02    //英文
+    case ko = 0x03    //韩文
+    case ja = 0x04    //日文
+    case de = 0x05    //德文
+    case es = 0x06    //西班牙文
+    case fa = 0x07    //法文
+    case it = 0x08    //意大利文
+    case pt = 0x09    //葡萄牙文
+    case ar = 0x0A    //阿拉伯文
+    case id = 0x0B    //印度语（V1.2.8，新增）
+    case hi = 0x0C    //印地语（V1.3.1，新增）
+    case pl = 0x0D    //波兰语（V1.3.3,新增）
+    case ru = 0x0E    //俄语（V1.3.3,新增）
+    case nl = 0x0F    //荷兰语（V1.3.8,新增）
+    case tr = 0x10    //土耳其文（V1.4.7新增或预留）
+    case bn = 0x11    //孟加拉语
+    case ur = 0x12    //乌尔都语
+    case jv = 0x13    //印度尼西亚语（爪哇语）
+    case pa = 0x14    //旁遮普语
+    case th = 0x15    //泰文
+    case cs = 0x16    //捷克语
+    case zhHK = 0x17    //繁体中文（V1.6.8）
+    case be = 0x1C
+}
+public enum LsANCSSwitch : Int {
     case open = 1                   // 打开
     case close = 2                  // 关闭
+    public init(boolValue: Bool) {
+        if boolValue {
+            self = .open
+        }else {
+            self = .close
+        }
+    }
+    
+    public init(uteSwitch: DeviceSwitch) {
+        if uteSwitch.rawValue == 0 {
+            self = .open
+        }else {
+            self = .close
+        }
+    }
 }
 
 public enum Ls02NotDisturb : UInt8 {
@@ -312,42 +398,12 @@ public enum Ls02Error: Error {
     case error(_ messae: String, _ code: Int = 0)
 }
 
-public enum SportModel: UInt8 {
-    case none = 0x00
-    case running                        // 跑步
-    case riding                         // 骑行
-    case jumprope                       // 跳绳
-    case swimming                       // 游泳
-    case badminton                      // 羽毛球
-    case tabletennis                    // 乒乓球
-    case tennis                         // 网球
-    case climbing                       // 登山
-    case walking                        // 徒步
-    case basketball                     // 篮球
-    case football                       // 足球
-    case baseball                       // 棒球
-    case volleyball                     // 排球
-    case cricket                        // 板球
-    case rugby                          // 橄榄球 或 美式足球
-    case hockey                         // 曲棍球
-    case dance                          // 跳舞
-    case spinning                       // 动感单车
-    case yoga                           // 瑜伽
-    case situp                          // 仰卧起坐
-    case treadmill                      // 跑步机
-    case gymnastics                     // 体操
-    case boating                        // 划船
-    case jumpingjack                    // 开合跳
-    case freetraining                   // 自由训练
-    case outdoorswimming                // 开放水域游泳
-    case indoorswimming                 // 室内游泳
-}
 
 public struct SportModelItem {
-    public var sportModel: SportModel = .badminton         // 运动模式
+    public var sportModel: Int = 0x01        // 运动模式
     public var heartRateNum: Int = 0              // 心率总数
-    public var startTime: String = ""             // 开始时间
-    public var endTime: String = ""                // 结束时间
+    public var startTimestamp: Int = 0            //开始的时间戳
+    public var endTimestamp: Int = 0            //开始的时间戳
     public var step: Int = 0                          // 步数
     public var count: Int  = 0                        // 次数
     public var cal: Int  = 0                          // 卡路里
@@ -358,6 +414,7 @@ public struct SportModelItem {
     public var pace: Int = 0                          // 配速
     public var hrInterval: Int = 0                    // 心率数据间隔
     public var heartRateData: Data = Data()            // 详细数据
+    public var durations: Int = 0
     
 }
 
@@ -367,9 +424,11 @@ public enum SportModelState: UInt8 {
     case suspend = 0x22
     case resume = 0x33
     case continued = 0x44
+    case unknown = 0xFF
 }
 
 public enum SportModelSaveDataInterval: UInt8 {
+    case unknown = 0
     case s10 = 1
     case s20 = 2
     case s30 = 3
@@ -380,9 +439,14 @@ public enum SportModelSaveDataInterval: UInt8 {
     case m5 = 30
 }
 
-public typealias UTEOriginalData = (from: String, data: Data)
-public typealias UTEBackData = (dataType: Ls02DeviceUploadDataType, data: Any)
+//public typealias UTEOriginalData = (from: String, data: Data)
+//public typealias UTEBackData = (dataType: Ls02DeviceUploadDataType, data: Any)
 
+struct UTEOriginalData: BleBackDataProtocol {
+    var from: String = ""
+    var data: Data = Data()
+    //    (from: String, data: Data)
+}
 
 public enum Ls02CameraMode:UInt8 {
     case enterCamera = 0x01
@@ -415,7 +479,7 @@ public enum Ls02GPSStatusMode:UInt8 {
     case localSucccess = 0x02
     case storageFull = 0x04
     case otaIng = 0x08
-//    case none = 0xFF
+    //    case none = 0xFF
 }
 public enum Ls02UpdateAGPSMode:UInt8 {
     case beidou = 0x00
@@ -435,13 +499,14 @@ public enum Ls02UpdateAGPSCompleteMode:UInt8 {
 }
 
 
-public enum Ls02ReadyUpdateAGPSStatue: UInt8 {
+public enum Ls02ReadyUpdateAGPSStatus: UInt8 {
     case ready = 0x00
     case complete = 0x01
     case continueSend = 0x02
     case success = 0x03
     case faile = 0x04
     case allComplete = 0x07
+    
 }
 
 public enum Ls02GPSOTAType: UInt8 {
@@ -494,5 +559,9 @@ public enum LsSpo2Status: UInt8 {
     }
     
 }
+
+
+
+
 
 

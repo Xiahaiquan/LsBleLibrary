@@ -16,7 +16,7 @@ import Foundation
         var tcmd = hl_cmds()
         tcmd.seconds = UInt32(Date().timeIntervalSince1970)
         tcmd.response = false
-        tcmd.timezone = Int32(TimeZone.current.secondsFromGMT() / (60 * 60))
+        tcmd.timezone = Int32(BleHelper.getTimeZone())
         tcmd.cmd = cmdType
         return tcmd
     }
@@ -87,7 +87,7 @@ extension Ble05sCmdsConfig {
     
     //根据包大小，获取超时时间
     func getTimeoutInterval(_ data: Data) ->UInt8 {
-        let interval = (Double(data.count) / Double(180)) * 0.3
+        let interval = (Double(data.count) / Double(mtu)) * 0.3
         return UInt8(interval) + 5
     }
     
@@ -109,10 +109,12 @@ extension Ble05sCmdsConfig {
         var tempCrcNumber = crcNumber
         let crcData = Data(bytes: &tempCrcNumber, count: 2)   // pb data crc
         contentData.append(crcData)
+        
         let contentBytes = [UInt8](contentData)
         let contentSum: UInt16 = contentBytes.reduce(0, { x, y in
             UInt16(x) + UInt16(y)
         })
+        
         var tempContentSum = contentSum
         let contentSumData = Data(bytes: &tempContentSum, count: 2)
         contentData.append(contentSumData)                       //(header) sum with out pb

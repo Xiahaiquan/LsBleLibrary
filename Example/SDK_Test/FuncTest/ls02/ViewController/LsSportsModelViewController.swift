@@ -27,7 +27,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
     
     var durationTimer: Timer?                                           // 定时向设备更新运动数据【只有手表发起运动时才这样做】
     var sportModelDuration: Int = 0                                     // 运动的总时长【暂停不计入】
-    var sportModel: SportModel = SportModel.none                        // 当前开启的运动模式 如： 跑步、骑行等
+    var sportModel: Int = 0x01                       // 当前开启的运动模式 如： 跑步、骑行等
     var sportModelState: SportModelState = SportModelState.start        // 当前运动模式的状态，如： 开、关 、暂停、 继续
     var saveInterval: SportModelSaveDataInterval = .s10
 
@@ -35,7 +35,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
      获取设备当前运动模式， 和运动状态
      */
     @IBAction func getSportModelAndState(_ sender: UIButton) {
-        BleOperator.shared.getSportModelState()
+        BleHandler.shared.getSportModelState()
             .subscribe { (state, model) in
                 print("状态: \(state)  运动模式:\(model)")
                 self.view.makeToast("状态: \(state)  运动模式:\(model)", duration: TimeInterval(2), position: .center)
@@ -53,11 +53,11 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
     @IBAction func clickStartSportModel(_ sender: UIButton) {
         
         // 假定用户UI上选择  【开启-跑步-10秒统计一次】
-        self.sportModel = SportModel.running
+        self.sportModel = 1
         self.saveInterval = .s10
         
         // 手机端主动开启运动模式。（设备端发起时没有） 设备端会返回运动数据
-        BleOperator.shared.startSportModel(model:self.sportModel, state: .start, interval: self.saveInterval)
+        BleHandler.shared.startSportModel(model:self.sportModel, state: .start, interval: self.saveInterval)
             .subscribe { (model) in
                 print("开始运动模式:\(model)")
                 
@@ -82,7 +82,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
                 
                 print("运动时长： \(self.sportModelDuration)")
                 //（app 自己计算距离 和卡路里 并发送到设备）卡路里 和距离 动态计算
-                BleOperator.shared.updateSportModel(model:self.sportModel, state: .continued, interval: .s10,  speed: 0, flag: 0, senond: 0,duration: self.sportModelDuration, cal: 10, distance: 1200, step: 0)
+                BleHandler.shared.updateSportModel(model:self.sportModel, state: .continued, interval: .s10,  speed: 0, flag: 0, duration: self.sportModelDuration, cal: 10, distance: 1200, step: 0)
                     .subscribe { (value) in
                         print("更新数据成功", value)
                     } onError: { (error) in
@@ -97,16 +97,18 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
      运动时 数据 和状态 会主动上报， 需要监听上报事件
      */
     func sportingModelObserver() {
-        guard let obser = BleOperator.shared.dataObserver else {
+        
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { (p) in
             switch p {
-            case let (dataType, sportInfo) as (Ls02DeviceUploadDataType, (model: SportModel, hr: Int, cal: Int, pace: Int, step: Int, count: Int, distance: Int)):
-                if dataType == .sportmodeling {
-                    print("\(sportInfo.model) 运动模式下 步数：\(sportInfo.step) 心率: \(sportInfo.hr)")
-                }
-            case let (dataType, sportInfo) as (Ls02DeviceUploadDataType, (model: SportModel, state: SportModelState, interval: SportModelSaveDataInterval, step: Int, cal: Int, distance: Int, pace: Int)):
+            case let (dataType, sportInfo) as (Ls02DeviceUploadDataType, (model: Int, hr: Int, cal: Int, pace: Int, step: Int, count: Int, distance: Int)):
+                break
+//                if dataType == .sportmodeling {
+//                    print("\(sportInfo.model) 运动模式下 步数：\(sportInfo.step) 心率: \(sportInfo.hr)")
+//                }
+            case let (dataType, sportInfo) as (Ls02DeviceUploadDataType, (model: Int, state: SportModelState, interval: SportModelSaveDataInterval, step: Int, cal: Int, distance: Int, pace: Int)):
                 if dataType == .sportmodestatechange {
                     // 设备 运动状态变更  如： 暂停 恢复
                     self.sportModelState = sportInfo.state
@@ -136,13 +138,19 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
         获取指定时间后产生的历史数据
      */
     @IBAction func getSportModelHistoryData(_ sender: Any) {
-        BleOperator.shared.getSportModelHistoryData(datebyFar: Date())
+        BleHandler.shared.getSportModelHistoryData(datebyFar: Date().addingTimeInterval( -7 * 24 * 60 * 60))
             .subscribe { (models) in
-                print("运动历史记录 记录数:\(models.count)")
-                print("\(models)")
+                
+                guard let items = models else {
+                    print("没有历史数据")
+                    return
+                }
+                
+                print("运动历史记录 记录数:\(items.value.count)")
+                print("\(items)")
                 var detail: String = ""
-                models.forEach { (item) in
-                    detail += "[模式: \(item.sportModel); 时间：\(item.startTime); 步数：\(item.step)];"
+                items.value.forEach { (item) in
+                    detail += "[模式: \(item.sportModel); 时间：\(item.startTimestamp); 步数：\(item.step)];"
                 }
                 if detail.count > 0 {
                     self.view.makeToast(detail, duration: TimeInterval(5), position: .center)
@@ -156,7 +164,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
     //MARK: 暂停运动
     @IBAction func clickPauseBtn(_ sender: UIButton) {
         // （app 自己计算距离 和卡路里 并发送到设备）卡路里 和距离 动态计算
-        BleOperator.shared.updateSportModel(model:self.sportModel, state: .suspend, interval: .s10,  speed: 0, flag: 0, senond: 0,duration: self.sportModelDuration, cal: 20, distance: 1300, step: 0)
+        BleHandler.shared.updateSportModel(model:self.sportModel, state: .suspend, interval: .s10,  speed: 0, flag: 0, duration: self.sportModelDuration, cal: 20, distance: 1300, step: 0)
             .subscribe { (_) in
                 print("暂停运动 完成")
                 self.sportModelState = .suspend
@@ -169,7 +177,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
     //MARK: 继续运动
     @IBAction func clickResumeBtn(_ sender: UIButton) {
         // // （app 自己计算距离 和卡路里 并发送到设备）卡路里 和距离 动态计算
-        BleOperator.shared.updateSportModel(model:self.sportModel, state: .resume, interval: .s10,  speed: 0, flag: 0, senond: 0,duration: self.sportModelDuration, cal: 30, distance: 1400, step: 0)
+        BleHandler.shared.updateSportModel(model:self.sportModel, state: .resume, interval: .s10,  speed: 0, flag: 0, duration: self.sportModelDuration, cal: 30, distance: 1400, step: 0)
             .subscribe { (_) in
                 print("继续运动")
                 self.sportModelState = .continued
@@ -182,7 +190,7 @@ class LsSportsModelViewController: UIViewController, Storyboardable {
     
     //MARK: 停止运动
     @IBAction func clickSoptBtn(_ sender: UIButton) {
-        BleOperator.shared.startSportModel(model:self.sportModel, state: .stop, interval: self.saveInterval)
+        BleHandler.shared.startSportModel(model:self.sportModel, state: .stop, interval: self.saveInterval)
             .subscribe { (model) in
                 print("结束运动模式:\(model)")
                 self.sportModelState = .stop
@@ -200,7 +208,7 @@ extension LsSportsModelViewController {
         self.durationTimer = Timer.init(timeInterval: timeOutInterval, repeats: repeats, block: { (timer) in
             timerBlock()
         })
-//        RunLoop.current.add(self.durationTimer!, forMode: RunLoopMode.commonModes)
+        RunLoop.current.add(self.durationTimer!, forMode: RunLoop.Mode.common)
     }
     
     func invalidateDurationTimer() {

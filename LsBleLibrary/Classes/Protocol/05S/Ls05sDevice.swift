@@ -14,9 +14,17 @@ import RxSwift
  具体外设类 （可能有很多不同的设备， 通道都不一样）
  */
 
-public class Ls05sDevice: NSObject, Deviceable {
+public class Ls05sDevice: NSObject, LsDeviceable {
     
-    public var dataObserver05s: Observable<LsBackData>?
+    private struct Characteristic {
+        static let mainChar = "000001FF-3C17-D293-8E48-14FE2E4DA212"
+        static let sendDataChar = "000002FF-3C17-D293-8E48-14FE2E4DA212"
+        static let receiveAckChar = "000003FF-3C17-D293-8E48-14FE2E4DA212"
+        static let sendAckChar = "000004FF-3C17-D293-8E48-14FE2E4DA212"
+        static let receiveDataChar = "000005FF-3C17-D293-8E48-14FE2E4DA212"
+    }
+    
+    public var dataObserver: Observable<BleBackDataProtocol>?
     
     var char0002: CBCharacteristic?
     var char0003: CBCharacteristic?
@@ -43,14 +51,15 @@ public class Ls05sDevice: NSObject, Deviceable {
     
     var bag: DisposeBag = DisposeBag()
     
-    var continueToAccept: Bool = true
+    var receiveTimer: Timer?
+    var isDataTransmission = false
     
-    lazy private var dataObserverPublishRelay: PublishRelay<LsBackData> = PublishRelay()
+    lazy private var dataObserverPublishRelay: PublishRelay<BleBackDataProtocol> = PublishRelay()
     
     public override init() {
         super.init()
         
-        self.dataObserver05s = self.dataObserverPublishRelay.asObservable()
+        self.dataObserver = self.dataObserverPublishRelay.asObservable()
     }
     
     
@@ -60,6 +69,9 @@ public class Ls05sDevice: NSObject, Deviceable {
             guard oldValue != peripheral else {
                 return
             }
+            
+            QueueManager.shared.addObserver()
+            
             // 监听 外设 返回的数据
             peripheral?.rx.didUpdateValue
                 .subscribe(onNext: { [weak self] (p, characteristic, error) in
@@ -81,7 +93,7 @@ public class Ls05sDevice: NSObject, Deviceable {
                         return
                     }
                     
-//                    print("back data：\(acceptData.count)")
+                    print("back data", acceptData.desc())
                     
                     let acceptBytes = [UInt8](acceptData)
                     
@@ -93,9 +105,7 @@ public class Ls05sDevice: NSObject, Deviceable {
                     
                     let parserState = self.parser.accept(data: acceptData)
                     if parserState == .dataEnd || parserState == .dataItemEnd || parserState == .pbDataNotMatch {
-                        DispatchQueue.global().asyncAfter(deadline: .now() + 0.02) {
-                            self.responseAck()
-                        }
+                        self.responseAck()
                     }
                     
                     if parserState != .dataItemEnd { return }
@@ -103,10 +113,10 @@ public class Ls05sDevice: NSObject, Deviceable {
                     guard let cmds = self.parser.receiveArray.first else {
                         return
                     }
-                                        
+                    
                     if self.parser.bigDataParserState == .invalid {
                         //读取的
-                        print("一般的数据")
+//                        print("一般的数据")
                         self.callbackData(cmd: cmds)
                         self.parser.resetAcceptancePackage()
                         
@@ -115,16 +125,21 @@ public class Ls05sDevice: NSObject, Deviceable {
                     
                     if self.parser.bigDataParserState == .start {
                         print("开始收大数据")
+                        self.isDataTransmission = true
+                        self.startReceiveTimer()
                         return
                     }
                     
                     if self.parser.bigDataParserState == .end {
+                        
+                        self.isDataTransmission = true
+                        
+                        self.invalidateReceiveTimer()
                         print("大数据接收完成")
-                        if !self.parser.bigDataItems.isEmpty {
+                        if self.parser.dataType == .historicalData {
                             self.callbackBigData(cmd: cmds, data: self.parser.bigDataItems)
-                        }else if self.parser.bigSportDataItems.isEmpty {
+                        }else if self.parser.dataType == .sportData {
                             self.callbackBigData(cmd: cmds, data: self.parser.bigSportDataItems)
-
                         }else {
                             //运动完后主动上报的
                             self.callbackData(cmd: cmds)
@@ -135,12 +150,25 @@ public class Ls05sDevice: NSObject, Deviceable {
                         return
                     }
                     
+                    if self.parser.bigDataParserState == .dataContinue {
+                        self.isDataTransmission = true
+                    }
                     
+                    
+                }, onError: { e in
+                    print(e, "didUpdateValue.err")
                 })
+                .disposed(by: bag)
+            
+            peripheral?.rx.didUpdateNotification.subscribe(onNext: { (p, d, e) in
+                print("isNotifying", d.isNotifying, "error", e)
+            }, onError: { e in
+                print(e, "didUpdateNotification.err")
+            })
                 .disposed(by: bag)
         }
     }
-
+    
     /// 更新设备特征通道， 并设置 notify
     /// - Parameter characteristic: <#characteristic description#>
     /// - Returns: 设备是否连接完成
@@ -148,49 +176,43 @@ public class Ls05sDevice: NSObject, Deviceable {
         guard let chars = characteristic else {
             return
         }
+        
         chars.forEach { (c) in
-            let uuid = c.uuid.uuidString
-            var uuidHeader = uuid
-            if uuid.count > 10 {
-                let startIndex = uuid.index(uuid.startIndex, offsetBy: 2)
-                let endIndex = uuid.index(uuid.startIndex, offsetBy: 6)
-                uuidHeader = String(uuid[startIndex..<endIndex])
-            }
-//            print("识别到UUID: \(uuidHeader)")
-            switch uuidHeader {
-            case "0002":
+            
+            switch c.uuid.uuidString {
+                
+            case Characteristic.sendDataChar:
                 self.char0002 = c
-            case "0003":
+            case Characteristic.receiveAckChar:
                 self.char0003 = c
                 self.peripheral?.setNotifyValue(true, for: c)
-            case "0004":
+            case Characteristic.sendAckChar:
                 self.char0004 = c
-            case "0005":
+            case Characteristic.receiveDataChar:
                 self.char0005 = c
                 self.peripheral?.setNotifyValue(true, for: c)
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {  statusCallback?(true)  }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {  statusCallback?(true)  }
             default:
                 break
-//                print("\(c.uuid.uuidString) 此特征不属于该对象")
+                //                print("\(c.uuid.uuidString) 此特征不属于该对象")
             }
         }
+        
     }
     
-    
-    
-    public func write(data: Data, name: String, expectNum: Int?, duration: Int?, ackInInterval: Bool?, endBySelf: Bool?, trigger: Bool, endRecognition: (((Data) -> Bool)?) = nil) -> Observable<BleResponse> {
+    public func write(data: Data, characteristic: Int, name: String, duration: Int?, endRecognition: (((Data) -> Bool)?) = nil) -> Observable<BleResponse> {
         
         guard let p = self.peripheral, let c = self.char0002 else {
             return Observable.error(BleError.disConnect)
             
         }
-    
-        return Observable.create { (subscriber) -> Disposable in
+        
+        return Observable.create { [unowned self] (subscriber) -> Disposable in
             
-            let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: 180)
+            let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: mtu)
             
-            let operation = BLEOperation.init(dataArr: dataArr, peripheral: p, characteristic: c, name: name, observer: subscriber, timeoutTimeInterval: TimeInterval(duration!))
+            let operation = BleOperation.init(dataArr: dataArr, peripheral: p, characteristic: c, name: name, observer: subscriber, timeoutTimeInterval: TimeInterval(duration!))
             
             QueueManager.shared.enqueueToQueue(operation)
             
@@ -199,12 +221,56 @@ public class Ls05sDevice: NSObject, Deviceable {
     }
     
 }
+//MARK: - 接收定时器
+extension Ls05sDevice {
+    
+    func startReceiveTimer() {
+        //This action not in main thread
+        
+        invalidateReceiveTimer()
+        
+        receiveTimer = Timer.scheduledTimer(timeInterval: TimeInterval(2), target: self, selector: #selector(receiveTimerTick), userInfo: nil, repeats: true)
+        
+    }
+    
+    @objc func receiveTimerTick() {
+        
+        printLog("")
+        if !self.isDataTransmission {
+            
+            if let operation = QueueManager.shared.syncDataQueue.operations.first as? BleOperation {
+                operation.observer?.onNext(.init(writeError: WriteError.error(messae: "No big data in 10 seconds")))
+                printLog("Finish curernt operation")
+                operation.finish()
+            }
+            invalidateReceiveTimer()
+            parser.resetAcceptancePackage()
+        }
+        
+        isDataTransmission = false
+        
+    }
+    
+    func invalidateReceiveTimer() {
+        printLog("")
+        receiveTimer?.invalidate()
+        receiveTimer = nil
+    }
+    
+}
+
+
 extension Ls05sDevice {
     func responseAck() {
+        
+        guard let characteristic = self.char0004 else {
+            return
+        }
+        
         let ackBytes : [UInt8] = [0x66, 0x77, 0x00, 0x00, 0x00, 0x00, 0x00]
         let ackData = Data.init(bytes: ackBytes, count: ackBytes.count)
         print("send ack to fw, \(ackBytes.hexString))")
-        self.peripheral!.writeValue(ackData, for: self.char0004!, type: .withResponse)
+        self.peripheral!.writeValue(ackData, for: characteristic, type: .withResponse)
     }
 }
 extension Ls05sDevice {
@@ -215,20 +281,24 @@ extension Ls05sDevice {
         self.char0004 = nil
         self.char0005 = nil
     }
-    func onException(_ error: BleError) -> Void {
+    public func onException(_ error: BleError) -> Void {
         QueueManager.shared.syncDataQueue.cancelAllOperations()
     }
-    public func directWrite(_ data: Data, _ type: Int) {
+    public func directWrite(_ data: Data, _ type: WitheType) {
         
         guard let p = self.peripheral, let c = self.char0002, self.connected == true else {
             return
         }
         
-        let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: 180)
+        let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: mtu)
         for data in dataArr {
-            print("send data:", data.desc())
-            p.writeValue(data, for: c, type: CBCharacteristicWriteType.init(rawValue: type) ?? .withoutResponse)
+            print("direct send data:", data.desc())
+            p.writeValue(data, for: c, type: CBCharacteristicWriteType.init(rawValue: type.rawValue) ?? .withoutResponse)
         }
+        
+    }
+    
+    public func readValue(channel: Channel) {
         
     }
 }
@@ -250,42 +320,17 @@ extension Ls05sDevice {
     
     func callbackData(cmd: hl_cmds) {
         
-//        print("callbackData", cmd)
-        
-        var data = [String: Any]()
-        switch cmd.cmd {
-        case .cmdSetFindPhone:
-            data["status"] = RingStatus.init(rawValue: cmd.rFindPhone.mRingStatus)
-        case .cmdDisturbSwitch:
-            data["status"] = DisturbSwitchStatus.init(rawValue:cmd.rGetDisturbEn.mDisturbEn)
-        case .cmdBindDevice:
-            data["status"] = LsBleBindState.init(rawValue:Int(cmd.rBindDevice.mBindOperate))
-        case .cmdGetUiHrsValue:
-            data["data"] = CurrentUIHR.init(act:cmd.rGetUiHrs.mUiActHr,
-                                            max:cmd.rGetUiHrs.mUiMaxHr,
-                                            min:cmd.rGetUiHrs.mUiMinHr)
-        case .cmdGetActiveRecordData:
-            let activeRecord = cmd.rGetActiveRecord
-            
-            let startTime =  activeRecord.mActiveStartSecond
-            data["status"] = SportModelItem.init(sportModel: .badminton, heartRateNum: 1, startTime: "", endTime: "", step: Int(activeRecord.mActiveStep), count: 0, cal: Int(activeRecord.mActiveCalories), distance: activeRecord.mActiveDistance.description, hrAvg: Int(activeRecord.mActiveAvgHr), hrMax: Int(activeRecord.mActiveMaxHr), hrMin: Int(activeRecord.mActiveMinHr), pace: Int(activeRecord.mActiveSpeed), hrInterval: Int(activeRecord.mActiveHrCount), heartRateData: Data())
-        default:  break
-        }
-        
-        
+        print("一般的数据")
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
-        }) as? BLEOperation else {
-            data["data"] = cmd
-            self.dataObserverPublishRelay.accept((type: LsBackDataTypeEnum.init(rawValue: cmd.cmd.rawValue)!, data: data))
+        }) as? BleOperation else {
+            
+            self.dataObserverPublishRelay.accept(cmd)
             return
         }
-        let lsBackDataTypeEnum = LsBackDataTypeEnum.init(rawValue: cmd.cmd.rawValue)!
-        if lsBackDataTypeEnum != .invalid {
-            operation.observer?.onNext(.init(backData: (type: lsBackDataTypeEnum, data: data)))
-        }else {
-            operation.observer?.onNext(.init(pbDatas: [cmd]))
-        }
+        
+        operation.observer?.onNext(.init(pbDatas: [cmd]))
+        
         
         if cmd.cmd == .cmdBindDevice {
             if cmd.rBindDevice.mBindOperate == 1 {
@@ -298,11 +343,11 @@ extension Ls05sDevice {
     
     func callbackBigData(cmd: hl_cmds, data: [BigDataProtocol]) {
         
-        print("all big data finisn",data.count)
+        print("历史数据",data.count)
         
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
-        }) as? BLEOperation else {
+        }) as? BleOperation else {
             return
         }
         
@@ -313,20 +358,21 @@ extension Ls05sDevice {
     
     func callbackBigData(cmd: hl_cmds, data: [SportModelItem]) {
         
-        print("all big data finisn",data.count)
+        print("运动记录",data.count)
+        
+        let items = LSWorkoutItem.init(value: data)
         
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == cmd.cmd.name
-        }) as? BLEOperation else {
+        }) as? BleOperation else {
+            self.dataObserverPublishRelay.accept(cmd)
             return
         }
         
-        operation.observer?.onNext(.init(sprotItems: data))
+        operation.observer?.onNext(.init(sprotItems: items))
         operation.finish()
-        
         
     }
     
-
 }
 

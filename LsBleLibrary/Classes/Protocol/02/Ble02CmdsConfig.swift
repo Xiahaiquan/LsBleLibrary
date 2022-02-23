@@ -20,13 +20,13 @@ extension Ble02CmdsConfig {
         // 第一条
         var result: [Data] = []
         let todayState = UInt8(current.weatherState.rawValue)
-        let todayHeight = UInt8(current.maxTemp)
-        let todayLow = UInt8(current.minTemp)
+        let todayHeight = UInt8(current.highTem)
+        let todayLow = UInt8(current.lowTem)
         let pm1 = UInt8(((current.pm25>>8)&0xFF))
         let pm2 = UInt8(current.pm25&0xFF)
-        let aqi1 = UInt8(((current.aqi>>8)&0xFF))
-        let aqi2 = UInt8(current.aqi&0xFF)
-        let weatherBytes: [UInt8] = [LS02CommandType.sendWeatherInfo.rawValue, 0x01, todayState, 0x00, UInt8(current.temperature), todayHeight, todayLow, pm1, pm2, aqi1, aqi2]
+        let aqi1 = UInt8(((current.airLevel>>8)&0xFF))
+        let aqi2 = UInt8(current.airLevel&0xFF)
+        let weatherBytes: [UInt8] = [LS02CommandType.sendWeatherInfo.rawValue, 0x01, todayState, 0x00, UInt8(current.currTem), todayHeight, todayLow, pm1, pm2, aqi1, aqi2]
         var weatherData = Data.init(bytes: weatherBytes, count: weatherBytes.count)
         if let cityData = current.city.data(using: .unicode) {
             var cityBytes = [UInt8](cityData)
@@ -51,7 +51,7 @@ extension Ble02CmdsConfig {
         var weatherSecondData = Data.init(bytes: weatherSecondBytes, count: weatherSecondBytes.count)
         for i in 1 ... 4 {
             let weatherInfo = weathData[i]
-            let tempWeatherBytes: [UInt8] = [UInt8(weatherInfo.weatherState.rawValue), 0x00, UInt8(weatherInfo.maxTemp), UInt8(weatherInfo.minTemp)]
+            let tempWeatherBytes: [UInt8] = [UInt8(weatherInfo.weatherState.rawValue), 0x00, UInt8(weatherInfo.highTem), UInt8(weatherInfo.lowTem)]
             let tempWeatherData = Data.init(bytes: tempWeatherBytes, count: tempWeatherBytes.count)
             weatherSecondData.append(tempWeatherData)
         }
@@ -60,7 +60,7 @@ extension Ble02CmdsConfig {
         var weatherThirdData = Data.init(bytes: weatherThirdBytes, count: weatherThirdBytes.count)
         for i in 5 ... 6 {
             let weatherInfo = weathData[i]
-            let tempWeatherBytes: [UInt8] = [UInt8(weatherInfo.weatherState.rawValue), 0x00, UInt8(weatherInfo.maxTemp), UInt8(weatherInfo.minTemp)]
+            let tempWeatherBytes: [UInt8] = [UInt8(weatherInfo.weatherState.rawValue), 0x00, UInt8(weatherInfo.highTem), UInt8(weatherInfo.lowTem)]
             let tempWeatherData = Data.init(bytes: tempWeatherBytes, count: tempWeatherBytes.count)
             weatherThirdData.append(tempWeatherData)
         }

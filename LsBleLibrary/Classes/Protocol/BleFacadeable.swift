@@ -31,11 +31,11 @@ public class BleResponse {
     public var pbDatas: [hl_cmds]?
     public var progress: CGFloat?
     public var writeError: WriteError?
-    public var backData: LsBackData?
+//    public var backData: LsBackData?
     public var uteData: Any?
     
     var item: [BigDataProtocol]?
-    var sprotItems: [SportModelItem]?
+    var sprotItems: LSWorkoutItem?
     
     public init(datas: [Data] = []) {
         self.datas = datas
@@ -53,15 +53,15 @@ public class BleResponse {
         self.writeError = writeError
     }
     
-    init(backData: LsBackData ) {
-        self.backData = backData
-    }
-    
+//    init(backData: LsBackData ) {
+//        self.backData = backData
+//    }
+//    
     init(item: [BigDataProtocol]? ) {
         self.item = item
     }
     
-    init(sprotItems: [SportModelItem]? ) {
+    init(sprotItems: LSWorkoutItem? ) {
         self.sprotItems = sprotItems
     }
     
@@ -74,30 +74,19 @@ public class BleResponse {
 
 public protocol BleFacadeable {
     
-    var dataObserver02: Observable<UTEOriginalData>? {
-        get
-    }
-    var dataObserver05s: Observable<LsBackData>? {
+    var dataObserver: Observable<BleBackDataProtocol>? {
         get
     }
     
     func write(_ writeData: Data,
+               _ characteristic: Int,
                _ name: String,
                _ duration: Int,
                _ endRecognition: (((Data) -> Bool)?))  -> Observable<BleResponse>
     
-    func write(_ writeData: Data,
-               _ name: String,
-               _ duration: Int,
-               _ expectNum: Int,
-               _ ackInInterval: Bool,
-               _ endBySelf: Bool?,
-               _ endRecognition: ((Data) -> Bool)?)  -> Observable<BleResponse>
+    func directWrite(_ data: Data, _ type: WitheType)
     
-    
-    func directWrite(_ data: Data, _ type: Int)
-    
-    func readValue(type: Int)
+    func readValue(channel: Channel)
     
 }
 

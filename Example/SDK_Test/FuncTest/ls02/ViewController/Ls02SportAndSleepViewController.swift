@@ -31,7 +31,7 @@ class Ls02SportAndSleepViewController: UIViewController, Storyboardable {
     }
     
     @IBAction func getCurerntStep(_ sender: Any) {
-        BleOperator.shared.requestRealtimeSteps().subscribe { value in
+        BleHandler.shared.requestRealtimeSteps().subscribe { value in
             print("current", value)
         } onError: { e in
             
@@ -43,7 +43,8 @@ class Ls02SportAndSleepViewController: UIViewController, Storyboardable {
      */
     @IBAction func clickGetSport(_ sender: UIButton) {
         self.sportDatas.removeAll()
-        BleOperator.shared.getHistoryDayData(dateByFar: Date())
+                
+        BleHandler.shared.getHistoryDayData(dateByFar: Date().addingTimeInterval(-7 * 24 * 60 * 60))
             .subscribe(onNext: { (sportData) in
                 print("持续接受数据")
                 self.sportDatas.append(sportData)
@@ -65,7 +66,7 @@ class Ls02SportAndSleepViewController: UIViewController, Storyboardable {
      运动时 数据会主动上报， 需要监听上报事件
      */
     func realTimeObserver() {
-        guard let obser = BleOperator.shared.dataObserver else {
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { (p) in
@@ -90,7 +91,7 @@ class Ls02SportAndSleepViewController: UIViewController, Storyboardable {
      获取睡眠历史数据数据
      */
     @IBAction func clickGetSleepBtn(_ sender: Any) {
-        BleOperator.shared.getHistorySleepData(dateByFar: Date())
+        BleHandler.shared.getHistorySleepData(dateByFar: Date())
             .subscribe(onNext: { (sleepData) in
                 print("持续接受数据")
                 var sleepMsg = ""

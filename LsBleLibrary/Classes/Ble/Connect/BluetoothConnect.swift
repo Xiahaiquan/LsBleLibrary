@@ -6,14 +6,15 @@
 //  Copyright © 2020 LieSheng. All rights reserved.
 //
 
+
 import Foundation
 import CoreBluetooth
 import RxCocoa
 import RxSwift
+//import Haylou_Fun
 
 public enum ConnectState: Int {
     case connectSuccessed
-    case connectComplete
     case connectFailed
     case disConect
     case dicoverChar
@@ -24,6 +25,8 @@ public enum ConnectState: Int {
 enum ConnectError: Error {
     case error(messae: String, _ state: BluetoothState? = .unknown)
 }
+
+internal let peripheralIdentifierCurrent = "LsBleLibrary.peripheralIdentifierCurrent"
 
 /*
  连接设备返回结果， 外设对象 和 特征值
@@ -64,6 +67,10 @@ public protocol BluetoothConnectable {
     
     func connect(duration: Int?) -> Observable<(state: ConnectState, response: ConnectResponse?)>            // 如不想用 响应式 方式， 可以定义block 方式接口
 
+    func reConnectDirect() -> Observable<(state: ConnectState, response: ConnectResponse?)>
+    
+    func disConnect() ->Observable<Bool>
+    
     func finish()
 }
 
@@ -77,6 +84,7 @@ public class BluetoothConnect: BluetoothConnectable {
     public var connectInfo: (connectDevice: String,  macAddress: String?)?
     public var scaner: BluetoothScanable
     public var connectTimer: Timer?
+
     
     public init(centralManager: CBCentralManager,
                 connectInfo: (connectDevice: String,  macAddress: String?)?,
@@ -91,26 +99,24 @@ public class BluetoothConnect: BluetoothConnectable {
     
     public func connect(duration: Int?) -> Observable<(state: ConnectState, response: ConnectResponse?)> {
         return Observable.create { [centralManager, connectInfo, scaner] (subscriber) -> Disposable in
-            
-            guard centralManager.state == .poweredOn else {
-                subscriber.onError(ConnectError.error(messae: "Bluetooth state error", BluetoothState(rawValue: centralManager.state.rawValue)))
-                return Disposables.create()
-            }
-            
+        
             guard let connectInfo = connectInfo else {
                 subscriber.onError(ConnectError.error(messae: "Connection information is missing", BluetoothState(rawValue: centralManager.state.rawValue)))
                 return Disposables.create()
             }
             
             if duration != nil {
-                self.connectTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration!), repeats: false, block: { (_) in
-                    centralManager.stopScan()
-                    subscriber.onNext((state: .timeOut, response: nil))
-                    subscriber.onCompleted()
-                })
+                DispatchQueue.main.async {
+                    self.connectTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(duration!), repeats: false, block: { (_) in
+                        print("停止扫描")
+                        centralManager.stopScan()
+                        subscriber.onNext((state: .timeOut, response: nil))
+                        subscriber.onCompleted()
+                    })
+                }
             }
             
-            _ = scaner.scan(duration: duration)
+            let sub = scaner.scan(duration: duration)
                 .filter({
                     $0.state == .nomal
                 })
@@ -133,7 +139,8 @@ public class BluetoothConnect: BluetoothConnectable {
                         
                         return $0.response?.filter({
                             
-                            if $0.advertisementData == nil,  $0.peripheral.identifier.uuidString == BleDeviceArchiveModel.get()?.uuid {
+                            if $0.advertisementData == nil,
+                               $0.peripheral.identifier.uuidString == UserDefaults.standard.object(forKey: peripheralIdentifierCurrent) as? String {
                                 return true
                             }
                             
@@ -158,18 +165,99 @@ public class BluetoothConnect: BluetoothConnectable {
                         self.subscribeCentralManagerObservable(subscriber)          // 扫描到设备， 订阅相关信号
                         self.subscribeDiscoverCharacteristicsObservable(scanPeripheral, subscriber)
                         self.peripherals.append(scanPeripheral)
+                  
+//                        print("123", scanPeripheral)
                         centralManager.connect(scanPeripheral, options: nil)        // 发起连接
                     }
                     self.finish()
                 }, onError: { error in
                     subscriber.onError(error)
                 })
-            return Disposables.create()
+            return Disposables.create([sub])
         }
     }
-    public func directConnect() {
+    
+    public func disConnect() ->Observable<Bool> {
+        return Observable.create { [centralManager, connectInfo, scaner] (subscriber) -> Disposable in
+        
+            guard let connectInfo = connectInfo else {
+                subscriber.onError(ConnectError.error(messae: "Connection information is missing", BluetoothState(rawValue: centralManager.state.rawValue)))
+                return Disposables.create()
+            }
+        
+           let sub = scaner.scan(duration: nil)
+                .filter({
+                    $0.state == .nomal
+                })
+                .filter({
+                    $0.response != nil
+                })
+                .filter({
+                    $0.response?.filter({
+                        $0.peripheral.name?.hasPrefix(connectInfo.connectDevice) ?? false               // 匹配设备前缀
+                    }).count ?? 0 > 0
+                })
+                .filter({
+                    // 连接时如没有提供mac 地址
+                    if connectInfo.macAddress == nil {
+                        return true
+                    }
+                    
+                    // 如有提供mac 地址 过滤掉不符合的
+                    if let macaddress = connectInfo.macAddress {
+                        
+                        return $0.response?.filter({
+                            
+                            if $0.advertisementData == nil,
+                               $0.peripheral.identifier.uuidString == UserDefaults.standard.object(forKey: peripheralIdentifierCurrent) as? String {
+                                return true
+                            }
+                            
+                            guard let advData = $0.advertisementData, let sd = advData[CBAdvertisementDataManufacturerDataKey] as? Data else {
+                                return false
+                            }
+                            let macAddressData = [UInt8](sd)
+                            let macAddressHex = macAddressData.hexString.lowercased()
+                            //                            print("scaned uuid: \($0.peripheral.identifier.uuidString), mac: \(macAddressHex)")
+                            return macAddressHex.hasSuffix(macaddress.lowercased())
+                        })
+                            .count ?? 0 > 0
+                    }
+                    return false
+                })
+                .subscribe(onNext: { (state, response) in
+                    if let scanPeripheral = response!.filter({
+                        ($0.peripheral.name?.hasPrefix(connectInfo.connectDevice) ?? false)
+                    })
+                        .first?.peripheral {
+                        self.disposeBag = DisposeBag()
+                        centralManager.cancelPeripheralConnection(scanPeripheral)
+                    }
+                    self.finish()
+                }, onError: { error in
+                    subscriber.onError(error)
+                })
+            return Disposables.create([sub])
+        }
+    }
+        
+    public func reConnectDirect() -> Observable<(state: ConnectState, response: ConnectResponse?)> {
+        
+        return Observable.create { [centralManager, connectInfo, scaner] (subscriber) -> Disposable in
+            
+            guard let peripheral = BleFacade.shared.bleDevice?.peripheral else {
+                return Disposables.create()
+            }
+            
+            self.subscribeCentralManagerObservable(subscriber)          
+            self.subscribeDiscoverCharacteristicsObservable(peripheral, subscriber)
+            centralManager.connect(peripheral, options: nil)
+            
+            return Disposables.create()
+        }
         
     }
+    
     //MARK: 订阅 找到设备广播特征
     func subscribeDiscoverCharacteristicsObservable(_ scanPeripheral: CBPeripheral, _ subscriber: RxSwift.AnyObserver<(state: ConnectState, response: ConnectResponse?)>) {
         _ = scanPeripheral.rx.didDiscoverCharacteristics
@@ -182,6 +270,9 @@ public class BluetoothConnect: BluetoothConnectable {
     //MARK: 订阅 连接成功、连接失败、 断开连接 特征
     func subscribeCentralManagerObservable(_ subscriber: RxSwift.AnyObserver<(state: ConnectState, response: ConnectResponse?)>) {
         _ = centralManager.rx.didConectPeripheral
+            .do(onNext: { res in
+                UserDefaults.standard.set(res.peripheral.identifier.uuidString, forKey: peripheralIdentifierCurrent)
+            })
             .map({ ConnectResponse(peripheral: $0.peripheral) })
             .subscribe(onNext: {
                 subscriber.onNext((state: .connectSuccessed, response: $0))

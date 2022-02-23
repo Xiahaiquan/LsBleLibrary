@@ -8,9 +8,10 @@
 import Foundation
 import RxSwift
 
-struct Ble05sSendDataConfig {
+public struct Ble05sSendDataConfig {
     
-    static var shared = Ble05sSendDataConfig()
+    public static var shared = Ble05sSendDataConfig()
+//    private var switchValue: UInt64 = 0x00
     private init() {}
     
     func getMUT() ->Data  {
@@ -26,7 +27,7 @@ struct Ble05sSendDataConfig {
     }
     
     func bind(userId: UInt32,
-              gender: Ls02Gender,
+              gender: LsGender,
               age: UInt32,
               height: UInt32,
               weight: UInt32,
@@ -47,7 +48,7 @@ struct Ble05sSendDataConfig {
     func configDevice(phoneInfo: (model: PhoneTypeEnum,
                                   systemversion: UInt32,
                                   appversion: UInt32,
-                                  language: UInt32),
+                                  language: LSDeviceLanguageEnum),
                       switchs: Data,
                       longsit: (duration: UInt32,
                                 startTime: UInt32,
@@ -67,8 +68,8 @@ struct Ble05sSendDataConfig {
                       target: (cal: UInt32,
                                dis: UInt32,
                                step: UInt32),
-                      timeFormat: Ls02TimeFormat,
-                      metricInch: Ls02Units,
+                      timeFormat: DeviceTimeFormat,
+                      metricInch: DeviceUnitsFormat,
                       brightTime: UInt32,
                       upper: UInt32,
                       lower: UInt32,
@@ -128,8 +129,9 @@ struct Ble05sSendDataConfig {
         return contentData
     }
     
-    func APPSynchronizesMobilePhoneSystemInformationToBand() ->Data {
-        let cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSyncPhoneInfo)
+    func syncPhoneInfoToLS(model: PhoneTypeEnum, systemversion: UInt32, appversion: UInt32, language: LSDeviceLanguageEnum) ->Data {
+        var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSyncPhoneInfo)
+        cmds.syncPhoneInfo = PBModel.getSync_phone_info_t(phonemodel: model, systemversion: systemversion, appversion: appversion, language: language)
         
         let serializedData = Ble05sCmdsConfig.shared.serializedData(cmds: cmds)
         let contentData = Ble05sCmdsConfig.shared.buildPBContent(serializedData)
@@ -218,7 +220,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configureDoNotDisturbMode(notdisturbTime1: Data,
+    func configureDoNotDisturbTime(notdisturbTime1: Data,
                                    notdisturbTime2: Data) ->Data {
         
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSetNotdisturb)
@@ -257,7 +259,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configureTimeSystemSetting(timeFormat: Ls02TimeFormat) ->Data {
+    func configureTimeSystemSetting(timeFormat: DeviceTimeFormat) ->Data {
         
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSetTimeFormat)
         cmds.setTimeFormat = PBModel.getSet_time_format_t(timeFormat: timeFormat)
@@ -269,7 +271,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configureMetricSettings(metricInch: Ls02Units) ->Data {
+    func configureMetricSettings(metricInch: DeviceUnitsFormat) ->Data {
         
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSetMetricInch)
         cmds.setMetricInch = PBModel.getSet_metric_inch_t(metricInch: metricInch)
@@ -281,7 +283,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configureTheBrightScreenDurationSetting(brightTime: UInt32) ->Data {
+    func configureTheBrightScreenDuration(brightTime: UInt32) ->Data {
         
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSetBrightTimes)
         cmds.setBrightTimes = PBModel.getSet_bright_times_t(brightTime: brightTime)
@@ -293,7 +295,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configureHeartRateWarningSettings(upper: UInt32,
+    func configureHeartRateWarning(upper: UInt32,
                                            lower: UInt32) ->Data {
         
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSetHrWarning)
@@ -404,87 +406,86 @@ struct Ble05sSendDataConfig {
         return contentData
     }
     
-    func configurationSwitch(item: Ls02ANCCItem, config: UInt64, itemSwitch: Ls02ANCCSwitch) -> Data {
-
-       var configValue = config
-       
+    func configurationSwitch(item: LsANCSItem, itemSwitch: LsANCSSwitch, switchConfigValue: UInt64) -> Data {
+        
+        var switchValue = switchConfigValue
         switch item {
         case .message:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.sms.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .sms, switchValue)
         case .qq:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.qq.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .qq, switchValue)
         case .wechat:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.wechat.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .wechat, switchValue)
         case .telephone:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.call.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .call, switchValue)
         case .facebook:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.facebook.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .facebook, switchValue)
         case .twitter:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.twitter.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .twitter, switchValue)
         case .whatsApp:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.whatsapp.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .whatsapp, switchValue)
         case .facebookMessenger:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.facebook.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .facebook, switchValue)
         case .line:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.line.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .line, switchValue)
         case .skype:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.skype.rawValue.1, configValue)
-        case .hangouts:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.Hand_up_bright.rawValue.1, configValue) //05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .skype, switchValue)
+        case .handUpBright:
+            switchValue = bitManipulation(itemSwitch, .Hand_up_bright, switchValue)
         case .linkedIn:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.linkedin.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .linkedin, switchValue)
         case .instagram:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.instagram.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .instagram, switchValue)
         case .viber:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.instagram.rawValue.1, configValue) //05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .instagram, switchValue) //05s没这个类型
         case .kakaoTalk:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.kakaotalk.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .kakaotalk, switchValue)
         case .vkontakte:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.kakaotalk.rawValue.1, configValue)//05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .kakaotalk, switchValue)//05s没这个类型
         case .snapchat:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.skype.rawValue.1, configValue)//05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .skype, switchValue)//05s没这个类型
         case .googlePlus:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.gmail.rawValue.1, configValue)//05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .gmail, switchValue)//05s没这个类型
         case .gmail:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.gmail.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .gmail, switchValue)
         case .flickr:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.feixin.rawValue.1, configValue)//05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .feixin, switchValue)//05s没这个类型
         case .tumblr:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.twitter.rawValue.1, configValue)//05s没这个类型
+            switchValue = bitManipulation(itemSwitch, .twitter, switchValue)//05s没这个类型
         case .pintrrest:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.pinterest.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .pinterest, switchValue)
         case .youtube:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.skype.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .skype, switchValue)
         default:
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.facetime.rawValue.1, configValue) //以下这些是05s有的04没有
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.feixin.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.sound.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.webook.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.dingtalk.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.aliwangwang.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.alipay.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.qianniu.rawValue.1, configValue)
-            configValue = bitManipulation(itemSwitch, YSNotificationTypeEnum.other_app.rawValue.1, configValue)
+            switchValue = bitManipulation(itemSwitch, .facetime, switchValue) //以下这些是05s有的04没有
+            switchValue = bitManipulation(itemSwitch, .feixin, switchValue)
+            switchValue = bitManipulation(itemSwitch, .sound, switchValue)
+            switchValue = bitManipulation(itemSwitch, .webook, switchValue)
+            switchValue = bitManipulation(itemSwitch, .dingtalk, switchValue)
+            switchValue = bitManipulation(itemSwitch, .aliwangwang, switchValue)
+            switchValue = bitManipulation(itemSwitch, .alipay, switchValue)
+            switchValue = bitManipulation(itemSwitch, .qianniu, switchValue)
+            switchValue = bitManipulation(itemSwitch, .other_app, switchValue)
         }
-         
-            
+        
+        
         var cmds = Ble05sCmdsConfig.shared.configCmds(.cmdSyncSwitch)
-        var bytes = UInt64.self
-        cmds.syncSwitch = PBModel.getSync_switch_t(data: Data(bytes: &bytes, count: MemoryLayout<UInt64>.size))
+        
+        cmds.syncSwitch = PBModel.getSync_switch_t(switchs: withUnsafeBytes(of: switchValue) { Data($0) })
         
         let serializedData = Ble05sCmdsConfig.shared.serializedData(cmds: cmds)
         let contentData = Ble05sCmdsConfig.shared.buildPBContent(serializedData)
         
         return contentData
-            
-   }
-    func bitManipulation(_ state: Ls02ANCCSwitch, _ index: Int, _ value: UInt64) -> UInt64{
+        
+    }
+    public func bitManipulation(_ state: LsANCSSwitch, _ index: YSNotificationTypeEnum, _ value: UInt64) -> UInt64{
         
         var valueNew = value
         if state == .open {
-            valueNew = valueNew | ((1 << index))
+            valueNew = valueNew | ((1 << index.rawValue.1))
         }else {
-            valueNew = valueNew & (~(1 << index))
+            valueNew = valueNew & (~(1 << index.rawValue.1))
         }
         
         return valueNew
@@ -540,7 +541,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func getRealTimeHeartRateInstructionsAndSetIntervals() ->Data {
+    func getRealTimeHeartRate() ->Data {
         
         let cmds = Ble05sCmdsConfig.shared.configCmds(.cmdGetRealtimeHr)
         
@@ -551,17 +552,17 @@ struct Ble05sSendDataConfig {
         
     }
     
-//    func appQueryData() ->Data {
-//        
-//        let cmds = Ble05sCmdsConfig.shared.configCmds(.cmdDisturbSwitch)
-//        
-//        
-//        let serializedData = Ble05sCmdsConfig.shared.serializedData(cmds: cmds)
-//        let contentData = Ble05sCmdsConfig.shared.buildPBContent(serializedData)
-//        
-//        return contentData
-//        
-//    }
+    func appQueryData() ->Data {
+        
+        let cmds = Ble05sCmdsConfig.shared.configCmds(.cmdDisturbSwitch)
+        
+        
+        let serializedData = Ble05sCmdsConfig.shared.serializedData(cmds: cmds)
+        let contentData = Ble05sCmdsConfig.shared.buildPBContent(serializedData)
+        
+        return contentData
+        
+    }
     
     func makeTestData() ->Data {
         
@@ -645,7 +646,7 @@ struct Ble05sSendDataConfig {
         
     }
     
-    func configSpo2AndHRWarning(type: UInt32,
+    func configSpo2AndHRWarning(type: HealthMonitorEnum,
                                 min: UInt32,
                                 max: UInt32) ->Data {
         
@@ -792,6 +793,43 @@ struct Ble05sSendDataConfig {
         
         return contentData
         
+    }
+    
+    public func change(notificationType: YSNotificationTypeEnum, statusFirst: DeviceSwitch, statusSecond: DeviceSwitch) ->Data {
+        
+        var dataSend = Data()
+        //head
+        
+        dataSend.append(Data([UInt8(notificationType.rawValue.0)]))
+        
+        var allOpen: UInt8 = 3
+        if statusFirst == .open {
+            allOpen = allOpen | ((1 << 0))
+        }else {
+            allOpen = allOpen & (~(1 << 0))
+        }
+        
+        if statusSecond == .open {
+            allOpen = allOpen | ((1 << 1))
+        }else {
+            allOpen = allOpen & (~(1 << 1))
+        }
+        
+        dataSend.append(Data([allOpen]))
+        
+        return dataSend
+        
+    }
+    
+    func handle(value: String) ->(hour: UInt8, min: UInt8) {
+        var s_hour = 0
+        var s_min = 0
+        let startTimeArray = value.components(separatedBy: ":")
+        if let hour = startTimeArray.first, let min = startTimeArray.last {
+            s_hour = (hour as NSString).integerValue
+            s_min = (min as NSString).integerValue
+        }
+        return (hour: UInt8(s_hour), min: UInt8(s_min))
     }
     
 }

@@ -35,7 +35,7 @@ enum LS02CommandType: UInt8 {
     case sevenDaysHistorySleepingDataReceive = 0x1E
     case bindingWatch = 0x20
     case supportMultiLanguageDisplay = 0x25
-        
+    
     case gpsCommand = 0x81
     case receiveGPSCommand = 0x82
     case historySpo2Data = 0x86
@@ -44,6 +44,7 @@ enum LS02CommandType: UInt8 {
     
     case getWatchSkinTheme = 0x1A
     case sendWatchSkinTheme = 0x1B
+    
     case creatTestData = 0x1F
     case updateAGPS = 0xF1
     case updateYearGPS = 0xF2
@@ -53,7 +54,84 @@ enum LS02CommandType: UInt8 {
     
     var name: String {
         get {
-            return "\(self)"
+            switch self {
+            case .setClockAndDistanceFormat:
+                return "setClockAndDistanceFormat"
+            case .getVersionNum:
+                return "getVersionNum"
+            case .getBatteryLevel:
+                return "getBatteryLevel"
+            case .setDateAndTime:
+                return "setDateAndTime"
+            case .setWatch:
+                return "setWatch"
+            case .setTimerAndMotorParams:
+                return "setTimerAndMotorParams"
+            case .requstFactoryReset:
+                return "requstFactoryReset"
+            case .requestBluetoothAddress:
+                return "requestBluetoothAddress"
+            case .requestRealtimeSteps:
+                return "requestRealtimeSteps"
+            case .requestSevenDaysHistorySteps:
+                return "requestSevenDaysHistorySteps"
+            case .requestHistorySleepingData:
+                return "requestHistorySleepingData"
+            case .requestFunctionSetAndStatus:
+                return "requestFunctionSetAndStatus"
+            case .setCameraMode:
+                return "setCameraMode"
+            case .sendWeatherInfo:
+                return "sendWeatherInfo"
+            case .watchBtnFunction:
+                return "watchBtnFunction"
+            case .configPushNotification:
+                return "configPushNotification"
+            case .setLongSitNotification:
+                return "setLongSitNotification"
+            case .setNoDisturbanceMode:
+                return "setNoDisturbanceMode"
+            case .requestRealtimeHeartRate:
+                return "requestRealtimeHeartRate"
+            case .phoneControlPowerOff:
+                return "phoneControlPowerOff"
+            case .historyHeartRateData:
+                return "historyHeartRateData"
+            case .multiSport:
+                return "multiSport"
+            case .enterFactoryTest:
+                return "enterFactoryTest"
+            case .sevenDaysHistorySleepingDataSend:
+                return "sevenDaysHistorySleepingDataSend"
+            case .sevenDaysHistorySleepingDataReceive:
+                return "sevenDaysHistorySleepingDataReceive"
+            case .bindingWatch:
+                return "bindingWatch"
+            case .supportMultiLanguageDisplay:
+                return "supportMultiLanguageDisplay"
+            case .gpsCommand:
+                return "gpsCommand"
+            case .receiveGPSCommand:
+                return "receiveGPSCommand"
+            case .historySpo2Data:
+                return "historySpo2Data"
+            case .supportAlarmsNum:
+                return "supportAlarmsNum"
+            case .getWatchSkinTheme:
+                return "getWatchSkinTheme"
+            case .sendWatchSkinTheme:
+                return "sendWatchSkinTheme"
+            case .creatTestData:
+                return "creatTestData"
+            case .updateAGPS:
+                return "updateAGPS"
+            case .updateYearGPS:
+                return "updateYearGPS"
+            case .beidouGPSAvailable:
+                return "beidouGPSAvailable"
+            case .generalEnds:
+                return "generalEnds"
+            }
         }
     }
     

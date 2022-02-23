@@ -11,7 +11,6 @@ import CoreBluetooth
 import RxCocoa
 import RxSwift
 
-
 public enum BluetoothState : Int {
     case unknown = 0
     case resetting = 1
@@ -27,10 +26,9 @@ public class BleFacade: NSObject, BleFacadeable {
     public static let shared: BleFacade = BleFacade()
     
     // 可选 有可能最开始不知道要连接某种设备
-    public var bleDevice: Deviceable? {
+    public var bleDevice: LsDeviceable? {
         didSet {
-            self.dataObserver02 = bleDevice?.dataObserver02
-            self.dataObserver05s = bleDevice?.dataObserver05s
+            self.dataObserver = bleDevice?.dataObserver
         }
     }
     
@@ -42,8 +40,7 @@ public class BleFacade: NSObject, BleFacadeable {
     var connectBuilder: BluetoothConnectable.ConnectBuilder?
     var isConnecting: Bool = false                  // 是否正在连接
     
-    public var dataObserver02: Observable<UTEOriginalData>?
-    public var dataObserver05s: Observable<LsBackData>?
+    public var dataObserver: Observable<BleBackDataProtocol>?
     
     // 状态变化信号
     public typealias BluetoothEvent = (
@@ -77,6 +74,7 @@ public class BleFacade: NSObject, BleFacadeable {
     }
     
     
+    
     public func configConnectDeviceInfo(_ config: BleConnectDeviceConfig) {
         var connectInfo : (String,  String?)?
         if config.connectName != nil {
@@ -94,7 +92,8 @@ public class BleFacade: NSObject, BleFacadeable {
         
         let options = [
             CBCentralManagerOptionShowPowerAlertKey: true,
-            CBCentralManagerOptionRestoreIdentifierKey: "RESTORE_KEY"
+            CBCentralManagerOptionRestoreIdentifierKey: "RESTORE_KEY",
+            CBCentralManagerScanOptionAllowDuplicatesKey: false
         ] as [String: Any]
         self.centralManager = CBCentralManager.init(delegate: self, queue: nil, options: options)
         
@@ -120,29 +119,16 @@ public class BleFacade: NSObject, BleFacadeable {
                     self.bleEvent.bluetoothState.accept(BluetoothState(rawValue: 4)!)
                     print("蓝牙开关已关闭")
                     self.bleDevice?.onException(.powerOff)
+                    self.bleDevice?.onException(.disConnect)
                 }
             })
     }
     
     public func write(_ writeData: Data,
+                      _ characteristic: Int = 0,
                       _ name: String,
                       _ duration: Int = 8,
                       _ endRecognition: (((Data) -> Bool)?) = nil)  -> Observable<BleResponse>  {
-        return self.write(writeData, name, duration, 1, false, false, endRecognition)
-    }
-    
-    
-    /**
-     App -> Device :  app 发送数据到设备， 如果设备未连接， 会尝试连接
-     */
-    public func write(_ writeData: Data,
-                      _ name: String,
-                      _ duration: Int = 8,
-                      //               _ characteristic: CBCharacteristic? = nil,
-                      _ expectNum: Int = 1,
-                      _ ackInInterval: Bool = false,
-                      _ endBySelf: Bool? = false,
-                      _ endRecognition: ((Data) -> Bool)? = nil)  -> Observable<BleResponse> {
         
         return Observable.create { [weak self] (subscriber) -> Disposable in
             guard let `self` = self else {
@@ -155,77 +141,37 @@ public class BleFacade: NSObject, BleFacadeable {
                 return Disposables.create()
             }
             
-            if self.bleDevice?.connected ?? false  {
-                
-                _ = self.bleDevice?.write( data: writeData, name: name, expectNum: expectNum, duration: duration, ackInInterval: ackInInterval, endBySelf: endBySelf, trigger: true, endRecognition: endRecognition)
-                    .subscribe(onNext: { (bleRes) in
-                        subscriber.onNext(bleRes)
-                    }, onError: { (e) in
-                        subscriber.onError(e)
-                    })
-                
+            guard let isConnected = self.bleDevice?.connected, isConnected else {
+                subscriber.onError(BleError.error("Bluetooth not connect"))
                 return Disposables.create()
-                
             }
-            // 未连接 先放入队列， 不尝试发送
-            _ = self.bleDevice?.write(data: writeData, name: name, expectNum: expectNum, duration: duration, ackInInterval: ackInInterval,  endBySelf: endBySelf, trigger: false, endRecognition: endRecognition)
+            
+            
+            _ = self.bleDevice?.write(data: writeData,characteristic: characteristic, name: name,  duration: duration, endRecognition: endRecognition)
                 .subscribe(onNext: { (bleRes) in
                     subscriber.onNext(bleRes)
                 }, onError: { (e) in
                     subscriber.onError(e)
                 })
             
-            if !self.isConnecting {
-                self.isConnecting = true
-                _ = self.connecter.connect(duration: duration)
-                    .do(onNext: { (state, response) in
-                        if state == .connectSuccessed {
-                            print("只连接不知道具体特征")
-                            guard let p = response?.peripheral else {
-                                return
-                            }
-                            self.bleDevice?.peripheral = p
-                        } else if (state == .dicoverChar) {
-                            self.bleDevice?.updateCharacteristic(characteristic: response?.characteristics, statusCallback: nil)
-                            // 到连接步骤， bleDevice 类型，必然已经知道，可以强解
-                            if self.bleDevice?.connected ?? false {
-                                print("现在，已经连接而且知道具体特征, 并且发送数据")
-                                BleFacade.shared.connecter.finish()
-                                
-                                self.isConnecting = false
-                            }
-                        } else if (state == .timeOut) {
-                            print("连接超时")
-                            subscriber.onError(BleError.timeout)
-                            self.isConnecting = false
-                            self.bleDevice?.onException(.timeout)
-                        }
-                        
-                    }, onError: { (error) in
-                        subscriber.onError(error)
-                        self.isConnecting = false
-                        self.bleDevice?.onException(BleError.error(error.localizedDescription))
-                    })
-                        .subscribe()
-                        }
-            
             return Disposables.create()
+            
         }
     }
     
-    public func directWrite(_ data: Data, _ type: Int) {
+    public func directWrite(_ data: Data, _ type: WitheType) {
         self.bleDevice?.directWrite(data, type)
     }
     
-    func getPeripheralMaximumWriteValueLength() -> Int? {
+    public func getPeripheralMaximumWriteValueLength() -> Int? {
         return self.bleDevice?.maximumWriteValueLength()
     }
     
-    func bluetoothOn() -> Bool {
+    public func bluetoothOn() -> Bool {
         return self.centralManager.state == .poweredOn
     }
     
-    func bluetoothUnAuth() -> Bool {
+    public func bluetoothUnAuth() -> Bool {
         return self.centralManager.state == .unauthorized
     }
     
@@ -233,8 +179,8 @@ public class BleFacade: NSObject, BleFacadeable {
         return self.bleDevice?.connected ?? false
     }
     
-    public func readValue(type: Int) {
-        self.bleDevice?.readValue(type)
+    public func readValue(channel: Channel) {
+        self.bleDevice?.readValue(channel: channel)
     }
 }
 

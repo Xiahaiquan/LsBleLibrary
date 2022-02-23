@@ -20,7 +20,7 @@ extension Ble02Operator {
                                  UInt8(min)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "closeWatchGPS", 3, nil)
+            self.bleFacade?.write(setData, 0,"closeWatchGPS", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first,
                           let data = [UInt8](datas).first,
@@ -41,7 +41,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x81]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "requestWatchGPSState", 3, nil)
+            self.bleFacade?.write(setData, 0,"requestWatchGPSState", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first,
                           let data = [UInt8](datas).first,
@@ -62,7 +62,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x82]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "deleteWatchGPSData", 3, nil)
+            self.bleFacade?.write(setData, 0,"deleteWatchGPSData", 3, nil)
                 .subscribe { (bleResponse) in
                     //返回值 0x818200 删除成功
                     //返回值 0x818201 删除失败
@@ -81,20 +81,29 @@ extension Ble02Operator {
     }
     
     //准备开始发送 AGPS 数据
-    public func readyUpdateAGPSCommand(type: Ls02UpdateAGPSMode) -> Observable<Ls02ReadyUpdateAGPSStatue> {
+    public func readyUpdateAGPSCommand(type: Ls02UpdateAGPSMode) -> Observable<Ls02ReadyUpdateAGPSStatus> {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, 0x00,
                                type.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "readyUpdateAGPSCommand", 3, nil)
+            self.bleFacade?.write(setData, 0,"readyUpdateAGPSCommand", 3, nil)
                 .subscribe { (bleResponse) in
-                    guard let datas = bleResponse.datas?.first,
-                          let data = [UInt8](datas).first,
-                          let status = Ls02ReadyUpdateAGPSStatue.init(rawValue: data) else {
-                              subscriber.onError(BleError.error(""))
-                              return
-                          }
-                    subscriber.onNext(status)
+                    guard let datas = bleResponse.datas?.first
+                    else {
+                        subscriber.onError(BleError.error("没有数据"))
+                        return
+                    }
+                    
+                    let bytes = [UInt8](datas)
+                    
+                    guard bytes.count > 2 else {
+                        subscriber.onError(BleError.error("数据位数不够"))
+                        return
+                    }
+                    
+                    let status = Ls02ReadyUpdateAGPSStatus.init(rawValue: bytes[2])
+                    
+                    subscriber.onNext(status ?? .faile)
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -102,14 +111,20 @@ extension Ble02Operator {
             return Disposables.create()
         }
     }
-    public func updateAGPComplete(type: Ls02UpdateAGPSCompleteMode) -> Observable<Bool> {
-        let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, type.rawValue,
-                               type.rawValue]
+    //表明升级单个文件or全部文件完成了
+    public func updateAGPComplete(type: Ls02UpdateAGPSCompleteMode) -> Observable<Ls02ReadyUpdateAGPSStatus> {
+        let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, type.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "updateAGPComplete", 3, nil)
+            self.bleFacade?.write(setData, 0,"updateAGPComplete", 3, nil)
                 .subscribe { (bleResponse) in
-                    subscriber.onNext(true)
+                    guard let datas = bleResponse.datas?.first,
+                          [UInt8](datas).count == 3 else {
+                              subscriber.onError(BleError.error(""))
+                              return
+                          }
+                    let state = Ls02ReadyUpdateAGPSStatus.init(rawValue: [UInt8](datas)[2])
+                    subscriber.onNext(state ?? .allComplete)
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -124,7 +139,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, 0x08]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "checkBeidouDataInvalte", 3, nil)
+            self.bleFacade?.write(setData, 0,"checkBeidouDataInvalte", 3, nil)
                 .subscribe { (bleResponse) in
                     //返回值 0x81830800 星历数据无效
                     //返回值 0x81830801 星历数据有效
@@ -142,36 +157,14 @@ extension Ble02Operator {
         }
     }
     
-    
-    public func checkBeidouDataInvate() -> Observable<Bool> {
-        let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x84, 0x00]
-        let setData = Data.init(bytes: setCmd, count: setCmd.count)
-        return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "checkBeidouDataInvalte", 3, nil)
-                .subscribe { (bleResponse) in
-                    //返回值 0x81830800 星历数据无效
-                    //返回值 0x81830801 星历数据有效
-                    guard let datas = bleResponse.datas?.first,
-                          [UInt8](datas).count == 4 else {
-                              subscriber.onError(BleError.error(""))
-                              return
-                          }
-                    subscriber.onNext([UInt8](datas)[3] == 1)
-                } onError: { (error) in
-                    subscriber.onError(error)
-                }
-                .disposed(by: self.bag)
-            return Disposables.create()
-        }
-    }
-    
+
     //准备开始发送 GPS 的 OTA 数据
     public func readyUpdateGPSCommand(type: Ls02UpdateAGPSMode) -> Observable<Bool> {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, 0x00,
                                type.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "readyUpdateGPSCommand", 3 * 60, { data in
+            self.bleFacade?.write(setData, 0,"readyUpdateGPSCommand", 3 * 60, { data in
                 
                 let dataBytes = [UInt8](data)
                 guard dataBytes.count >= 3 else {
@@ -212,7 +205,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x84,0x87]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "getGPSFirmwareVersion", 3, nil)
+            self.bleFacade?.write(setData, 0,"getGPSFirmwareVersion", 3, nil)
                 .subscribe { (bleResponse) in
 //                    返回 0x818407xxxxxx 准备开始发送 GPS 的 OTA 数据，数据格式参 照 5） 发送 0x8185+纬度（4b
                     subscriber.onNext("123")
@@ -251,7 +244,7 @@ extension Ble02Operator {
         
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "sentLocationInformation", 3, nil)
+            self.bleFacade?.write(setData, 0,"sentLocationInformation", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -270,7 +263,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x73,UInt8(sportType)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "openWatchGPS", 3, nil)
+            self.bleFacade?.write(setData, 0,"openWatchGPS", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -286,7 +279,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x73, 0x00]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "closeWatchGPS", 3, nil)
+            self.bleFacade?.write(setData, 0,"closeWatchGPS", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -303,7 +296,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x83, UInt8(agpsType)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "startAGPSDataCommand", 3, nil)
+            self.bleFacade?.write(setData, 0,"startAGPSDataCommand", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -322,7 +315,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.gpsCommand.rawValue, 0x84, gpsType]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "startGPSOTADataCommand", 3, nil)
+            self.bleFacade?.write(setData, 0,"startGPSOTADataCommand", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -333,18 +326,18 @@ extension Ble02Operator {
         }
     }
     
-    public func sendAGPSDataCommand(gpsData: Data, number: Int) -> Observable<Ls02ReadyUpdateAGPSStatue> {
+    public func sendAGPSDataCommand(gpsData: Data, number: Int) -> Observable<Ls02ReadyUpdateAGPSStatus> {
         let setCmd: [UInt8] = [LS02CommandType.receiveGPSCommand.rawValue,
                                UInt8((number>>8)&0xff),
                                UInt8(number&0xff)]
         var setData = Data.init(bytes: setCmd, count: setCmd.count)
         setData.append(gpsData)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "sendAGPSDataCommand", 3, nil)
+            self.bleFacade?.write(setData, 0,"sendAGPSDataCommand", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas?.first,
                           let data = [UInt8](datas).first,
-                          let status = Ls02ReadyUpdateAGPSStatue.init(rawValue: data) else {
+                          let status = Ls02ReadyUpdateAGPSStatus.init(rawValue: data) else {
                               subscriber.onError(BleError.error(""))
                               return
                           }
@@ -363,7 +356,7 @@ extension Ble02Operator {
         var setData = Data.init(bytes: setCmd, count: setCmd.count)
         setData.append(gpsData)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "sendAGPSDataCommand", 3, nil)
+            self.bleFacade?.write(setData, 0,"sendAGPSDataCommand", 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in

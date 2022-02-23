@@ -26,6 +26,65 @@ public extension Array where Element == UInt8 {
         .joined(separator: "")
     }
 }
+//extension UInt32 {
+//    var data: Data {
+//        var int = self
+//        return Data(bytes: &int, count: MemoryLayout<UInt32>.size)
+//    }
+//}
+extension Int {
+    var data: Data {
+        var int = self
+        return Data(bytes: &int, count: MemoryLayout<Int>.size)
+    }
+}
+public extension Data {
+    var uint8: UInt8 {
+        get {
+            var number: UInt8 = 0
+            self.copyBytes(to:&number, count: MemoryLayout<UInt8>.size)
+            return number
+        }
+    }
+    
+    var uint16: UInt16 {
+        get {
+            let i16array = self.withUnsafeBytes { $0.load(as: UInt16.self) }
+            return i16array
+        }
+    }
+    
+    var uint32: UInt32 {
+        get {
+            let i32array = self.withUnsafeBytes { $0.load(as: UInt32.self) }
+            return i32array
+        }
+    }
+    
+    var uuid: NSUUID? {
+        get {
+            var bytes = [UInt8](repeating: 0, count: self.count)
+            self.copyBytes(to:&bytes, count: self.count * MemoryLayout<UInt32>.size)
+            return NSUUID(uuidBytes: bytes)
+        }
+    }
+    var stringASCII: String? {
+        get {
+            return NSString(data: self, encoding: String.Encoding.ascii.rawValue) as String?
+        }
+    }
+    
+    var stringUTF8: String? {
+        get {
+            return NSString(data: self, encoding: String.Encoding.utf8.rawValue) as String?
+        }
+    }
+
+    var bytes : [UInt8] {
+        return [UInt8](self)
+    }
+    
+}
 public extension Data {
     func scanValue<T: FixedWidthInteger>(at index: Data.Index) -> T {
         let start = index

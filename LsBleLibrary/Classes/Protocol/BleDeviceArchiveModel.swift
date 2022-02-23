@@ -44,8 +44,6 @@ public class BleDeviceArchiveModel: NSObject, NSCoding, NSSecureCoding {
     }
     
     
-    
-    
     // 编码成object
     public func encode(with coder: NSCoder) {
         coder.encode(uuid, forKey: "uuid")
@@ -76,7 +74,7 @@ extension BleDeviceArchiveModel {
             let model = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? BleDeviceArchiveModel
             return model!
         } catch {
-            print("获取data数据失败: \(error)")
+//            print("获取data数据失败: \(error)")
         }
         
         return nil

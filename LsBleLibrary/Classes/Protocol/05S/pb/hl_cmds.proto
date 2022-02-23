@@ -1,0 +1,698 @@
+syntax="proto2";
+
+enum ver_t { 
+	PB_VERSION = 1;
+}
+
+message weather_t{
+	required uint32 	m_weather_num 			= 1;
+	required uint32		m_climate	 			= 2;
+	required uint32		m_temperature	 		= 3;
+	required uint32 	m_pm25		 			= 4;
+	required uint32		m_aqi		 			= 5;
+	required uint32		m_city			 		= 6;
+	required uint32		m_max_temp				= 7;
+	required uint32		m_min_temp				= 8;
+	required uint32		m_seconds				= 9;
+
+	optional uint32     m_humidity              = 10;
+	optional uint32     m_uv                    = 11;
+	optional bytes      m_city_name             = 12;
+}
+
+message alarm_t{
+	required bytes 	m_alarm1_cfg 	    = 1;
+	required uint32	m_alarm1_hour 	    = 2;
+	required uint32	m_alarm1_min	 	= 3;
+	optional uint32 m_alarm1_once	    = 4;
+	optional bytes m_alarm1_remarks     = 5;
+}
+
+message bind_app_info_t{
+	
+	required uint32 m_usrid				= 1;
+	required uint32 m_gender			= 2;
+	required uint32 m_age				= 3;
+	required uint32 m_height			= 4;
+	required uint32 m_weight			= 5;
+	required uint32 m_wearstyle			= 6;
+
+
+}
+
+message r_bind_device_t{
+	required bytes m_projno			= 1;
+	required uint32 m_hwversion		= 2;
+	required bytes m_fwversion		= 3;
+	required uint32 m_fontversion	= 4;
+	required uint32 m_sdversion		= 5;
+	required uint32 m_uiversion		= 6;
+	required uint32 m_devicesn		= 7;
+	required uint32 m_devicename	= 8;
+	required uint32 m_battvalue		= 9;
+	required uint32 m_devicemac		= 10;
+	required uint32 m_bind_operate	= 11;
+	required uint32	m_power			= 12;
+	optional uint32 m_langversion   = 13;
+	optional uint32 m_lang_is_right = 14;
+}
+
+
+message r_get_device_info_t{
+	required bytes m_projno			= 1;
+	required uint32 m_hwversion		= 2;
+	required bytes m_fwversion		= 3;
+	required uint32 m_fontversion	= 4;
+	required uint32 m_sdversion		= 5;
+	required uint32 m_uiversion		= 6;
+	required uint32 m_devicesn		= 7;
+	required uint32 m_devicename	= 8;
+	required uint32 m_battvalue		= 9;
+	required uint32 m_devicemac		= 10;
+	optional uint32 m_langversion   = 11;
+	optional uint32 m_lang_is_right = 12;
+}
+
+message sync_phone_info_t{
+	required uint32 m_phonemodel		= 1;
+	required uint32 m_systemversion		= 2;
+	required uint32 m_appversion		= 3;
+	required uint32	m_language			= 4;
+}
+
+message sync_user_info_t{
+	required uint32 m_usrid			= 1;
+	required uint32 m_gender		= 2;
+	required uint32 m_age			= 3;
+	required uint32 m_height		= 4;
+	required uint32 m_weight		= 5;
+	required uint32 m_wearstyle		= 6;
+}
+
+message set_drink_slot_t{
+	required uint32 m_drink_slot			= 1;
+	required uint32 m_start_time			= 2;
+	required uint32 m_end_time				= 3;
+	required uint32 m_nodisturb_start_time	= 4;
+	required uint32 m_nodisturb_end_time	= 5;
+}
+
+message sync_switch_t{
+	required bytes m_switchs		= 1;
+}
+
+message set_hr_sample_slot_t{
+	required uint32 m_hr_slot		= 1;
+}
+
+message set_longsit_duration_t{
+	required uint32 m_longsit_duration		= 1;
+	required uint32 m_start_time			= 2;
+	required uint32 m_end_time				= 3;
+	required uint32 m_nodisturb_start_time	= 4;
+	required uint32 m_nodisturb_end_time	= 5;
+	
+}
+
+message set_notdisturb_t{
+	required bytes m_notdisturb_time_1	= 1;
+	required bytes m_notdisturb_time_2	= 2;
+}
+
+message set_country_info_t{
+	required bytes m_country_name			= 1;
+	required uint32 m_country_timezone		= 2;
+}
+
+message set_ui_style_t{
+	required uint32 	m_ui_style			= 1;
+	required uint32 	m_dial_clock		= 2;	
+}
+
+message set_sport_target_t{
+	required uint32 	m_target_cal			= 1;
+	required uint32 	m_target_dis			= 2;
+	required uint32 	m_target_step			= 3;
+	optional uint32     m_target_actime         = 4;
+	optional uint32     m_check                 = 5;
+}
+
+message set_time_format_t{
+	required uint32 	m_time_format			= 1;
+}
+
+message set_metric_inch_t{
+	required uint32 	m_metric_inch  			= 1;
+}
+
+message set_bright_times_t{
+	required uint32 	m_bright_time  			= 1;
+}
+
+message set_hr_warning_t{
+	required uint32 	m_hr_upper 				= 1;
+	required uint32 	m_hr_lower				= 2;
+}
+
+message r_get_hr_value_t{
+	required uint32 	m_hr_value 				= 1;
+	required uint32		m_err_code				= 2;
+}
+
+message set_notify_warning_t{
+	required uint32 	m_notify_type		= 1;
+	required uint32		m_title_len			= 2;
+	required uint32		m_msg_len			= 3;
+	required bytes 		m_reserved			= 4;
+	required bytes 		m_title				= 5;
+	required bytes 		m_msg				= 6;
+	required uint32 	m_utc				= 7;
+}
+
+message r_sync_health_data_t{
+	required uint32 	m_sync_type			= 1;
+	required uint32		m_second_start		= 2;
+	required uint32     m_second_end		= 3;
+	
+}
+
+message r_get_health_data_t{
+	required uint32		m_err_code			= 1;
+	required uint32		m_sn				= 2;
+	required bytes      m_data				= 3;
+	
+}
+
+message r_get_power_t{
+	required uint32		m_err_code			= 1;
+	required uint32		m_power				= 2;
+}
+
+message set_updata_fw_t{
+	required uint32		m_new_version		= 1;
+
+}
+
+
+
+message set_weather_info_t{
+	repeated weather_t weathers = 1;
+}
+
+message set_reset_machine_t{
+	required uint32 m_factory_mode		= 1;
+}
+
+
+message set_sport_status_t{
+	required uint32 m_sport_mode		= 1;
+	required uint32 m_sport_status		= 2;
+	required uint32	m_sport_speed 		= 3;
+	required float	m_sport_distance	= 4;
+	required uint32 m_sport_calorie		= 5;
+	required uint32 m_sport_flag		= 6;
+	required uint32 m_sport_duration	= 7;
+	required uint32 m_sport_second  	= 8;
+	optional uint32 m_sport_step        = 9;
+}
+
+message r_get_sport_data_t{
+
+	required uint32 m_sport_mode		= 1;
+	required uint32 m_sport_status		= 2;	
+	required uint32	m_sport_step 		= 3;
+	required uint32	m_sport_calorie		= 4;
+	required uint32 m_sport_heart		= 5;
+	
+}
+
+message set_music_info_t{
+	required uint32 m_music_ctr_code	= 1;
+	optional uint32 m_music_volume		= 2;
+	optional bytes 	m_music_title		= 3;
+	optional bytes  m_music_words       = 4;
+	optional uint32 m_music_duration_ms = 5;
+	optional uint32 m_music_elapsed_ms  = 6;
+}
+
+message r_get_mtu_size_t{
+	required uint32		m_err_code			= 1;
+	required uint32		m_mtu				= 2;
+}
+
+message set_bin_data_t{
+
+	required uint32		m_sn				= 1;
+	required bytes      m_data				= 2;
+	
+}
+
+message set_big_data_t{
+	
+	required uint32		m_type				= 1;
+	required uint32     m_data_lenth		= 2;
+	required uint32     m_pic_id			= 3;
+	required uint32     m_crc_code			= 4;
+}
+
+
+message set_alarms_t{
+	repeated alarm_t alarms = 1;
+}
+
+message set_rtimehr_dur_t{
+	required uint32		m_hr_duration		= 1;
+}
+
+message r_rtimehr_value_t{
+	required uint32		m_hr_value		= 1;
+
+}
+message r_error_code_t{
+	required uint32 err = 1;
+}
+
+message r_find_phone_t{
+	required uint32 m_ring_status = 1;
+}
+message r_get_disturb_en_t{
+	required uint32 m_disturb_en = 1;
+}
+message r_get_step_count_t{
+	required uint32 m_step_count 		= 1;
+	required uint32 m_time_second		= 2;
+	required uint32 m_step_calorie 		= 3;
+	required uint32 m_step_distance 	= 4;
+	optional uint32	m_activeduration 	= 5;
+}
+
+message r_get_current_hr_t{
+    required uint32 m_current_hr        = 1;
+    optional uint32 m_cur_sport_status	= 2;
+    optional uint32 m_step              = 3;
+    optional uint32 m_calories_kcal     = 4;
+    optional uint32 m_distance_m        = 5;
+    optional uint32 m_time_second       = 6;
+    optional uint32 m_space_skm         = 7;
+}
+
+message r_set_light_leak_result_t{
+  required uint32 m_check_result 		= 1;
+}
+
+message r_get_log_info_t{
+	required uint32 m_log_length 	= 1;
+	required uint32 m_log_sn 		= 2;
+	required bytes m_log_data 		= 3;
+}
+message r_set_active_info_t{
+	required uint32 m_act_start_time 	= 1;
+	required uint32 m_act_end_time 		= 2;
+}
+
+message r_get_active_record_data_t{
+	required uint32 m_count_num 			    = 1;
+	required uint32 m_total_length				= 2;
+	required uint32 m_active_start_second		= 3;
+	required uint32 m_active_hr_count			= 4;
+	required uint32 m_active_type				= 5;
+	required uint32 m_active_step				= 6;
+	required uint32 m_active_durations			= 7;
+	required uint32 m_active_calories			= 8;
+	required uint32 m_active_distance			= 9;
+	required uint32 m_active_avg_hr				= 10;
+	required uint32 m_active_max_hr				= 11;
+	required uint32 m_burn_fat_mins				= 12;
+	required uint32 m_aerobic_mins				= 13;
+	required uint32 m_limit_mins				= 14;
+	required uint32 m_is_effective				= 15;
+	required uint32 m_magic_num					= 16;
+	required uint32 m_sn						= 17;
+	required bytes  m_hr_data					= 18;
+	required uint32 m_active_speed				= 19;
+	required uint32 m_active_swing				= 20;
+	required uint32 m_active_min_hr				= 21;
+	required uint32 m_active_skip_times			= 22;
+	required uint32 m_active_gps_count			= 23;
+	optional uint32 m_total_gps_num				= 24;
+	
+	optional uint32 m_active_space_count	    = 25;
+	optional uint32 m_active_speed_count        = 26;
+
+}
+
+message r_get_ui_hrs_t{
+	required uint32 m_ui_act_hr 			= 1;
+	required uint32 m_ui_max_hr				= 2;
+	required uint32 m_ui_min_hr				= 3;
+	
+}
+
+message set_nfc_operate_t{
+	
+	required uint32 m_nfc_operate_code 		= 1;
+	required bytes  m_nfc_data				= 2;
+	required uint32 m_nfc_err_code 			= 3;
+	optional uint32 m_nfc_sub_operate_code 	= 4;
+	optional uint64 m_nfc_city          	= 5;
+}
+message set_page_switch_t{
+
+	required uint32 m_operate_type 			= 1;
+	required uint32 m_page_switch 			= 2;
+}
+
+message set_check_gps_info_t{
+	required uint32 m_check_type	 		= 1;
+	required uint32 m_file_num				= 2;
+	required uint32  m_second				= 3;
+	required uint32 m_new_version 			= 4;
+	
+}
+
+message set_update_gps_data_t{
+	required uint32 m_file_name				= 1;
+	required uint32 m_file_length			= 2;
+	required uint32		m_sn				= 3;
+	required bytes      m_data				= 4;
+	
+}
+message set_update_spo2_data_t{
+	required uint32 m_spo2_value 			= 1;
+	required uint32 m_seconds    			= 2;
+}
+
+message get_dial_config_data_t {
+	required uint32 m_dial_id             = 1;
+	required uint32 m_dial_width          = 2;
+	required uint32 m_dial_height         = 3;
+	required uint32 m_dial_form           = 4;
+	required uint32 m_dial_max_size       = 5;
+}
+
+message set_warming_data_t {
+	required uint32 m_type				  = 1;
+	required uint32 m_min				  = 2;
+	required uint32 m_max				  = 3;
+}
+
+message set_menu_sequence_t {
+	required uint32 m_type                = 1;
+	required uint32 m_count               = 2;
+	required bytes  m_data                = 3;
+}
+
+message get_menu_sequence_t {
+    required uint32 m_type                = 1;
+}
+message r_get_menu_sequence_t {
+    required uint32 m_type                = 1;
+	required uint32 m_support_count       = 2;
+    required uint32 m_support             = 3;
+	required uint32 m_count               = 4;
+	required bytes m_data                 = 5;
+}
+
+message get_nfc_card_data_t {
+	required bytes m_data 			      = 1;
+}
+
+message set_spo2_detect_t {
+	required uint32 m_night_enable		  = 1;
+	required uint32 m_night_intersec      = 2;
+}
+
+message r_get_spo2_detect_t{
+	required uint32 m_night_enable		  = 1;
+	required uint32 m_night_intersec      = 2;
+}
+
+message swsn_info_t {
+	required bytes	    swsn               =1;                  
+	required uint32     func_switch        =2;     
+	required uint32	    langs_switch       =3;	
+	required uint32	    default_lang       =4;	
+	required uint32     project_num        =5;		
+}
+
+message set_phone_app_status_t {
+	required uint32 m_status               = 1;
+}
+
+message set_female_health_info_t {
+	required uint32 m_duration 	           = 1;
+	required uint32 m_period               = 2;
+	required uint32 m_last_year            = 3;
+	required uint32 m_last_month           = 4;
+	required uint32 m_last_day             = 5;
+	required uint32 m_set_timestamps       = 6;
+	required uint32 m_set_year             = 7;
+	required uint32 m_set_month            = 8;
+	required uint32 m_set_day              = 9;
+    required uint32 m_check                =10;
+}
+
+message r_get_record_info_t {
+	required uint32 m_reboot_cnt 		= 1;
+	required uint32 m_key1_press_cnt 	= 2;
+	required uint32 m_msg_cnt 			= 3;
+	required uint32 m_call_cnt 			= 4;
+	required uint32 m_longsit_cnt		= 5;
+	required uint32 m_update_dial_cnt	= 6;
+	required uint32 m_raise_up_cnt		= 7;
+	required uint32 m_music_page_cnt	= 8;
+	required uint32 m_hr_page_cnt		= 9;
+	required uint32 m_spo2_page_cnt		= 10;
+	required uint32 m_alipay_page_cnt	= 11;
+	required uint32 m_weather_page_cnt	= 12;
+	required uint32 m_breath_page_cnt	= 13;
+	required uint32 m_stopwatch_page_cnt = 14;
+	required uint32 m_countdown_page_cnt = 15;
+	required uint32 m_status_page_cnt	= 16;
+	required uint32 m_sleep_page_cnt	= 17;
+	required uint32 m_findphone_page_cnt = 18;
+	required uint32 m_mulspt_page_cnt	= 19;
+	required uint32 m_motor_cnt			= 20;
+	required uint32 m_motor_work_time_sec = 21;
+	required uint32 m_lcd_on_time_sec	= 22;
+	required uint32 m_last_charge_timestamps = 23;
+	required uint32 m_last_charge_second = 24;
+	required uint32 m_last_used_second   = 25;
+	required uint32 m_dial_id			 = 26;
+	required uint32 m_page_style		 = 27;
+	required uint32 m_call_onoff		 = 28;
+	required uint32 m_msg_onoff			 = 29;
+	required uint32 m_longsit_onoff		 = 30;
+	required uint32 m_raise_up_onoff	 = 31;
+	required uint32 m_lcd_on_level		 = 32;
+	required uint32 m_lcd_on_second		 = 33;
+}
+
+message r_get_shell_temperature_t {
+	required bytes m_data            = 1; 
+}
+
+message set_dev_config_t {
+	required uint32 m_type               = 1;
+	required bytes m_param               = 2;
+}
+
+//***********************app or fw send cmd****************/
+message hl_cmds {
+  enum cmd_t { 
+		CMD_BIND_DEVICE 			= 1; 
+	   	CMD_GET_DEVICE_INFO			= 2; 
+	    CMD_SYNC_PHONE_INFO			= 3;
+	    CMD_SYNC_USER_INFO			= 4;
+		CMD_SYNC_SWITCH				= 5;
+		CMD_SET_HR_SAMPLE_SLOT		= 6;
+		CMD_SET_LONGSIT_DURATION	= 7;
+		CMD_SET_DRINK_SLOT			= 8;
+		CMD_SET_ALARMS				= 9;
+		CMD_SET_NOTDISTURB			= 10;
+		CMD_SET_COUNTRY_INFO		= 11;
+		CMD_SET_UI_STYLE			= 12;
+		CMD_SET_SPORT_TARGET		= 13;
+		CMD_SET_TIME_FORMAT			= 14;
+		CMD_SET_METRIC_INCH			= 15;
+		CMD_SET_BRIGHT_TIMES		= 16;
+		CMD_SET_HR_WARNING			= 17;
+		CMD_GET_HR_VALUE			= 18;
+		CMD_SET_NOTIFY_WARN			= 19;
+		CMD_SET_SYNC_HEALTH_DATA	= 20;
+		CMD_GET_POWER_VALUE			= 21;
+		CMD_SET_UPDATA_FW			= 22;
+		CMD_SET_TAKE_PIC			= 23;
+		CMD_SET_FIND_PHONE			= 24;
+		CMD_SET_FIND_DEV			= 25;
+		CMD_SET_WEATHER_INFO		= 26;
+		CMD_SET_RESET_MACHINE		= 27;
+		CMD_SET_SPORT_STATUS		= 28;
+		CMD_GET_HEALTH_DATA			= 29;
+		CMD_SET_MUSIC_INFO			= 30;
+		CMD_GET_SYNC_MTU			= 31;
+		CMD_SET_BIN_DATA_UPDATE		= 32;
+		CMD_FACTORY_TEST_MODE		= 33;
+		CMD_SEND_BIG_DATA			= 34;
+		CMD_GET_REALTIME_HR			= 35;
+		CMD_SYNC_REALTIME_HR		= 36;
+		CMD_HAND_UP_PHONE			= 37;
+		CMD_DISTURB_SWITCH			= 38;
+		CMD_CTR_APP_SPORTS			= 39;
+		CMD_SYNC_STEP_COUNT			= 40;
+		CMD_CHECK_SPORT_STATUS		= 41;
+		CMD_GET_CURRENT_SPORT_HR	= 42;
+		CMD_SET_MAKE_TEST_DATA		= 43;
+		CMD_SET_LIGHT_LEAK_RESULT   = 44;
+		CMD_GET_ACTIVE_RECORD_DATA  = 45;
+		CMD_SET_ACTIVE_RECORD_DATA  = 46;
+		CMD_SET_LOG_INFO_DATA		= 47;
+		CMD_GET_LOG_INFO_DATA		= 48;
+		CMD_GET_UI_HRS_VALUE		= 49;
+		CMD_SET_ALL_CONFIG_PARAM	= 50;
+		CMD_SET_NFC_OPERATE_CODE	= 51;
+		CMD_SET_PAGE_SWITCH		    = 52;
+		CMD_SET_CHECK_GPS_INFO		= 53;
+		CMD_SET_UPDATE_GPS_DATA		= 54;
+		CMD_GET_UPDATE_SPO2_DATA	= 55;
+		CMD_GET_DIAL_CONFIG_DATA    = 56;
+		CMD_SET_WARMING_DATA        = 57;
+		CMD_GET_MENU_SEQUENCE_DATA  = 58;
+		CMD_SET_MENU_SEQUENCE_DATA  = 59;
+		CMD_NFC_ACCESS_CARD_DATA    = 60;
+		CMD_SET_SPO2_DETECT         = 61;
+		CMD_GET_SPO2_DETECT         = 62;
+		CMD_SWSN_GET_DATA_INFO      = 63;
+		CMD_SWSN_SET_DATA_INFO      = 64;
+		CMD_PHONE_APP_SET_STATUS    = 65;
+		CMD_GET_ALARMS              = 66;
+		CMD_SET_FEMALE_HEALTH_INFO  = 67;
+		CMD_GET_RECORD_INFO         = 68;
+		CMD_GET_SHELL_TEMPERATURE_INFO = 69;
+		CMD_SET_DEV_CONFIG_INFO     = 70;
+	}
+ 
+	required cmd_t			cmd				= 1;//cmd  
+	required bool 			response		= 2;
+	required uint32	 		seconds			= 3;  
+	required int32	 		timezone		= 45; 
+
+	optional bind_app_info_t		set_app_info			= 4;
+	
+	optional r_bind_device_t		r_bind_device 			= 5;
+
+	optional r_get_device_info_t	r_get_device_info 		= 6;	
+
+	optional sync_phone_info_t		sync_phone_info 		= 7;	
+
+	optional sync_user_info_t		sync_user_info 			= 8;
+
+	optional sync_switch_t			sync_switch 			= 9;
+
+	optional set_hr_sample_slot_t	set_hr_sample_slot 		= 10;
+
+	optional set_longsit_duration_t	set_longsit_duration 	= 11;
+
+	optional set_drink_slot_t		set_drink_slot 			= 12;
+
+	optional set_alarms_t			set_alarms 				= 13;
+
+	optional set_notdisturb_t		set_notdisturb 			= 14;
+
+	optional set_country_info_t		set_country_info 		= 15;
+
+	optional set_ui_style_t 		set_ui_style 			= 16;
+
+	optional set_sport_target_t 	set_sport_target 		= 17;
+
+	optional set_time_format_t 		set_time_format 		= 18;
+
+	optional set_metric_inch_t		set_metric_inch 		= 19;
+
+	optional set_bright_times_t		set_bright_times 		= 20;
+
+	optional set_hr_warning_t		set_set_hr_warning 		= 21;
+
+	optional r_get_hr_value_t		r_get_hr_value 			= 22;
+
+	optional set_notify_warning_t	set_notify_warn_info 	= 23;
+
+	optional r_sync_health_data_t	set_health_data_info	= 24;
+
+	optional r_get_power_t			r_get_power_value 		= 25;
+
+	optional set_updata_fw_t		set_updata_fw 	 		= 26;
+
+	optional set_weather_info_t		set_weather_info 	 	= 27;
+
+	optional set_reset_machine_t	set_reset_machine 	 	= 28;
+
+	optional set_sport_status_t		set_sport_status 	 	= 29;
+
+	optional r_get_health_data_t	r_get_health_data 		= 30;
+
+	optional set_music_info_t		set_music_info 			= 31;
+
+	optional r_get_mtu_size_t		r_get_mtu_size 			= 32;
+
+	optional set_bin_data_t			set_bin_data 			= 33;
+
+	optional set_big_data_t			set_big_data 			= 34;
+
+	optional r_find_phone_t			r_find_phone 			= 35;
+	
+	optional set_rtimehr_dur_t		set_hr_dur 				= 36;
+	
+	optional r_rtimehr_value_t		r_hr_value 				= 37;
+	
+	optional r_get_sport_data_t     r_get_sprot_data		= 38;
+	
+	optional r_get_disturb_en_t      r_get_disturb_en       = 39;
+	
+	optional r_get_step_count_t      r_get_step_count       = 40;
+	
+	optional r_get_current_hr_t      r_get_current_hr       = 41;
+	
+	optional r_set_light_leak_result_t   r_set_light_result = 42;
+
+	optional r_get_active_record_data_t  r_get_active_record= 43;
+	
+	optional r_set_active_info_t		r_set_active_info 	= 44;
+
+	optional r_get_log_info_t		r_get_log_info 			= 46;
+
+	optional r_get_ui_hrs_t		r_get_ui_hrs 			    = 47;
+
+	optional r_error_code_t			r_error_code 			= 48;
+
+	optional set_nfc_operate_t	set_nfc_operate 			= 49;
+
+	optional set_page_switch_t	set_page_switch 			= 50;
+
+	optional set_check_gps_info_t	set_check_gps_info 		= 51;
+
+	optional set_update_gps_data_t	set_update_gps_data 	= 52;
+
+	optional set_update_spo2_data_t	set_update_spo2_data 	= 53;
+
+	optional get_dial_config_data_t   get_dial_config_data  = 54;
+	optional set_warming_data_t       set_warming_data      = 55;
+	optional set_menu_sequence_t      set_menu_seq_data     = 56;
+	optional get_menu_sequence_t      get_menu_seq_data     = 57;
+	optional r_get_menu_sequence_t    r_get_menu_seq_data   = 58;
+
+	optional get_nfc_card_data_t      get_nfc_card_data     = 59;
+	
+	optional set_spo2_detect_t      set_spo2_detect         = 60;
+	optional r_get_spo2_detect_t    r_get_spo2_detect       = 61;
+	optional swsn_info_t             swsn_info              = 62; 
+	optional set_phone_app_status_t set_phone_app_status    = 63;
+	optional set_female_health_info_t set_female_health_info= 64;
+	optional r_get_record_info_t 	r_get_record_info       = 65;
+	optional r_get_shell_temperature_t r_get_shell_temperature = 66;
+	optional set_dev_config_t       set_dev_config          = 67;
+}
+
+
+
+

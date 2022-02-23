@@ -41,7 +41,7 @@ class Ls02HeartrateViewController: UIViewController, Storyboardable {
     }
     
     func realTimeObserver() {
-        guard let obser = BleOperator.shared.dataObserver else {
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { (p) in
@@ -60,7 +60,7 @@ class Ls02HeartrateViewController: UIViewController, Storyboardable {
     }
     
     func statisticsHrObserver() {
-        guard let obser = BleOperator.shared.dataObserver else {
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { (p) in
@@ -88,7 +88,7 @@ class Ls02HeartrateViewController: UIViewController, Storyboardable {
     
     @IBAction func setHRModel(_ sender: UIButton) {
         
-        BleOperator.shared.setHeartRateMeasureMode(settings: .automatic).subscribe { value in
+        BleHandler.shared.setHeartRateMeasureMode(settings: .automatic).subscribe { value in
             print("setHRModel", value)
         } onError: { er in
             
@@ -101,7 +101,7 @@ class Ls02HeartrateViewController: UIViewController, Storyboardable {
      */
     @IBAction func clickHistoryBtn(_ sender: UIButton) {
         self.heartRateDatas.removeAll()
-        BleOperator.shared.getHistoryHeartrateData(dateByFar: Date())
+        BleHandler.shared.getHistoryHeartrateData(dateByFar: Date().addingTimeInterval(-7 * 24 * 60 * 60))
             .subscribe(onNext: { (heartRateItem) in
                 print("持续接受心率数据")
                 self.heartRateDatas.append(heartRateItem)

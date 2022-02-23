@@ -137,7 +137,7 @@ public class NFCUTETool: NSObject {
         let bytes: [UInt8] = [0x84, 0x00, 0x01]
         let openData =  Data.init(bytes: bytes, count: bytes.count)
         
-        return BleOperator.shared.sendNFCData(writeData: openData, characteristic: 6101, duration: 3, endRecognition: nil)
+        return BleHandler.shared.sendNFCData(writeData: openData, characteristic: 6101, duration: 3, endRecognition: nil)
             .map({ bleResponse -> Bool in
                 guard let datas = bleResponse.datas, let data = datas.first else {
                     return false
@@ -163,7 +163,7 @@ public class NFCUTETool: NSObject {
         printLog("start close chanel")
         let bytes: [UInt8] = [0x84, 0x00, 0x00]
         let closeData =  Data.init(bytes: bytes, count: bytes.count)
-        return BleOperator.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3, endRecognition: nil)
+        return BleHandler.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3, endRecognition: nil)
             .map({ bleResponse -> Bool in
                 guard let datas = bleResponse.datas, let data = datas.first else {
                     return false
@@ -206,7 +206,7 @@ public class NFCUTETool: NSObject {
         printLog("执行YCY触发更新指令")
         let bytes: [UInt8] = [0x84, 0x04, cityByte8, cityByte7, cityByte6, cityByte5, cityByte4, cityByte3, cityByte2, cityByte1]
         let closeData =  Data.init(bytes: bytes, count: bytes.count)
-        return BleOperator.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3)
+        return BleHandler.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3)
             .map({ bleResponse -> Bool in
                 guard let datas = bleResponse.datas, let data = datas.first else {
                     return false
@@ -232,7 +232,7 @@ public class NFCUTETool: NSObject {
         var closeData = Data.init(bytes: bytes, count: bytes.count)
         closeData.append(data)
         
-        return BleOperator.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3, endRecognition: nil)
+        return BleHandler.shared.sendNFCData(writeData: closeData, characteristic: 6101, duration: 3, endRecognition: nil)
             .map({ bleResponse -> UInt8 in
                 guard let datas = bleResponse.datas, let data = datas.first else {
                     return 0
@@ -261,7 +261,7 @@ public class NFCUTETool: NSObject {
         
         return Observable.create { (subscriber) -> Disposable in
                         
-            BleOperator.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 30) { (data) -> Bool in
+            BleHandler.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 30) { (data) -> Bool in
                 
                 return totalLength != 0 && finalResultData.count == totalLength
             }.map({ bleResponse -> UInt8 in
@@ -367,7 +367,7 @@ public class NFCUTETool: NSObject {
         var finalResultData: Data = Data()
         
         return Observable.create { (subscriber) -> Disposable in
-            BleOperator.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 8) { (data) -> Bool in
+            BleHandler.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 8) { (data) -> Bool in
 
 //            BleFacade.shared.write(commandData, 6101, 1, false, nil, 8, excuteData) { (data) -> Bool in
                 return totalLength != 0 && finalResultData.count == totalLength
@@ -422,7 +422,7 @@ public class NFCUTETool: NSObject {
         let excuteData =  Data.init(bytes: excuteCmd, count: excuteCmd.count)
         
         return Observable.create { (subscriber) -> Disposable in
-            BleOperator.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 3, endRecognition: nil)
+            BleHandler.shared.sendNFCData(writeData: excuteData, characteristic: 6101, duration: 3, endRecognition: nil)
                 .map({ bleResponse -> Void in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("数据异常"))

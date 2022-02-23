@@ -14,19 +14,19 @@ extension Ble02Operator {
      获取设备表盘信息
      */
     public func getCloudWatchFaceSetting() -> Observable<(watchFaceNo: Int, watchFaceWidth: Int, watchFaceHeight: Int, watchFaceType: Int, maxSpace: Int)> {
-        let setCmd: [UInt8] = [0x1A, 0x01]
+        let setCmd: [UInt8] = [LS02CommandType.getWatchSkinTheme.rawValue, LS02Placeholder.one.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
-        return self.bleFacade!.write(setData, "getCloudWatchFaceSetting", 3, nil)
+        return self.bleFacade!.write(setData, 0,"getCloudWatchFaceSetting", 3, nil)
             .flatMap({
                 self.parseCloudWatchFaceSetting(bleResponse: $0)
             })
     }
     
     public func writeComplete() -> Observable<Bool> {
-        let setCmd: [UInt8] = [0x1A, 0x03, 0x00]
+        let setCmd: [UInt8] = [LS02CommandType.getWatchSkinTheme.rawValue, LS02Placeholder.three.rawValue, LS02Placeholder.zero.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "writeComplete", 3, nil)
+            self.bleFacade?.write(setData, 0,"writeComplete", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -51,11 +51,11 @@ extension Ble02Operator {
      询问设备是否可以传输表盘
      */
     public func requestCloudWatchFaceTransfer() -> Observable<Bool> {
-        let setCmd: [UInt8] = [0x1A, 0x02]
+        let setCmd: [UInt8] = [LS02CommandType.getWatchSkinTheme.rawValue, LS02Placeholder.two.rawValue]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
             
-            self.bleFacade?.write(setData, "requestCloudWatchFaceTransfer", 3, nil)
+            self.bleFacade?.write(setData, 0,"requestCloudWatchFaceTransfer", 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -66,7 +66,7 @@ extension Ble02Operator {
                         subscriber.onError(BleError.error("设备返回数据不匹配"))
                         return
                     }
-                    if dataBytes[0] == 0x0A && dataBytes[1] == 0x02 {
+                    if dataBytes[0] == LS02Placeholder.a.rawValue && dataBytes[1] == LS02Placeholder.two.rawValue {
                         subscriber.onNext(true)
                     } else {
                         subscriber.onNext(false)

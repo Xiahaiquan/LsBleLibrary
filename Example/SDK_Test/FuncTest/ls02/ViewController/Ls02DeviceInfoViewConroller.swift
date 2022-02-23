@@ -26,10 +26,10 @@ class Ls02DeviceInfoViewConroller: UIViewController, Storyboardable {
     @IBOutlet weak var resultLabel: UILabel!
     
     @IBAction func clickGetMacAddress(_ sender: Any) {
-        BleOperator.shared.getMacAddress()
+        BleHandler.shared.getMacAddress()
             .subscribe { (macAddress) in
                 print("mac Address:\(macAddress)")
-                self.view.makeToast("mac地址: \(macAddress)", duration: TimeInterval(4), position: .center)
+                self.view.makeToast("mac地址: \(macAddress)", duration: TimeInterval(2), position: .center)
             } onError: { (error) in
                 print("error")
             }
@@ -38,10 +38,10 @@ class Ls02DeviceInfoViewConroller: UIViewController, Storyboardable {
     }
     
     @IBAction func clickGetVersion(_ sender: Any) {
-        BleOperator.shared.getDeviceVersion()
+        BleHandler.shared.getDeviceVersion()
             .subscribe { (deviceVersion) in
                 print("device version: \(deviceVersion)")
-                self.view.makeToast("设备版本: \(deviceVersion)", duration: TimeInterval(4), position: .center)
+                self.view.makeToast("设备版本: \(deviceVersion)", duration: TimeInterval(2), position: .center)
             } onError: { (error) in
                 print("error")
             }
@@ -49,10 +49,10 @@ class Ls02DeviceInfoViewConroller: UIViewController, Storyboardable {
     }
     
     @IBAction func clickGetPower(_ sender: Any) {
-        BleOperator.shared.getDeviceBattery()
+        BleHandler.shared.getBattery()
             .subscribe { (deviceVersion) in
                 print("battery : \(deviceVersion)")
-                self.view.makeToast("设备电量: \(deviceVersion)", duration: TimeInterval(4), position: .center)
+                self.view.makeToast("设备电量: \(deviceVersion)", duration: TimeInterval(2), position: .center)
             } onError: { (error) in
                 print("Battery error")
             }
@@ -70,34 +70,27 @@ class Ls02DeviceInfoViewConroller: UIViewController, Storyboardable {
         guard BleFacade.shared.deviceConnected() else {
             return
         }
-        guard let obser = BleOperator.shared.dataObserver else {
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { [weak self] (value) in
             
-            guard let p = value.ute else {
-                return
-            }
-            
-            
-            switch p {
-            case let (_, functionTag) as (Ls02DeviceUploadDataType, FunctionTag):
-                
+            if value.type == .functionTag {
+                let functionTag = value.data as! UTEFunctionTag
                 let result = "NFC: \(functionTag.NFC); 自定义数据格式传输：\(functionTag.CustomDataTransfer); 血氧:\(functionTag.bloodOxygen); GPS: \(functionTag.GPS)"
                 
                 print("功能标志位", result)
                 
                 
                 self?.resultLabel.text = result
-            default :
-                print("其他上报数据6")
             }
+            
         } onError: { (error) in
             print("发生错误：\(error)")
         }
         .disposed(by: self.bag)
         // 查看33161查看功能标志位
-        BleFacade.shared.readValue(type: 33161)
+        BleFacade.shared.readValue(channel: .ute33F1)
     }
     
 }

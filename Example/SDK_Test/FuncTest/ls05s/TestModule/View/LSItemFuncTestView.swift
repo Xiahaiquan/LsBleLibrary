@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 protocol LSItemFuncTestViewProtocol {
     func clickCollectViewCell(value: String)
 }
@@ -31,20 +32,23 @@ class LSItemFuncTestView: UIView {
     
     private let footerHeight:CGFloat = 50
     
-    let settings = WatchFunction(column: "手表设置", item: ["获取MTU","绑定设备", "配置设备","获取设备信息", "同步手机信息", "同步用户信息","设置天气","设置心率采样间隔", "设置久坐间隔","设置喝水间隔",  "设置免打扰", "设置国家", "设置UI风格", "设置时间格式", "设置公英制", "设置亮屏时长", "设置心率预警", "获取心率", "设置通知提醒",  "设置固件升级",   "获取实时心率", "设置免打扰开关",  "同步步数",  "获取功能项目",  "设置提醒数据", "设置血氧采样间隔", "获取血氧采样间隔", "发送App状态","同步时间","设置常用参数"])
-    let bind = WatchFunction.init(column: "手表绑定", item: ["恢复出厂","工厂测试"])
+    let settings = WatchFunction(column: "手表设置", item: ["获取MTU","绑定设备","配置设备","获取设备信息", "同步手机信息","设置运动目标","同步开关","设置心率采样间隔","设置久坐间隔","设置喝水间隔","设置闹钟", "获取闹钟","设置免打扰","设置国家","设置UI风格","设置时间格式","设置亮屏时长","设置心率预警","获取心率","设置通知提醒", "获取电量","设置固件升级","设置天气","工厂测试","获取实时心率","生成测试数据"])
+    let bind = WatchFunction.init(column: "手表绑定", item: ["恢复出厂","工厂测试", "断开连接", "重连"])
     let alerm = WatchFunction.init(column: "闹钟", item: ["设置闹钟","获取闹钟"])
     let goal = WatchFunction.init(column: "运动目标", item: ["设置运动目标"])
-    let sportStatus = WatchFunction.init(column: "运动状态", item: ["设置运动状态", "查询运动状态"])
-    let switches = WatchFunction.init(column: "开关相关", item: ["同步开关"])
-    let testData = WatchFunction.init(column: "测试数据", item: ["生成测试数据"])
-    let bigData = WatchFunction.init(column: "大数据相关", item: ["获取步数历史数据", "获取血氧历史数据", "获取心率历史数据", "获取睡眠历史数据","获取运动数据", "获取手表Log"])
-    let daile = WatchFunction.init(column: "表盘相关", item: ["获取表盘数据","升表盘1","升表盘2"])
+    let sportStatus = WatchFunction.init(column: "运动相关", item: ["设置运动状态", "查询运动状态", "获取运动历史数据",  "同步步数"])
+    let switches = WatchFunction.init(column: "开关相关", item: ["同步开关", "抬腕亮屏开关", "抬腕亮屏时长"])
+    let testData = WatchFunction.init(column: "测试数据", item: ["生成测试数据", "04的步数","04的睡眠","04的心率","04的运动"])
+    let bigData = WatchFunction.init(column: "大数据相关", item: ["获取步数历史数据", "获取血氧历史数据", "获取心率历史数据", "获取睡眠历史数据","获取每日活动步数", "获取手表Log"])
+    let daile = WatchFunction.init(column: "表盘相关", item: ["获取表盘数据","升级05S的表盘","升级05的表盘"])
     let inner = WatchFunction.init(column: "内部应用", item: ["清除连接记录"])
-    let appFunc = WatchFunction.init(column: "App功能测试", item: ["获取每日步数", "获取手表功能列表"])
-    let gps = WatchFunction.init(column: "GPS", item: ["查询GPS信息", "设置GPS信息"])
+    let appFunc = WatchFunction.init(column: "App功能测试", item: ["获取每日步数", "获取功能项目", "设备初始化"])
+    let gps = WatchFunction.init(column: "GPS", item: ["查询GPS信息", "设置GPS信息", "检查星历数据是否有效", "准备升级", "升级星历文件", "升级年历文件"])
+    let monitor = WatchFunction.init(column: "监听的", item: ["找手机", "勿扰模式", "运动数据", "实时步数", "实时心率", "监听电量", "监听蓝牙事件的完成"])
     
     let sort = WatchFunction(column: "排序", item: ["获取一级排序","设置一级排序"])
+    
+    let testDB = WatchFunction(column: "数据库", item: ["增", "改", "查", "删"])
     
     var dataSource: [WatchFunction]!
     
@@ -52,7 +56,7 @@ class LSItemFuncTestView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        dataSource = [settings, bind,alerm, goal, sportStatus, switches, testData, bigData, daile, inner, appFunc, gps, sort]
+        dataSource = [settings, bind,alerm, goal, sportStatus, switches, testData, bigData, daile, inner, appFunc, gps, monitor, sort, testDB]
         createCollectionView()
     }
     
@@ -74,7 +78,7 @@ class LSItemFuncTestView: UIView {
         collectionView!.delegate = self
         collectionView!.dataSource = self
         collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellReuseId)
-        collectionView!.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: headReuseId)
+        collectionView!.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headReuseId)
         
         self.addSubview(collectionView!);
     }
@@ -105,7 +109,7 @@ extension LSItemFuncTestView:UICollectionViewDelegate,UICollectionViewDataSource
         
         var reusableview:UICollectionReusableView!
         
-        if kind == UICollectionElementKindSectionHeader {
+        if kind == UICollectionView.elementKindSectionHeader {
             reusableview = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                                                                            withReuseIdentifier: headReuseId, for: indexPath)
             

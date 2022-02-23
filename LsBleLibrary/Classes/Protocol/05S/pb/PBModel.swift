@@ -10,7 +10,7 @@ import Foundation
 struct PBModel {
     
     static func getBind_app_info_t(userId: UInt32,
-                                   gender: Ls02Gender,
+                                   gender: LsGender,
                                    age: UInt32,
                                    height: UInt32,
                                    weight: UInt32,
@@ -29,12 +29,12 @@ struct PBModel {
     static func getSync_phone_info_t(phonemodel: PhoneTypeEnum,
                                      systemversion: UInt32,
                                      appversion: UInt32,
-                                     language: UInt32) ->sync_phone_info_t {
+                                     language: LSDeviceLanguageEnum) ->sync_phone_info_t {
         var info = sync_phone_info_t()
         info.mPhonemodel = UInt32(phonemodel.rawValue)
         info.mSystemversion = systemversion
         info.mAppversion = appversion
-        info.mLanguage = language
+        info.mLanguage = UInt32(language.rawValue)
         return info
     }
     
@@ -81,14 +81,23 @@ struct PBModel {
         
         for item in alarms {
             
+            var cfg: UInt8 = 0
+            let weeks = UInt8(item.cfg)
+            
+            if item.enable {
+                cfg = UInt8(weeks << 1 | 1)
+            }else {
+                cfg = UInt8(weeks << 1 | 0)
+            }
+            
             var alarm = alarm_t()
             
             alarm.mAlarm1Min = item.min
             alarm.mAlarm1Hour = item.hour
-            alarm.mAlarm1Cfg = item.cfg
+            alarm.mAlarm1Cfg = Int(cfg).data
             alarm.mAlarm1Once = item.once
-            alarm.mAlarm1Remarks = item.reMark
-            
+            alarm.mAlarm1Remarks = item.reMark.data(using: .utf8) ?? Data()
+            print("alarm", alarm.debugDescription)
             info.alarms.append(alarm)
             
         }
@@ -126,13 +135,13 @@ struct PBModel {
         
     }
     
-    static func getSet_time_format_t(timeFormat: Ls02TimeFormat) ->set_time_format_t {
+    static func getSet_time_format_t(timeFormat: DeviceTimeFormat) ->set_time_format_t {
         var info = set_time_format_t()
         info.mTimeFormat = UInt32(timeFormat.rawValue)
         return info
     }
     
-    static func getSet_metric_inch_t(metricInch: Ls02Units) ->set_metric_inch_t {
+    static func getSet_metric_inch_t(metricInch: DeviceUnitsFormat) ->set_metric_inch_t {
         
         var info = set_metric_inch_t()
         info.mMetricInch = UInt32(metricInch.rawValue)
@@ -259,13 +268,18 @@ struct PBModel {
             
             weather.mWeatherNum = UInt32(index)
             weather.mClimate = UInt32(item.weatherState.rawValue)
-            weather.mTemperature = UInt32(item.temperature)
+            weather.mTemperature = UInt32(item.currTem)
             weather.mPm25 = UInt32(item.pm25)
-            weather.mAqi = UInt32(item.aqi)
+            weather.mAqi = UInt32(item.airLevel)
             weather.mCity = 0
-            weather.mMaxTemp = UInt32(item.maxTemp)
-            weather.mMinTemp = UInt32(item.minTemp)
-            weather.mSeconds = UInt32(item.timestamp)
+            weather.mMaxTemp = UInt32(item.highTem)
+            weather.mMinTemp = UInt32(item.lowTem)
+            
+            weather.mHumidity = UInt32(item.humidity)
+            weather.mUv = UInt32(item.uvIndex)
+            weather.mCityName = Data(item.city.utf8)
+        
+            weather.mSeconds = UInt32(BleHelper.getCurrentTimeWithSecond(timestamp: UInt32(item.timestamp)))
             
             info.weathers.append(weather)
         }
@@ -282,17 +296,6 @@ struct PBModel {
         
         return info
     }
-    
-    static func getSync_switch_t(data: Data) ->sync_switch_t {
-        
-        var info = sync_switch_t()
-        
-        info.mSwitchs = data
-        
-        return info
-    }
-    
-    
     
     static func getSet_sport_status_t(mode: UInt32,
                                       status: UInt32,
@@ -357,13 +360,13 @@ struct PBModel {
         return info
     }
     
-    static func getSet_warming_data_t(type: UInt32,
+    static func getSet_warming_data_t(type: HealthMonitorEnum,
                                       min: UInt32,
                                       max: UInt32) ->set_warming_data_t {
         
         var info = set_warming_data_t()
         
-        info.mType = type
+        info.mType = type.rawValue
         info.mMin = min
         info.mMax = max
         

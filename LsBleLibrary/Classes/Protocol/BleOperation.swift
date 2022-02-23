@@ -1,5 +1,5 @@
 //
-//  BLEOperation.swift
+//  BleOperation.swift
 //  ble_debugging
 //
 //  Created by Antonio on 2021/5/31.
@@ -10,7 +10,7 @@ import RxCocoa
 import RxSwift
 import CoreBluetooth
 
-class BLEOperation: ConcurrentOperation {
+class BleOperation: ConcurrentOperation {
     
     var bag: DisposeBag = DisposeBag()
     
@@ -57,7 +57,7 @@ class BLEOperation: ConcurrentOperation {
         DispatchQueue.global().async { [self] in
             //分包，逐步发送数据数据到手表
             for data in dataArr {
-                print("send data:", data.desc())
+                print("char",characteristic.uuid.uuidString, "send data:", data.desc())
                 peripheral.writeValue(data, for: characteristic, type: .withoutResponse)
             }
         }
@@ -84,7 +84,7 @@ class BLEOperation: ConcurrentOperation {
     }
     
     deinit {
-        print("deinit", self)
+        printLog("\(self)")
     }
 }
 // MARK: - ConcurrentOperation
@@ -139,29 +139,28 @@ class ConcurrentOperation: Operation {
 }
 
 // MARK: - QueueManager
-class QueueManager {
+public class QueueManager {
     
-    var observation : NSKeyValueObservation?
+    private var observation : NSKeyValueObservation?
     
-    lazy var syncDataQueue: OperationQueue = {
+    public lazy var syncDataQueue: OperationQueue = {
         var queue = OperationQueue()
         queue.name = "Sync data queue"
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
     
-    static let shared = QueueManager()
-    
-    private func `init`() {
+    public static let shared = QueueManager()
         
+    func addObserver() {
         observation = QueueManager.shared.syncDataQueue.observe(\.operationCount, options: [.new]) { (queue, change) in
             let changeNewValue = Int(change.newValue ?? 0)
             printLog("Current operation count: \(changeNewValue.description)")
-            printLog("\(String(describing: QueueManager.shared.syncDataQueue.operations.first?.name))")
+//            printLog("\(String(describing: QueueManager.shared.syncDataQueue.operations.first?.name))")
         }
     }
     
-    func enqueueToQueue(_ operation: BLEOperation) {
+    func enqueueToQueue(_ operation: BleOperation) {
         syncDataQueue.addOperation(operation)
         
     }

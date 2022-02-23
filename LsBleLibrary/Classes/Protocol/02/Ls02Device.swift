@@ -11,7 +11,7 @@ import CoreBluetooth
 import RxCocoa
 import RxSwift
 
-public class Ls02Device: NSObject, Deviceable {
+public class Ls02Device: NSObject, LsDeviceable {
     
     var char6001: CBCharacteristic?
     var char6002: CBCharacteristic?
@@ -39,14 +39,14 @@ public class Ls02Device: NSObject, Deviceable {
     
     var bag: DisposeBag = DisposeBag()
     
-    public var dataObserver02: Observable<UTEOriginalData>?
+    public var dataObserver: Observable<BleBackDataProtocol>?
     
-    lazy private var dataObserverPublishRelay: PublishRelay<UTEOriginalData> = PublishRelay()
+    lazy private var dataObserverPublishRelay: PublishRelay<BleBackDataProtocol> = PublishRelay()
     
     public override init() {
         super.init()
         
-        self.dataObserver02 = self.dataObserverPublishRelay.asObservable()
+        self.dataObserver = self.dataObserverPublishRelay.asObservable()
     }
     
     public var peripheral: CBPeripheral? {
@@ -55,6 +55,9 @@ public class Ls02Device: NSObject, Deviceable {
             guard oldValue != peripheral else {
                 return
             }
+            
+            QueueManager.shared.addObserver()
+            
             // 监听 外设 返回的数据
             peripheral?.rx.didUpdateValue
                 .subscribe(onNext: { [weak self] (p, characteristic, error) in
@@ -67,15 +70,15 @@ public class Ls02Device: NSObject, Deviceable {
                         return
                     }
                     
-                    guard let operation = QueueManager.shared.syncDataQueue.operations.first as? BLEOperation else {
-                        self.dataObserverPublishRelay.accept((characteristic.uuid.uuidString, acceptData))
+                    guard let operation = QueueManager.shared.syncDataQueue.operations.first as? BleOperation else {
+                        //                        let sss = UTEOriginalData.init(from: characteristic.uuid.uuidString, data: acceptData)
+                        self.dataObserverPublishRelay.accept(UTEOriginalData.init(from: characteristic.uuid.uuidString, data: acceptData))
                         return
                     }
                     
                     // 校验 如与发送数据不匹配 过滤
                     guard operation.ble02Parser?.validate(acceptData) == true else {
-                        self.dataObserverPublishRelay.accept((characteristic.uuid.uuidString, acceptData))
-//                        self.routerData((characteristic.uuid.uuidString, acceptData))
+                        self.dataObserverPublishRelay.accept(UTEOriginalData.init(from: characteristic.uuid.uuidString, data: acceptData))
                         return
                     }
                     
@@ -99,6 +102,7 @@ public class Ls02Device: NSObject, Deviceable {
                     }
                 })
                 .disposed(by: bag)
+        
         }
     }
     
@@ -117,7 +121,7 @@ public class Ls02Device: NSObject, Deviceable {
                 let endIndex = uuid.index(uuid.startIndex, offsetBy: 6)
                 uuidHeader = String(uuid[startIndex..<endIndex])
             }
-            //            print("header: \(uuidHeader)")
+                        print("header: \(uuidHeader)")
             
             switch uuidHeader {
             case "6001":
@@ -127,13 +131,12 @@ public class Ls02Device: NSObject, Deviceable {
                 self.peripheral?.setNotifyValue(true, for: c)
             case "6101":
                 self.char6101 = c
-                self.peripheral?.readValue(for: c)
             case "6102":
                 self.char6102 = c
                 self.peripheral?.setNotifyValue(true, for: c)
             case "33F1":
                 self.char33f1 = c
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {  statusCallback?(true)  }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {  statusCallback?(true)  }
             default:
                 break
             }
@@ -141,20 +144,27 @@ public class Ls02Device: NSObject, Deviceable {
         
     }
     
-    public func write(data: Data, name: String, expectNum: Int?, duration: Int?, ackInInterval: Bool?, endBySelf: Bool?, trigger: Bool, endRecognition: ((Data) -> Bool)? = nil) -> Observable<BleResponse> {
+    public func write(data: Data, characteristic: Int, name: String, duration: Int?, endRecognition: ((Data) -> Bool)? = nil) -> Observable<BleResponse> {
         
-        guard let p = self.peripheral, let c = self.char6001 else {
+        guard let p = self.peripheral else {
             return Observable.error(BleError.disConnect)
             
         }
         
-        return Observable.create { (subscriber) -> Disposable in
-            
+        var char: CBCharacteristic!
+        if characteristic == 0,  self.char6001 != nil {
+            char = char6001!
+        }else if characteristic == 6101 {
+            char = char6101!
+        }
+        
+        return Observable.create { [unowned  self] (subscriber) -> Disposable in
+            //一般数据的传输默认就20个byte 在传输表盘等大数据是，才用大于20的mtu
             let dataArr = Ble05sCmdsConfig.shared.chunked(data: data, chunkSize: 20)
             
             let parser = Ble02Parser(writeData: data)
             
-            let operation = BLEOperation.init(dataArr: dataArr, peripheral: p, characteristic: c, name: name, endRecognition:endRecognition,ble02Parser: parser, observer: subscriber, timeoutTimeInterval: TimeInterval(duration!))
+            let operation = BleOperation.init(dataArr: dataArr, peripheral: p, characteristic: char, name: name, endRecognition:endRecognition,ble02Parser: parser, observer: subscriber, timeoutTimeInterval: TimeInterval(duration!))
             
             QueueManager.shared.enqueueToQueue(operation)
             
@@ -172,28 +182,33 @@ extension Ls02Device {
         self.char6002 = nil
     }
     
-    public func readValue(_ type: Int = 0) {
+    public func readValue(channel: Channel) {
         guard let p = self.peripheral, self.connected == true else {
             return
         }
-        if type == 6001 {
+        if channel == .ute6001 {
             p.readValue(for: self.char6001!)
-        } else if type == 6101 {
+        } else if channel == .ute6101 {
             p.readValue(for: self.char6101!)
-        } else if type == 33161 {
+        } else if channel == .ute33F1 {
             p.readValue(for: self.char33f1!)
         }
     }
     
-    func onException(_ error: BleError) -> Void {
+    public func onException(_ error: BleError) -> Void {
         QueueManager.shared.syncDataQueue.cancelAllOperations()
     }
     
-    public func directWrite(_ data: Data, _ type: Int) {
+    public func directWrite(_ data: Data, _ type: WitheType) {
         guard let p = self.peripheral, let c = self.char6101, self.connected == true else {
             return
         }
-        p.writeValue(data, for: c, type: .withoutResponse)
+        print("directWrite", data.bytes.hexString)
+        
+        DispatchQueue.global().async { [self] in
+            p.writeValue(data, for: c, type: .withoutResponse)
+        }
+        
     }
 }
 
@@ -202,7 +217,7 @@ extension Ls02Device {
         self.timeoutTimer = Timer.init(timeInterval: timeOutInterval, repeats: repeats, block: { (timer) in
             timerBlock()
         })
-//        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoop.Mode.common)
+        //        RunLoop.current.add(self.timeoutTimer!, forMode: RunLoop.Mode.common)
     }
     
     public func invalidateTimeoutTimer() {
@@ -216,7 +231,7 @@ extension Ls02Device {
 extension Ls02Device {
     func routerData(_ routerData: (from: String, data: Data)) {
         
-    
+        
         let data = routerData.data
         let acceptBytes = [UInt8](data)
         
@@ -225,8 +240,9 @@ extension Ls02Device {
         
         guard let operation = QueueManager.shared.syncDataQueue.operations.first(where: { (op) -> Bool in
             return op.name == command?.name
-        }) as? BLEOperation else {
-            self.dataObserverPublishRelay.accept((routerData.from, routerData.data))
+        }) as? BleOperation else {
+            
+            self.dataObserverPublishRelay.accept(UTEOriginalData.init(from: routerData.from, data: routerData.data))
             return
         }
         
@@ -244,7 +260,7 @@ extension Ls02Device {
         default:
             print("有未知命令的数据")
         }
-          
+        
     }
 }
 

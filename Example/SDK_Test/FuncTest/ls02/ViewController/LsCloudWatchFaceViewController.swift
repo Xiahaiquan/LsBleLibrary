@@ -12,7 +12,7 @@ import RxCocoa
 import RxSwift
 import LsBleLibrary
 
-public class LsCloudWatchFaceViewController: UIViewController, Storyboardable {
+class LsCloudWatchFaceViewController: UIViewController, Storyboardable {
 
     let bag: DisposeBag = DisposeBag()
     
@@ -21,9 +21,9 @@ public class LsCloudWatchFaceViewController: UIViewController, Storyboardable {
                 
     @IBOutlet weak var progressView: UIProgressView!
     
-//    var cloudTransferManager: Ls02WatchFaceTransferManager!
+    var cloudTransferManager: Ls02WatchFaceTransferManager!
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
     }
     
@@ -35,7 +35,7 @@ public class LsCloudWatchFaceViewController: UIViewController, Storyboardable {
      获取设备上在线表盘信息
      */
     @IBAction func clickGetCurrentWatchFaceSeting(_ sender: UIButton) {
-        BleOperator.shared.getCloudWatchFaceSetting()
+        BleHandler.shared.getCloudWatchFaceSetting()
             .subscribe { (cloudWatchFaceSeting) in
                 print("当前表盘编号: \(cloudWatchFaceSeting.watchFaceNo)")                // 升级前可以判断，如果一致就不需要再升级
                 print("宽: \(cloudWatchFaceSeting.watchFaceWidth)")
@@ -69,39 +69,39 @@ public class LsCloudWatchFaceViewController: UIViewController, Storyboardable {
         do {
             
             let watchFaceData = try Data(contentsOf: URL(fileURLWithPath: watchFacePath))
-//            self.cloudTransferManager = Ls02WatchFaceTransferManager(binData: watchFaceData)
+            self.cloudTransferManager = Ls02WatchFaceTransferManager(binData: watchFaceData)
             
-//            self.cloudTransferManager.start()
-//                .subscribe { (progressState) in
-//                    print("\(progressState)")
-//
-//                    switch progressState {
-//                    case .progress(let value):
-//                        self.progressView.progress = value
-//                    case .success:
-//                        print("传输表盘完成")
-//                        self.view.makeToast("传输表盘完成", duration: TimeInterval(2), position: .center)
-//                    case .notaccept:
-//                        print("设备不接受传输")
-//                        self.view.makeToast("设备不接受传输", duration: TimeInterval(2), position: .center)
-//                    case .spaceerror:
-//                        print("设备空间不足")
-//                        self.view.makeToast("设备空间不足", duration: TimeInterval(2), position: .center)
-//                    case .crcerror:
-//                        print("CRC 校验不通过，停止传输")
-//                        self.view.makeToast("CRC 校验不通过，停止传输", duration: TimeInterval(2), position: .center)
-//                    case .timeout:
-//                        print("发送数据超时")
-//                        self.view.makeToast("发送数据超时", duration: TimeInterval(2), position: .center)
-//                    default:
-//                        print("其他异常")
-//                        self.view.makeToast("其他异常", duration: TimeInterval(2), position: .center)
-//                    }
-//
-//                } onError: { (error) in
-//                    print("start error")
-//                }
-//                .disposed(by: self.bag)
+            self.cloudTransferManager.start()
+                .subscribe { (progressState) in
+                    print("\(progressState)")
+
+                    switch progressState {
+                    case .progress(let value):
+                        self.progressView.progress = value
+                    case .success:
+                        print("传输表盘完成")
+                        self.view.makeToast("传输表盘完成", duration: TimeInterval(2), position: .center)
+                    case .notaccept:
+                        print("设备不接受传输")
+                        self.view.makeToast("设备不接受传输", duration: TimeInterval(2), position: .center)
+                    case .spaceerror:
+                        print("设备空间不足")
+                        self.view.makeToast("设备空间不足", duration: TimeInterval(2), position: .center)
+                    case .crcerror:
+                        print("CRC 校验不通过，停止传输")
+                        self.view.makeToast("CRC 校验不通过，停止传输", duration: TimeInterval(2), position: .center)
+                    case .timeout:
+                        print("发送数据超时")
+                        self.view.makeToast("发送数据超时", duration: TimeInterval(2), position: .center)
+                    default:
+                        print("其他异常")
+                        self.view.makeToast("其他异常", duration: TimeInterval(2), position: .center)
+                    }
+
+                } onError: { (error) in
+                    print("start error")
+                }
+                .disposed(by: self.bag)
         } catch {
             print("Bin 文件异常")
         }

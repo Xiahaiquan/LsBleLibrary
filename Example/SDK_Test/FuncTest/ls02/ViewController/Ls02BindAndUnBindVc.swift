@@ -28,7 +28,7 @@ class Ls02BindAndUnBindVc: UIViewController, Storyboardable {
     }
     
     @IBAction func clickBindDeviceBtn(_ sender: UIButton) {
-        let userId = 11272015  //11272014
+        let userId = 11272025  //11272014
         self.bindDevice(userId)
     }
     
@@ -36,7 +36,7 @@ class Ls02BindAndUnBindVc: UIViewController, Storyboardable {
      解绑 无数据返回， 会直接重启
      */
     @IBAction func clickUnBindDeviceBtn(_ sender: UIButton) {
-        BleOperator.shared.unBindDevice()
+        BleHandler.shared.unBindDevice()
             .subscribe(onError: { (error) in
                 switch error {
                 case BleError.disConnect:
@@ -56,13 +56,13 @@ class Ls02BindAndUnBindVc: UIViewController, Storyboardable {
      */
     func bindDevice(_ userId: Int) {
         
-        BleOperator.shared.setUserInfo(userId: UInt32(userId))
-            .subscribe { (state) in
-                print("state: \(state)")
+        BleHandler.shared.bindDevice(userId: UInt32(userId))
+            .subscribe { (value) in
+                print("state: \(value)")
                 self.previousBindState = self.bindState
-                self.bindState = state
+                self.bindState = value.bindStatus
                 
-                if state == .success {
+                if value.bindStatus == .success {
                     print("绑定完成")
                     self.view.makeToast("绑定完成", duration: TimeInterval(4), position: .center)
                 }
@@ -79,18 +79,6 @@ class Ls02BindAndUnBindVc: UIViewController, Storyboardable {
                     // 用户点击了确认， 设备需要重启断开，需要重连
                     if state == .confirm && (previousState == .timeout) {
                         print("设备会重启，2秒后再重连")
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            BleOperator.shared.sentBindcmd(userId)
-                                .subscribe { (state) in
-                                    if state == .success {
-                                        print("绑定完成")
-                                        self.view.makeToast("绑定完成", duration: TimeInterval(4), position: .center)
-                                    }
-                                } onError: { (error) in
-                                    print("bind device error 2: \(error)")
-                                }
-                                .disposed(by: self.bag)
-                        }
                     }
                 default:
                     print("绑定失败: \(e)")
@@ -100,7 +88,7 @@ class Ls02BindAndUnBindVc: UIViewController, Storyboardable {
     }
     
     func bindObserver() {
-        guard let obser = BleOperator.shared.dataObserver else {
+        guard let obser = BleHandler.shared.dataObserver else {
             return
         }
         obser.subscribe { (p) in

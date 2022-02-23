@@ -18,7 +18,10 @@ public enum NFCError: Error {
 
 public typealias ExcuteResult = (index: Int, excuteResult: String)
 
-
 public enum NFCService: UInt32 {
     case None = 0x00, Card, CardOn, CardOff, Charge, CardAndCharge, Emigration, ExitCard, DeleteCard, Unbind, Blance, Refund, UseRecords, CityList, SwitchCard
+}
+
+public protocol Command {
+    func execute()
 }

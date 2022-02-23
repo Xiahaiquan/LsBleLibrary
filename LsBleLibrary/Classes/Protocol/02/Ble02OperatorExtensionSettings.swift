@@ -14,13 +14,14 @@ extension Ble02Operator {
     /**
      单位设置 和 12 & 24 显示
      */
-    public func setUnitFormat(unit: Ls02Units, date: Ls02TimeFormat) -> Observable<Bool> {
+    public func setUnitFormat(unit: DeviceUnitsFormat, date: DeviceTimeFormat) -> Observable<Bool> {
         let setCmd: [UInt8] = [LS02CommandType.setClockAndDistanceFormat.rawValue, UInt8(unit.rawValue), UInt8(date.rawValue)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, LS02CommandType.setClockAndDistanceFormat.name, 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setClockAndDistanceFormat.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
+                    subscriber.onCompleted()
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -29,11 +30,11 @@ extension Ble02Operator {
         }
     }
     
-    public func setDateFormat(unit: Ls02Units, date: Ls02TimeFormat) -> Observable<Bool> {
+    public func setDateFormat(unit: DeviceUnitsFormat, date: DeviceTimeFormat) -> Observable<Bool> {
         let setCmd: [UInt8] = [LS02CommandType.setClockAndDistanceFormat.rawValue, UInt8(unit.rawValue), UInt8(date.rawValue)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, LS02CommandType.setClockAndDistanceFormat.name, 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setClockAndDistanceFormat.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -61,7 +62,7 @@ extension Ble02Operator {
                                 timeZone]
         let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, LS02CommandType.setDateAndTime.name, 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setDateAndTime.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -79,7 +80,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.requestBluetoothAddress.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "getMacAddress", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.requestBluetoothAddress.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         return
@@ -103,7 +104,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.getVersionNum.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "getDeviceVersion", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.getVersionNum.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -123,11 +124,11 @@ extension Ble02Operator {
     /**
      查询手环端快捷开关设置支持类型
      */
-    public func requestQuickFunctionSetting() -> Observable<Ls02sShortcutSwitchsProtocol> {
+    public func requestQuickFunctionSetting() -> Observable<Ls02sShortcutSwitchsOpenStatus> {
         let getCmd: [UInt8] = [LS02CommandType.requestFunctionSetAndStatus.rawValue,LS02Placeholder.one.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, LS02CommandType.requestFunctionSetAndStatus.name , 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.requestFunctionSetAndStatus.name , 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -138,7 +139,7 @@ extension Ble02Operator {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
                         return
                     }
-                
+                    
                     subscriber.onNext(switchs)
                 } onError: { (error) in
                     subscriber.onError(error)
@@ -155,7 +156,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.requestFunctionSetAndStatus.rawValue,LS02Placeholder.two.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, LS02CommandType.requestFunctionSetAndStatus.name, 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.requestFunctionSetAndStatus.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -176,17 +177,17 @@ extension Ble02Operator {
     /**
      获取设备电量
      */
-    public func getDeviceBattery() -> Observable<UInt8> {
+    public func getBattery() -> Observable<UInt32> {
         let getCmd: [UInt8] = [LS02CommandType.getBatteryLevel.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "getDeviceVersion", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.getBatteryLevel.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
                         return
                     }
-                    subscriber.onNext(data.last!)
+                    subscriber.onNext(UInt32(data.last ?? 0))
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -202,7 +203,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.requestRealtimeSteps.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "requestRealtimeSteps", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.requestRealtimeSteps.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -224,7 +225,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.requestRealtimeHeartRate.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "requestRealtimeHeartRate", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.requestRealtimeHeartRate.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -243,7 +244,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.historyHeartRateData.rawValue, settings.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "requestRealtimeHeartRate", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.historyHeartRateData.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1, [UInt8](data).count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -251,7 +252,7 @@ extension Ble02Operator {
                     }
                     
                     subscriber.onNext([UInt8](data)[1] == settings.rawValue)
-    
+                    
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -264,7 +265,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.multiSport.rawValue, LS02Placeholder.aa.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, LS02CommandType.multiSport.name, 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.multiSport.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -283,7 +284,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.setCameraMode.rawValue, mode.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "setCameraMode", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.setCameraMode.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -298,19 +299,22 @@ extension Ble02Operator {
         }
     }
     
-    public func getAlarmsSupportNum() -> Observable<UInt8> {
+    public func getAlarmsMaxSupportNum() -> Observable<UInt8> {
         let getCmd: [UInt8] = [LS02CommandType.supportAlarmsNum.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "getAlarmsSupportNum", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.supportAlarmsNum.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
                         return
                     }
                     subscriber.onNext(data.last!)
+                    subscriber.onCompleted()
                 } onError: { (error) in
-                    subscriber.onError(error)
+//                    subscriber.onError(error)
+                    subscriber.onNext(3)
+                    subscriber.onCompleted()
                 }
                 .disposed(by: self.bag)
             return Disposables.create()
@@ -320,22 +324,26 @@ extension Ble02Operator {
     /**
      久坐提醒
      */
-    public func setLongSitNotification(enable:Ls02Switch, targetTime:UInt8, startHour: UInt8, startMin: UInt8, endHour: UInt8, endMin: UInt8, donotDistrubAtNoon: Ls02Switch) -> Observable<Bool> {
+    public func setLongSitNotification(enable:DeviceSwitch, startTime: String, endTime: String, nodStartTime: String, nodEndTime: String, donotDistrubAtNoon: DeviceSwitch, longsitDuration: UInt8) -> Observable<Bool> {
+        
+        let startTimeValue = Ble05sSendDataConfig.shared.handle(value: startTime)
+        let endTimeValue = Ble05sSendDataConfig.shared.handle(value: endTime)
+        
         let syncCmd: [UInt8] = [LS02CommandType.setLongSitNotification.rawValue,
                                 enable.rawValue,
-                                targetTime,
+                                longsitDuration,
                                 LS02Placeholder.two.rawValue,
                                 LS02Placeholder.five.rawValue,
                                 LS02Placeholder.zero.rawValue,
                                 LS02Placeholder.zero.rawValue,
-                                startHour,
-                                startMin,
-                                endHour,
-                                endMin,
+                                startTimeValue.hour,
+                                startTimeValue.min,
+                                endTimeValue.hour,
+                                endTimeValue.min,
                                 donotDistrubAtNoon.rawValue]
         let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "setLongSitNotification", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setLongSitNotification.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -359,7 +367,41 @@ extension Ble02Operator {
                                 enable == true ? 0x01 : 0x00]
         let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "setNoDisturbanceMode", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setNoDisturbanceMode.name, 3, nil)
+                .subscribe { (bleResponse) in
+                    subscriber.onNext(true)
+                } onError: { (error) in
+                    subscriber.onError(error)
+                }
+                .disposed(by: self.bag)
+            return Disposables.create()
+        }
+    }
+    
+    public func raiseWristBrightenScreen(height: Int, weight: Int, brightScreen: UInt8, raiseSwitch: DeviceSwitch, stepGoal: Int,  maxHrAlert: UInt8, minHrAlert: UInt8, age: UInt8,  gender: LsGender,  lostAlert: DeviceSwitch,  language: UTEDeviceLanguageEnum, temperatureUnit: Ls02TemperatureUnit,switchConfigValue: UInt64) -> Observable<Bool> {
+        let syncCmd: [UInt8] = [LS02CommandType.setWatch.rawValue,
+                                UInt8(((height>>8)&0xFF)),
+                                UInt8(height&0xFF),
+                                UInt8(((weight>>8)&0xFF)),
+                                UInt8(weight&0xFF),
+                                brightScreen,
+                                UInt8((stepGoal >> 24) & 0xFF),
+                                UInt8((stepGoal >> 16) & 0xFF),
+                                UInt8((stepGoal >> 8) & 0xFF),
+                                UInt8(stepGoal & 0xFF),
+                                UInt8(raiseSwitch.rawValue),
+                                maxHrAlert,
+                                0x00, //这个是保留位
+                                age,
+                                UInt8(gender.rawValue),
+                                UInt8(lostAlert.rawValue),
+                                UInt8(language.rawValue),
+                                UInt8(temperatureUnit.rawValue),
+                                minHrAlert]
+        
+        let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
+        return Observable.create { (subscriber) -> Disposable in
+            self.bleFacade?.write(setData, 0,LS02CommandType.setWatch.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -375,7 +417,7 @@ extension Ble02Operator {
         let getCmd: [UInt8] = [LS02CommandType.phoneControlPowerOff.rawValue, LS02Placeholder.eleven.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "phoneControlPowerOff", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.phoneControlPowerOff.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -390,11 +432,11 @@ extension Ble02Operator {
         }
     }
     
-    public func configFoundTelephone(enable: Ls02Switch) -> Observable<UInt8> {
+    public func configFoundTelephone(enable: DeviceSwitch) -> Observable<UInt8> {
         let getCmd: [UInt8] = [LS02CommandType.watchBtnFunction.rawValue, LS02Placeholder.a.rawValue, enable.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "configFoundTelephone", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.watchBtnFunction.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -409,11 +451,11 @@ extension Ble02Operator {
         }
     }
     
-    public func supportMultiLanguageDisplay(code: UInt8) -> Observable<UInt8> {
-        let getCmd: [UInt8] = [LS02CommandType.supportMultiLanguageDisplay.rawValue, LS02Placeholder.ab.rawValue,code]
+    public func setLanguageToUTE(code: UTEDeviceLanguageEnum) -> Observable<UInt8> {
+        let getCmd: [UInt8] = [LS02CommandType.supportMultiLanguageDisplay.rawValue, LS02Placeholder.ab.rawValue, code.rawValue]
         let getData = Data.init(bytes: getCmd, count: getCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(getData, "supportMultiLanguageDisplay", 3, nil)
+            self.bleFacade?.write(getData, 0,LS02CommandType.supportMultiLanguageDisplay.name, 3, nil)
                 .subscribe { (bleResponse) in
                     guard let datas = bleResponse.datas, let data = datas.first, data.count > 1 else {
                         subscriber.onError(BleError.error("设备返回数据缺失"))
@@ -445,10 +487,10 @@ extension Ble02Operator {
      temperatureUnit： 温度单位设置
      */
     
-    public func setDeviceParameter(_ height: Int, _ weight: Int, _ brightScreen: UInt8, _ stepGoal: Int, _ raiseSwitch: Ls02Switch, _ maxHrAlert: UInt8, _ minHrAlert: UInt8, _ age: UInt8, _ gender: Ls02Gender, _ lostAlert: Ls02Switch, _ language: Ls02Language, _ temperatureUnit: Ls02TemperatureUnit) -> Observable<Bool> {
+    public func syncUserInfoToUTE( height: Int,  weight: Int,  brightScreen: UInt8,  stepGoal: Int,  raiseSwitch: DeviceSwitch,  maxHrAlert: UInt8,  minHrAlert: UInt8,  age: UInt8,  gender: LsGender,  lostAlert: DeviceSwitch,  language: UTEDeviceLanguageEnum,  temperatureUnit: Ls02TemperatureUnit) -> Observable<Bool> {
         
         
-        let syncCmd: [UInt8] = [0x05,
+        let syncCmd: [UInt8] = [LS02CommandType.setWatch.rawValue,
                                 UInt8(((height>>8)&0xFF)),
                                 UInt8(height&0xFF),
                                 UInt8(((weight>>8)&0xFF)),
@@ -470,9 +512,10 @@ extension Ble02Operator {
         
         let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "getDeviceVersion", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setWatch.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
+                    subscriber.onCompleted()
                 } onError: { (error) in
                     subscriber.onError(error)
                 }
@@ -480,45 +523,64 @@ extension Ble02Operator {
             return Disposables.create()
         }
     }
-    
+
     /**
      部分参数。02设备不支持
      */
-    public func setReminder(_ reminder: (index: Int, hour: Int, min: Int, period: UInt8, state: Bool)) -> Observable<Bool> {
+    
+    public func configureAlarmReminder(alarms: [AlarmModel]) ->Observable<Bool> {
+        
         // 第五字节: 0x02 震动频率。2 秒震动 2 秒停止
         // 第六字节: 0x08 震动周期数， 8个 震动频率
         // 第七字节：有多盏灯的设备， 可以指定灯亮的设备， 0x01 : 第一盏灯， 0x02: 第二盏灯， 0x04: 第三盏灯， 0x06 表示： 第二盏和第三盏
         // 第八字节：灯状态，0x00 表示跟震动屏幕一样闪烁，  0x01 表示震动周期 长亮。
-        let frequencyRate: UInt8 = reminder.state ? 0x02 : 0x00
-        let period: UInt8 = reminder.state ? 0x08 : 0x00
-        let lightIndex: UInt8 = reminder.state ? 0x06 : 0x00
         
-        let syncCmd: [UInt8] = [0x06, UInt8(reminder.period), UInt8(reminder.hour), UInt8(reminder.min), frequencyRate, period, lightIndex, 0x00, UInt8(reminder.index)]
-        let setData = Data.init(bytes: syncCmd, count: syncCmd.count)
-        return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "getDeviceVersion", 3, nil)
-                .subscribe { (bleResponse) in
-                    subscriber.onNext(true)
-                } onError: { (error) in
-                    subscriber.onError(error)
-                }
-                .disposed(by: self.bag)
-            return Disposables.create()
+        let datas = alarms.map { model -> Data in
+            let repeatDays: UInt8 = model.enable ? UInt8(model.cfg) : 0x60
+            let frequencyRate: UInt8 = model.enable ? 0x02 : 0x00
+            let period: UInt8 = model.enable ? 0x08 : 0x00
+            let lightIndex: UInt8 = model.enable ? 0x06 : 0x00
+            
+            let syncCmd: [UInt8] = [LS02CommandType.setTimerAndMotorParams.rawValue,
+                                    repeatDays,
+                                    UInt8(model.hour),
+                                    UInt8(model.min),
+                                    frequencyRate,
+                                    period,
+                                    lightIndex,
+                                    0x00,
+                                    UInt8(model.index + 1)] ////第几个闹钟，从1开始
+            return Data.init(bytes: syncCmd, count: syncCmd.count)
         }
+        //06600A170000000000
+        // 063E0A2E0208060000
+        //06 3E 0A 2E 02 08 06 00 00
+        print("alarms data:", datas)
+        return Observable.from(datas).flatMap { data in
+            return self.bleFacade!.write(data, 0,LS02CommandType.setTimerAndMotorParams.name, 3, nil)
+        }
+        .flatMap({ (bleResponse) in
+            return Observable.create { observer in
+                observer.onNext(true)
+                observer.onCompleted()
+                return Disposables.create()
+            }
+        })
+        
     }
     
     /**
      设置 ANCC 推送开关
      */
-    public func setANCCItemSwitch(_ item: Ls02ANCCItem, _ itemSwitch: Ls02ANCCSwitch) -> Observable<Bool> {
+    public func setANCCItemSwitch(_ item: LsANCSItem, _ itemSwitch: LsANCSSwitch,switchConfigValue: UInt64) -> Observable<Bool> {
         let item1 = UInt8((item.rawValue&0xFF))
         let item2 = UInt8(((item.rawValue>>8)&0xFF))
         let item3 = UInt8(((item.rawValue>>16)&0xFF))
         let item4 = UInt8(((item.rawValue>>24)&0xFF))
-        let setCmd: [UInt8] = [LS02CommandType.configPushNotification.rawValue, item1, item2, item3, item4, UInt8(itemSwitch.rawValue)]
+        let setCmd: [UInt8] = [LS02CommandType.configPushNotification.rawValue, UInt8(itemSwitch.rawValue),item1, item2, item3, item4]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, LS02CommandType.configPushNotification.name, 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.configPushNotification.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -533,14 +595,14 @@ extension Ble02Operator {
     /**
      久坐提醒设置开关
      */
-    public func setSedentary(_ sswitch: Ls02Switch, _ interval: UInt8, _ startHour: UInt8, _ startMin: UInt8, _ endHour: UInt8, _ endMin: UInt8, _ noNap: Ls02SwitchReverse) -> Observable<Bool> {
+    public func setSedentary(_ sswitch: DeviceSwitch, _ interval: UInt8, _ startHour: UInt8, _ startMin: UInt8, _ endHour: UInt8, _ endMin: UInt8, _ noNap: Ls02SwitchReverse) -> Observable<Bool> {
         let setCmd: [UInt8] = [LS02CommandType.setLongSitNotification.rawValue,
                                UInt8(sswitch.rawValue), interval,
                                0x02, 0x05, 0x00, 0x00, //这4个字节表示马达震动的指令
                                startHour, startMin, endHour, endMin, UInt8(noNap.rawValue)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "setSedentary", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setLongSitNotification.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -555,7 +617,7 @@ extension Ble02Operator {
     /**
      设置勿扰模式
      */
-    public func setNotDisturb(_ sswitch: Ls02Switch, _ startHour: UInt8, _ startMin: UInt8, _ endHour: UInt8, _ endMin: UInt8, _ subSwitch: (screen: Bool, shock: Bool, message: Bool, call: Bool)) -> Observable<Bool> {
+    public func setNotDisturb(_ sswitch: DeviceSwitch, _ startHour: UInt8, _ startMin: UInt8, _ endHour: UInt8, _ endMin: UInt8, _ subSwitch: (screen: Bool, shock: Bool, message: Bool, call: Bool)) -> Observable<Bool> {
         
         var value: UInt8 = 0
         
@@ -575,7 +637,7 @@ extension Ble02Operator {
         let setCmd: [UInt8] = [LS02CommandType.setNoDisturbanceMode.rawValue, value, startHour, startMin, endHour, endMin, UInt8(sswitch.rawValue)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "setNotDisturb", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.setNoDisturbanceMode.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in
@@ -592,7 +654,7 @@ extension Ble02Operator {
                                UInt8(mode.rawValue & 0x00ff)]
         let setData = Data.init(bytes: setCmd, count: setCmd.count)
         return Observable.create { (subscriber) -> Disposable in
-            self.bleFacade?.write(setData, "setSedentary", 3, nil)
+            self.bleFacade?.write(setData, 0,LS02CommandType.enterFactoryTest.name, 3, nil)
                 .subscribe { (bleResponse) in
                     subscriber.onNext(true)
                 } onError: { (error) in

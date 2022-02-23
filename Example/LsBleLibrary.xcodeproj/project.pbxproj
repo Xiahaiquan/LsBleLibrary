@@ -39,6 +39,7 @@
 		A90583A2275602E000EA0A58 /* RTKLEFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A905839E275602D400EA0A58 /* RTKLEFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A90583A4275602E200EA0A58 /* RTKOTASDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A905839D275602D400EA0A58 /* RTKOTASDK.framework */; };
 		A90583A5275602E200EA0A58 /* RTKOTASDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A905839D275602D400EA0A58 /* RTKOTASDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A91C092827C634E700584A59 /* LsBinTransferManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A91C092727C634E700584A59 /* LsBinTransferManage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -95,6 +96,7 @@
 		A905837F2756008C00EA0A58 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A905839D275602D400EA0A58 /* RTKOTASDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RTKOTASDK.framework; sourceTree = "<group>"; };
 		A905839E275602D400EA0A58 /* RTKLEFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RTKLEFoundation.framework; sourceTree = "<group>"; };
+		A91C092727C634E700584A59 /* LsBinTransferManage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LsBinTransferManage.swift; sourceTree = "<group>"; };
 		DFE5EF80CF154DA9EC332989 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		E2D246664F00F48BC7C24953 /* Pods-LsBleLibrary_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LsBleLibrary_Tests.release.xcconfig"; path = "Target Support Files/Pods-LsBleLibrary_Tests/Pods-LsBleLibrary_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -208,6 +210,7 @@
 		A90583662756008C00EA0A58 /* FuncTest */ = {
 			isa = PBXGroup;
 			children = (
+				A91C092727C634E700584A59 /* LsBinTransferManage.swift */,
 				A90583672756008C00EA0A58 /* ls02 */,
 				A90583772756008C00EA0A58 /* ls05s */,
 			);
@@ -437,6 +440,7 @@
 				A90583912756008C00EA0A58 /* Ls02HeartrateViewController.swift in Sources */,
 				A90583902756008C00EA0A58 /* LsSportsModelViewController.swift in Sources */,
 				A90583962756008C00EA0A58 /* Ls02SetViewController.swift in Sources */,
+				A91C092827C634E700584A59 /* LsBinTransferManage.swift in Sources */,
 				A90583952756008C00EA0A58 /* Ls02BindAndUnBindVc.swift in Sources */,
 				A90583982756008C00EA0A58 /* LSItemFuncTestViewModel.swift in Sources */,
 				A905838F2756008C00EA0A58 /* Ls02WeatherViewController.swift in Sources */,
