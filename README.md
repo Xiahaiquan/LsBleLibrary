@@ -38,21 +38,21 @@ BleFacade.shared.configDeviceInfo(BleScanDeviceConfig(
 
 ### Search
 ```swift
-        BleFacade.shared.scaner
-            .scan(duration: 5)
-            .subscribe(onNext: { (state, response) in
-                if state == .nomal {
-                    print("Peripherals searched")
-                    let devices = response?.filter({ $0.peripheral.name != nil })
-                    self.dataSource.append(contentsOf: devices)
-                    self.tableView.reloadData()
-                } else if (state == .end) {
-                    print("scan stop")
-                }
-            }, onError: { error in
-                print("\(error)")
-            })
-            .disposed(by: bag)
+BleFacade.shared.scaner
+    .scan(duration: 5)
+    .subscribe(onNext: { (state, response) in
+        if state == .nomal {
+            print("Peripherals searched")
+            let devices = response?.filter({ $0.peripheral.name != nil })
+            self.dataSource.append(contentsOf: devices)
+            self.tableView.reloadData()
+        } else if (state == .end) {
+            print("scan stop")
+        }
+    }, onError: { error in
+        print("\(error)")
+    })
+    .disposed(by: bag)
 ```
 ### Connect
 ```swift
