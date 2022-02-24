@@ -1,7 +1,7 @@
 # LsBleLibrary
  A library that encapsulates the system bluetooth, which can communicate with bluetooth using raw byte streams and Google Protocol Buffer(PB) format.
 
-### Installation 安装
+### Installation 
 
 [CocoaPods](https://guides.cocoapods.org/using/using-cocoapods.html):
 
@@ -25,12 +25,10 @@ pod 'LsBleLibrary'
             )
         }
         
-        // 配置扫描和连接实现
         //Conifg scan and connect 
         BleFacade.shared.configBuider(scanBuilder, connectBuilder)
         
-        //要扫描什么类型的设备
-        //
+        //Configure what type of device to scan
         BleFacade.shared.configDeviceInfo(BleScanDeviceConfig(
             services: nil,
             deviceCategory: [.Watch],
@@ -44,12 +42,12 @@ pod 'LsBleLibrary'
             .scan(duration: 5)
             .subscribe(onNext: { (state, response) in
                 if state == .nomal {
-                    print("已搜索出外设")
+                    print("Peripherals searched")
                     let devices = response?.filter({ $0.peripheral.name != nil })
                     self.dataSource.append(contentsOf: devices)
                     self.tableView.reloadData()
                 } else if (state == .end) {
-                    print("扫描结束")
+                    print("scan stop")
                 }
             }, onError: { error in
                 print("\(error)")
@@ -61,17 +59,17 @@ pod 'LsBleLibrary'
                BleFacade.shared.connecter.connect(duration: 5)
             .subscribe(onNext: { (state, response) in
                 if state == .connectSuccessed {
-                    print("已连接等待扫描服务及特征")
+                    print("Connected waiting to scan for services and characteristics")
                     BleFacade.shared.bleDevice?.peripheral = response?.peripheral
                 } else if (state == .dicoverChar) {
                     BleFacade.shared.bleDevice?.updateCharacteristic(characteristic: response?.characteristics, statusCallback: nil)
                     if ((BleFacade.shared.bleDevice?.connected) != nil) {
                         BleFacade.shared.connecter.finish()
                     }
-                    print("发现了特征值")
+                    print("characteristic found")
                 } else if (state == .timeOut) {
-                    print("连接超时，未找到配置信息指定设备")
-                    self.view.makeToast("连接超时, 请重试")
+                    print("connect timeout")
+                    self.view.makeToast("connect timeout")
                 }
             }, onError: { error in
                 print("\(error)")
@@ -96,8 +94,8 @@ pod 'LsBleLibrary'
                 let weather = LSWeather.init(timestamp: 1641571200,
                                          city: "shenzhen",
                                          air: 0,
-                                         weaDesc: "晴",
-                                         airDesc: "优",
+                                         weaDesc: "sunny",
+                                         airDesc: "good",
                                          humidity: 1,
                                          uvIndex: 2,
                                          currTem: 3,
