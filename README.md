@@ -127,7 +127,7 @@ pod 'LsBleLibrary'
             }.disposed(by: bag)
 ```
 
-## Release History 版本历史
+## Release History 
 
 * 0.2.1
     * CHANGE: Update docs
@@ -136,10 +136,11 @@ pod 'LsBleLibrary'
 * 0.1.0
     * Work in progress
 
-## Authors 关于作者
+## Authors 
 
 [Haiquan](https://xiahaiquan.github.io/)
 
-## License 授权协议
+## License 
 
-这个项目 MIT 协议， 请点击 [LICENSE.md](https://github.com/Xiahaiquan/LsBleLibrary/blob/main/LICENSE) 了解更多细节。
+This project is under the MIT license, please click [LICENSE.md](https://github.com/Xiahaiquan/LsBleLibrary/blob/main/LICENSE) for more details.
+
