@@ -8,7 +8,7 @@
 ```sh
 pod 'LsBleLibrary'
 ```
-## How use ble lib
+## How use the ble lib
 
 ### Config lib
 ```swift
@@ -77,7 +77,7 @@ pod 'LsBleLibrary'
             .disposed(by: bag)
 ```
 
-## How to use ble handler
+## How to use the ble handler
 
 ### Get data from device
 
