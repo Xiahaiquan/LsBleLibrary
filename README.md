@@ -56,25 +56,25 @@ BleFacade.shared.scaner
 ```
 ### Connect
 ```swift
-               BleFacade.shared.connecter.connect(duration: 5)
-            .subscribe(onNext: { (state, response) in
-                if state == .connectSuccessed {
-                    print("Connected waiting to scan for services and characteristics")
-                    BleFacade.shared.bleDevice?.peripheral = response?.peripheral
-                } else if (state == .dicoverChar) {
-                    BleFacade.shared.bleDevice?.updateCharacteristic(characteristic: response?.characteristics, statusCallback: nil)
-                    if ((BleFacade.shared.bleDevice?.connected) != nil) {
-                        BleFacade.shared.connecter.finish()
-                    }
-                    print("characteristic found")
-                } else if (state == .timeOut) {
-                    print("connect timeout")
-                    self.view.makeToast("connect timeout")
+BleFacade.shared.connecter.connect(duration: 5)
+    .subscribe(onNext: { (state, response) in
+        if state == .connectSuccessed {
+            print("Connected waiting to scan for services and characteristics")
+            BleFacade.shared.bleDevice?.peripheral = response?.peripheral
+        } else if (state == .dicoverChar) {
+            BleFacade.shared.bleDevice?.updateCharacteristic(characteristic: response?.characteristics, statusCallback: nil)
+                if ((BleFacade.shared.bleDevice?.connected) != nil) {
+                    BleFacade.shared.connecter.finish()
                 }
-            }, onError: { error in
-                print("\(error)")
-            })
-            .disposed(by: bag)
+                print("characteristic found")
+            } else if (state == .timeOut) {
+                print("connect timeout")
+                self.view.makeToast("connect timeout")
+            }
+        }, onError: { error in
+            print("\(error)")
+    })
+    .disposed(by: bag)
 ```
 
 ## How to use the ble handler
@@ -82,49 +82,50 @@ BleFacade.shared.scaner
 ### Get data from device
 
 ```swift
-            BleHandler.shared.getmtu().subscribe { (mtu) in
-                print(mtu, "back mtu")
-            } onError: { (err) in
-                print(err)
-            }.disposed(by: bag)
+BleHandler.shared.getmtu().subscribe { (mtu) in
+    print(mtu, "back mtu")
+} onError: { (err) in
+    print(err)
+}.disposed(by: bag)
 ```
 
 ### Set data to device
 ```swift
-                let weather = LSWeather.init(timestamp: 1641571200,
-                                         city: "shenzhen",
-                                         air: 0,
-                                         weaDesc: "sunny",
-                                         airDesc: "good",
-                                         humidity: 1,
-                                         uvIndex: 2,
-                                         currTem: 3,
-                                         highTem: 4,
-                                         lowTem: 5,
-                                         wea: 6,
-                                         airLevel: 7,
-                                         pm25: 8,
-                                         weatherState: .sunny)
-            BleHandler.shared.setWeatherData([weather]).subscribe { value in
-                print("set the weather successfully", value)
-            } onError: { error in
-                print("设置天气失败", error)
-            }.disposed(by: bag)
+let weather = LSWeather.init(timestamp: 1641571200,
+                                    city: "shenzhen",
+                                    air: 0,
+                                    weaDesc: "sunny",
+                                    airDesc: "good",
+                                    humidity: 1,
+                                    uvIndex: 2,
+                                    currTem: 3,
+                                    highTem: 4,
+                                    lowTem: 5,
+                                    wea: 6,
+                                    airLevel: 7,
+                                    pm25: 8,
+                                    weatherState: .sunny)
+
+BleHandler.shared.setWeatherData([weather]).subscribe { value in
+    print("set the weather successfully", value)
+} onError: { error in
+    print("设置天气失败", error)
+}.disposed(by: bag)
   ```
   
 ### Monitor  device data update
 
 ```swift
-        BleHandler.shared.dataObserver?.filter({ arg in
-            return arg.type == .electricityUpdate
-        })
-            .subscribe { value in
-                if let power = value.data as? UInt32 {
-                    print("Current battery:",power)
-                }
-            } onError: {  error in
-                print(error)
-            }.disposed(by: bag)
+BleHandler.shared.dataObserver?.filter({ arg in
+    return arg.type == .electricityUpdate
+})
+    .subscribe { value in
+        if let power = value.data as? UInt32 {
+            print("Current battery:",power)
+        }
+    } onError: {  error in
+        print(error)
+    }.disposed(by: bag)
 ```
 
 ## Release History 
