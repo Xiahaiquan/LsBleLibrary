@@ -12,28 +12,28 @@ pod 'LsBleLibrary'
 
 ### Config lib
 ```swift
-        // Scan buileder
-        let scanBuilder: BluetoothScanable.ScanBuilder = {
-            BluetoothScan(centralManager: $0.centralManager, scanInfo: $0.scanInfo)
-        }
-        //Connect buileder
-        let connectBuilder: BluetoothConnectable.ConnectBuilder = {
-            BluetoothConnect(
-                centralManager: $0.centralManager,
-                connectInfo: $0.connectInfo,
-                scaner: $0.scaner
-            )
-        }
+// Scan buileder
+let scanBuilder: BluetoothScanable.ScanBuilder = {
+    BluetoothScan(centralManager: $0.centralManager, scanInfo: $0.scanInfo)
+}
+//Connect buileder
+let connectBuilder: BluetoothConnectable.ConnectBuilder = {
+    BluetoothConnect(
+        centralManager: $0.centralManager,
+        connectInfo: $0.connectInfo,
+        scaner: $0.scaner
+    )
+}
         
-        //Conifg scan and connect 
-        BleFacade.shared.configBuider(scanBuilder, connectBuilder)
+//Conifg scan and connect 
+BleFacade.shared.configBuider(scanBuilder, connectBuilder)
         
-        //Configure what type of device to scan
-        BleFacade.shared.configDeviceInfo(BleScanDeviceConfig(
-            services: nil,
-            deviceCategory: [.Watch],
-            deviceType: [.LS04,.LS05, .LS05S, .LS09A, .LS09B, .LS10, .LS11]
-        ))
+//Configure what type of device to scan
+BleFacade.shared.configDeviceInfo(BleScanDeviceConfig(
+    services: nil,
+    deviceCategory: [.Watch],
+    deviceType: [.LS04,.LS05, .LS05S, .LS09A, .LS09B, .LS10, .LS11]
+))
  ```
 
 ### Search
