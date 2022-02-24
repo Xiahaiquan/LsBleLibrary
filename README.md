@@ -106,7 +106,7 @@ pod 'LsBleLibrary'
                                          pm25: 8,
                                          weatherState: .sunny)
             BleHandler.shared.setWeatherData([weather]).subscribe { value in
-                print("设置天气成功", value)
+                print("set the weather successfully", value)
             } onError: { error in
                 print("设置天气失败", error)
             }.disposed(by: bag)
@@ -120,7 +120,7 @@ pod 'LsBleLibrary'
         })
             .subscribe { value in
                 if let power = value.data as? UInt32 {
-                    print("当前电量:",power)
+                    print("Current battery:",power)
                 }
             } onError: {  error in
                 print(error)
