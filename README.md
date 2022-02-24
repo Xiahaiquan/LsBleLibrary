@@ -1,5 +1,5 @@
 # LsBleLibrary
- 封装系统蓝牙，可使用原始字节流和pb格式与蓝牙通信的库。
+ A library that encapsulates the system bluetooth, which can communicate with bluetooth using raw byte streams and Google Protocol Buffer(PB) format.
 
 ### Installation 安装
 
@@ -12,10 +12,11 @@ pod 'LsBleLibrary'
 
 ### Config lib
 ```swift
-        // 扫描 和 连接 的具体实现
+        // Scan buileder
         let scanBuilder: BluetoothScanable.ScanBuilder = {
             BluetoothScan(centralManager: $0.centralManager, scanInfo: $0.scanInfo)
         }
+        //Connect buileder
         let connectBuilder: BluetoothConnectable.ConnectBuilder = {
             BluetoothConnect(
                 centralManager: $0.centralManager,
@@ -25,9 +26,11 @@ pod 'LsBleLibrary'
         }
         
         // 配置扫描和连接实现
+        //Conifg scan and connect 
         BleFacade.shared.configBuider(scanBuilder, connectBuilder)
         
         //要扫描什么类型的设备
+        //
         BleFacade.shared.configDeviceInfo(BleScanDeviceConfig(
             services: nil,
             deviceCategory: [.Watch],
